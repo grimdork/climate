@@ -66,12 +66,72 @@ func (opt *Options) GetPosStringSlice(placeholder string) []string {
 	}
 
 	if o.Value == nil {
-		if o.Default != nil {
-			return o.Default.([]string)
-		}
-
-		return nil
+		return o.Default.([]string)
 	}
 
 	return o.Value.([]string)
+}
+
+// GetPosInt returns a positional int's value.
+func (opt *Options) GetPosInt(placeholder string) int {
+	o := opt.posmap[placeholder]
+	if o == nil {
+		return 0
+	}
+
+	if o.Value == nil {
+		if o.Default != nil {
+			return o.Default.(int)
+		}
+
+		return 0
+	}
+
+	return o.Value.(int)
+}
+
+// GetPosIntSlice returns a positional int slice's values.
+func (opt *Options) GetPosIntSlice(placeholder string) []int {
+	o := opt.posmap[placeholder]
+	if o == nil {
+		return nil
+	}
+
+	if o.Value == nil {
+		return o.Default.([]int)
+	}
+
+	return o.Value.([]int)
+}
+
+// GetPosFloat returns a positional float's value.
+func (opt *Options) GetPosFloat(placeholder string) float64 {
+	o := opt.posmap[placeholder]
+	if o == nil {
+		return 0
+	}
+
+	if o.Value == nil {
+		if o.Default != nil {
+			return o.Default.(float64)
+		}
+
+		return 0
+	}
+
+	return o.Value.(float64)
+}
+
+// GetPosFloatSlice returns a positional float slice's values.
+func (opt *Options) GetPosFloatSlice(placeholder string) []float64 {
+	o := opt.posmap[placeholder]
+	if o == nil {
+		return nil
+	}
+
+	if o.Value == nil {
+		return o.Default.([]float64)
+	}
+
+	return o.Value.([]float64)
 }

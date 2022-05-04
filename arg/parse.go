@@ -327,6 +327,19 @@ func (opt *Options) ParseArgs(args []string) error {
 
 				pos[0].Value = v
 
+			case VarIntSlice:
+				if pos[0].Value == nil {
+					pos[0].Value = []int{}
+				}
+
+				v, err := strconv.Atoi(arg)
+				if err != nil {
+					return err
+				}
+
+				pos[0].Value = append(pos[0].Value.([]int), v)
+				continue
+
 			case VarFloat:
 				v, err := strconv.ParseFloat(arg, 64)
 				if err != nil {
@@ -334,6 +347,19 @@ func (opt *Options) ParseArgs(args []string) error {
 				}
 
 				pos[0].Value = v
+
+			case VarFloatSlice:
+				if pos[0].Value == nil {
+					pos[0].Value = []float64{}
+				}
+
+				v, err := strconv.ParseFloat(arg, 64)
+				if err != nil {
+					return err
+				}
+
+				pos[0].Value = append(pos[0].Value.([]float64), v)
+				continue
 			}
 
 			pos = pos[1:]

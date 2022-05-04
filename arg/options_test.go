@@ -275,7 +275,7 @@ func TestPositional(t *testing.T) {
 	}
 }
 
-func TestSPositionalSlice(t *testing.T) {
+func TestPositionalStringSlice(t *testing.T) {
 	opt := sopt.New()
 	err := opt.SetPositional("FILE", "Full file path.", nil, false, sopt.VarStringSlice)
 	if err != nil {
@@ -297,5 +297,55 @@ func TestSPositionalSlice(t *testing.T) {
 		t.Fail()
 	} else {
 		t.Logf("File paths are as expected: %+v", files)
+	}
+}
+
+func TestPositionalIntSlice(t *testing.T) {
+	opt := sopt.New()
+	err := opt.SetPositional("PORT", "Port number.", 3000, false, sopt.VarIntSlice)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	opt.PrintHelp()
+	args := []string{"4000", "5000"}
+	err = opt.ParseArgs(args)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.Fail()
+	}
+
+	ports := opt.GetPosIntSlice("PORT")
+	if len(ports) != 2 {
+		t.Errorf("Expected 2 ports, but got %d", len(ports))
+		t.Fail()
+	} else {
+		t.Logf("Ports are as expected: %+v", ports)
+	}
+}
+
+func TestPositionalFloatSlice(t *testing.T) {
+	opt := sopt.New()
+	err := opt.SetPositional("PI", "Your definition of pi.", 3.14, false, sopt.VarFloatSlice)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	opt.PrintHelp()
+	args := []string{"3.14159", "3.1415926535"}
+	err = opt.ParseArgs(args)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.Fail()
+	}
+
+	pis := opt.GetPosFloatSlice("PI")
+	if len(pis) != 2 {
+		t.Errorf("Expected 2 pis, but got %d", len(pis))
+		t.Fail()
+	} else {
+		t.Logf("Pis are as expected: %+v", pis)
 	}
 }
