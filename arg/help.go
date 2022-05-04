@@ -9,7 +9,7 @@ import (
 
 // SetDefaultHelp sets the default help text.
 func (opt *Options) SetDefaultHelp() {
-	opt.SetOption("", "h", "help", "Print this help message.", nil, false, VarTypeBool, nil)
+	opt.SetOption("", "h", "help", "Print this help message.", nil, false, VarBool, nil)
 	opt.hashelp = true
 }
 
@@ -41,7 +41,7 @@ func (opt *Options) PrintHelp() {
 	if len(opt.positional) > 0 {
 		for _, o := range opt.positional {
 			fmt.Fprintf(w, " [%s]", o.Placeholder)
-			if o.Type == VarTypePosStringSlice {
+			if o.Type == VarStringSlice {
 				fmt.Fprintf(w, "...")
 			}
 		}

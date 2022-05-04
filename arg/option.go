@@ -28,18 +28,18 @@ type Option struct {
 
 // Variable types
 const (
-	// 	VarTypeBool option.
-	VarTypeBool uint8 = iota
-	// 	VarTypeInt option.
-	VarTypeInt
-	// 	VarTypeFloat option.
-	VarTypeFloat
-	// 	VarTypeString option.
-	VarTypeString
-	// VarTypeStringSlice option.
-	VarTypeStringSlice
-	// VarTypePosStringSlice option.
-	VarTypePosStringSlice
+	// 	VarBool option.
+	VarBool uint8 = iota
+	// 	VarInt option.
+	VarInt
+	// VarIntClice option.
+	VarIntClice
+	// 	VarFloat option.
+	VarFloat
+	// 	VarString option.
+	VarString
+	// VarStringSlice option.
+	VarStringSlice
 )
 
 // SetOption sets an option.

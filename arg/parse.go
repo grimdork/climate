@@ -99,7 +99,7 @@ func (opt *Options) ParseArgs(args []string) error {
 			o, ok := opt.long[a[0]]
 			if ok {
 				switch o.Type {
-				case VarTypeBool:
+				case VarBool:
 					t, v := isTruthy(a[1])
 					// We have the form "--option=value"
 					if t {
@@ -120,7 +120,7 @@ func (opt *Options) ParseArgs(args []string) error {
 					// It's a standalone boolean option, so just set it to teue. Phew!
 					o.Value = true
 
-				case VarTypeString:
+				case VarString:
 					if a[1] != "" {
 						o.Value = a[1]
 						continue
@@ -134,7 +134,7 @@ func (opt *Options) ParseArgs(args []string) error {
 
 					return fmt.Errorf("--%s: %w", o.LongName, ErrMissingArgument)
 
-				case VarTypeInt:
+				case VarInt:
 					if a[1] != "" {
 						v, err := strconv.Atoi(a[1])
 						if err != nil {
@@ -158,7 +158,7 @@ func (opt *Options) ParseArgs(args []string) error {
 
 					return fmt.Errorf("--%s: %w", o.LongName, ErrMissingArgument)
 
-				case VarTypeFloat:
+				case VarFloat:
 					if a[1] != "" {
 						v, err := strconv.ParseFloat(a[1], 64)
 						if err != nil {
@@ -206,7 +206,7 @@ func (opt *Options) ParseArgs(args []string) error {
 				o, ok := opt.short[string(c)]
 				if ok {
 					switch o.Type {
-					case VarTypeBool:
+					case VarBool:
 						if a[0] == string(c) && a[1] != "" {
 							_, v := isTruthy(a[1])
 							o.Value = v
@@ -224,7 +224,7 @@ func (opt *Options) ParseArgs(args []string) error {
 
 						o.Value = true
 
-					case VarTypeString:
+					case VarString:
 						if a[0] == string(c) && a[1] != "" {
 							o.Value = a[1]
 							continue
@@ -238,7 +238,7 @@ func (opt *Options) ParseArgs(args []string) error {
 
 						return fmt.Errorf("-%c: %w", c, ErrMissingArgument)
 
-					case VarTypeInt:
+					case VarInt:
 						if a[0] == string(c) && a[1] != "" {
 							v, err := strconv.Atoi(a[1])
 							if err != nil {
@@ -262,7 +262,7 @@ func (opt *Options) ParseArgs(args []string) error {
 
 						return fmt.Errorf("-%c: %w", c, ErrMissingArgument)
 
-					case VarTypeFloat:
+					case VarFloat:
 						if a[0] == string(c) && a[1] != "" {
 							v, err := strconv.ParseFloat(a[1], 64)
 							if err != nil {
@@ -294,9 +294,13 @@ func (opt *Options) ParseArgs(args []string) error {
 			continue
 		} // if short option
 
+		//
+		// Positional arguments
+		//
+
 		if len(pos) > 0 {
 			switch pos[0].Type {
-			case VarTypeBool:
+			case VarBool:
 				t, v := isTruthy(arg)
 				if t {
 					pos[0].Value = v
@@ -304,10 +308,10 @@ func (opt *Options) ParseArgs(args []string) error {
 					pos[0].Value = false
 				}
 
-			case VarTypeString:
+			case VarString:
 				pos[0].Value = arg
 
-			case VarTypePosStringSlice:
+			case VarStringSlice:
 				if pos[0].Value == nil {
 					pos[0].Value = []string{}
 				}
@@ -315,7 +319,7 @@ func (opt *Options) ParseArgs(args []string) error {
 				pos[0].Value = append(pos[0].Value.([]string), arg)
 				continue
 
-			case VarTypeInt:
+			case VarInt:
 				v, err := strconv.Atoi(arg)
 				if err != nil {
 					return err
@@ -323,7 +327,7 @@ func (opt *Options) ParseArgs(args []string) error {
 
 				pos[0].Value = v
 
-			case VarTypeFloat:
+			case VarFloat:
 				v, err := strconv.ParseFloat(arg, 64)
 				if err != nil {
 					return err
@@ -336,10 +340,10 @@ func (opt *Options) ParseArgs(args []string) error {
 			continue
 		}
 
+		// The leftovers go here
 		unknown = append(unknown, arg)
 	}
 
-	// Parse the remaining unknown arguments as positional arguments, if applicable.
 	for _, arg := range unknown {
 		if arg != "" {
 		}

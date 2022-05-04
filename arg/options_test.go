@@ -66,9 +66,9 @@ func TestRemoveLastGroup(t *testing.T) {
 
 func TestSortGroup(t *testing.T) {
 	opt := sopt.New()
-	opt.SetOption("", "v", "verbose", "Show more details in output.", false, false, sopt.VarTypeBool, nil)
-	opt.SetOption("", "f", "file", "Full file path.", "", false, sopt.VarTypeString, nil)
-	opt.SetOption("", "p", "port", "Port number.", 0, false, sopt.VarTypeInt, nil)
+	opt.SetOption("", "v", "verbose", "Show more details in output.", false, false, sopt.VarBool, nil)
+	opt.SetOption("", "f", "file", "Full file path.", "", false, sopt.VarString, nil)
+	opt.SetOption("", "p", "port", "Port number.", 0, false, sopt.VarInt, nil)
 	opt.SetDefaultHelp()
 	g := opt.GetGroup("default")
 	if g == nil {
@@ -96,7 +96,7 @@ func TestSortGroup(t *testing.T) {
 
 func TestAutoGroup(t *testing.T) {
 	opt := sopt.New()
-	opt.SetOption("General", "v", "verbose", "Show more details in output.", false, false, sopt.VarTypeBool, nil)
+	opt.SetOption("General", "v", "verbose", "Show more details in output.", false, false, sopt.VarBool, nil)
 	list := opt.GetGroups()
 	if list[1].Name != "General" {
 		t.Errorf("Expected 'General' group, but got %s", list[1].Name)
@@ -105,7 +105,7 @@ func TestAutoGroup(t *testing.T) {
 }
 
 func TestLongShort(t *testing.T) {
-	err := sopt.New().SetOption("", "verbose", "", "", false, false, sopt.VarTypeBool, nil)
+	err := sopt.New().SetOption("", "verbose", "", "", false, false, sopt.VarBool, nil)
 	if err == nil {
 		t.Errorf("Expected error, but long short worked.")
 		t.Fail()
@@ -115,7 +115,7 @@ func TestLongShort(t *testing.T) {
 }
 
 func TestShortLong(t *testing.T) {
-	err := sopt.New().SetOption("", "", "v", "", false, false, sopt.VarTypeBool, nil)
+	err := sopt.New().SetOption("", "", "v", "", false, false, sopt.VarBool, nil)
 	if err == nil {
 		t.Errorf("Expected error, but short long worked.")
 		t.Fail()
@@ -126,7 +126,7 @@ func TestShortLong(t *testing.T) {
 
 func TestBool(t *testing.T) {
 	opt := sopt.New()
-	err := opt.SetOption("", "v", "verbose", "Show more details in output.", false, false, sopt.VarTypeBool, nil)
+	err := opt.SetOption("", "v", "verbose", "Show more details in output.", false, false, sopt.VarBool, nil)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()
@@ -150,7 +150,7 @@ func TestBool(t *testing.T) {
 
 func TestString(t *testing.T) {
 	opt := sopt.New()
-	err := opt.SetOption("", "f", "file", "Full file path.", nil, false, sopt.VarTypeString, nil)
+	err := opt.SetOption("", "f", "file", "Full file path.", nil, false, sopt.VarString, nil)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.Fail()
@@ -174,7 +174,7 @@ func TestString(t *testing.T) {
 
 func TestInt(t *testing.T) {
 	opt := sopt.New()
-	err := opt.SetOption("", "p", "port", "Port number.", 3000, false, sopt.VarTypeInt, nil)
+	err := opt.SetOption("", "p", "port", "Port number.", 3000, false, sopt.VarInt, nil)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()
@@ -199,7 +199,7 @@ func TestInt(t *testing.T) {
 
 func TestFloat(t *testing.T) {
 	opt := sopt.New()
-	err := opt.SetOption("", "p", "pi", "Your definition of pi.", 3.14, false, sopt.VarTypeFloat, nil)
+	err := opt.SetOption("", "p", "pi", "Your definition of pi.", 3.14, false, sopt.VarFloat, nil)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()
@@ -252,7 +252,7 @@ func TestCommand(t *testing.T) {
 
 func TestPositional(t *testing.T) {
 	opt := sopt.New()
-	err := opt.SetPositional("FILE", "Full file path.", nil, false, sopt.VarTypeString)
+	err := opt.SetPositional("FILE", "Full file path.", nil, false, sopt.VarString)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()
@@ -277,7 +277,7 @@ func TestPositional(t *testing.T) {
 
 func TestSPositionalSlice(t *testing.T) {
 	opt := sopt.New()
-	err := opt.SetPositional("FILE", "Full file path.", nil, false, sopt.VarTypePosStringSlice)
+	err := opt.SetPositional("FILE", "Full file path.", nil, false, sopt.VarStringSlice)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()
