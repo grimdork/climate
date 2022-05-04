@@ -32,10 +32,12 @@ const (
 	VarBool uint8 = iota
 	// 	VarInt option.
 	VarInt
-	// VarIntClice option.
-	VarIntClice
+	// VarIntSlice option.
+	VarIntSlice
 	// 	VarFloat option.
 	VarFloat
+	// 	VarFloatSlice option.
+	VarFloatSlice
 	// 	VarString option.
 	VarString
 	// VarStringSlice option.
