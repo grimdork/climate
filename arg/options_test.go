@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	sopt "github.com/grimdork/cliapp/arg"
+	sopt "github.com/grimdork/climate/arg"
 )
 
 func TestRemoveFirstGroup(t *testing.T) {

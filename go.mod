@@ -1,3 +1,3 @@
-module github.com/grimdork/cliapp
+module github.com/grimdork/climate
 
 go 1.18

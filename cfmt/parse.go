@@ -17,7 +17,7 @@ func Print(s string) {
 
 // Printf with colours uses fmt.Printf().
 func Printf(s string, v ...interface{}) {
-	buf := str.New()
+	buf := str.NewStringer()
 	colour(buf, s)
 	fmt.Printf(buf.String(), v...)
 }
