@@ -3,7 +3,7 @@ package paths_test
 import (
 	"testing"
 
-	"github.com/grimdork/cliapp/paths"
+	"github.com/grimdork/climate/paths"
 )
 
 func TestPaths(t *testing.T) {
