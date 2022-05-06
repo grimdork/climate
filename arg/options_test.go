@@ -134,7 +134,7 @@ func TestBool(t *testing.T) {
 
 	opt.PrintHelp()
 	args := []string{"-v"}
-	err = opt.ParseArgs(args)
+	err = opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()
@@ -158,7 +158,7 @@ func TestString(t *testing.T) {
 
 	opt.PrintHelp()
 	args := []string{"-f", "test.txt"}
-	err = opt.ParseArgs(args)
+	err = opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.Fail()
@@ -182,7 +182,7 @@ func TestInt(t *testing.T) {
 
 	opt.PrintHelp()
 	args := []string{"-p", "4000"}
-	err = opt.ParseArgs(args)
+	err = opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()
@@ -207,7 +207,7 @@ func TestFloat(t *testing.T) {
 
 	opt.PrintHelp()
 	args := []string{"-p", "3.14159"}
-	err = opt.ParseArgs(args)
+	err = opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()
@@ -243,7 +243,7 @@ func TestCommand(t *testing.T) {
 	opt.PrintHelp()
 
 	args := []string{"moo", "--help"}
-	err := opt.ParseArgs(args)
+	err := opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.Fail()
@@ -260,7 +260,7 @@ func TestPositional(t *testing.T) {
 
 	opt.PrintHelp()
 	args := []string{"test.txt"}
-	err = opt.ParseArgs(args)
+	err = opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.Fail()
@@ -285,7 +285,7 @@ func TestPositionalStringSlice(t *testing.T) {
 
 	opt.PrintHelp()
 	args := []string{"test.txt", "test2.txt"}
-	err = opt.ParseArgs(args)
+	err = opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.Fail()
@@ -310,7 +310,7 @@ func TestPositionalIntSlice(t *testing.T) {
 
 	opt.PrintHelp()
 	args := []string{"4000", "5000"}
-	err = opt.ParseArgs(args)
+	err = opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.Fail()
@@ -335,7 +335,7 @@ func TestPositionalFloatSlice(t *testing.T) {
 
 	opt.PrintHelp()
 	args := []string{"3.14159", "3.1415926535"}
-	err = opt.ParseArgs(args)
+	err = opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.Fail()

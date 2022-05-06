@@ -18,17 +18,36 @@ func (opt *Options) ShowOptions() {
 	}
 }
 
-// Parse the command line arguments from os.Args. Internally it calls ParseArgs.
+// Parse command line arguments from a string slice.
 // - If default help is defined, it will print the help message after parsing when "-h" or "--help" is supplied,
-// then os.Exit(0).
-// - If emptyhelp is true and no arguments are supplied, it will print the help message and os.Exit(0).
-func (opt *Options) Parse(emptyhelp bool) error {
-	if len(os.Args) == 1 && emptyhelp {
-		opt.PrintHelp()
-		os.Exit(0)
+// then os.Exit(0). Returns ErrNoArgs if no arguments are supplied.
+//
+// Tool commands, short options (single dash and one letter), long options (double dash and one or more
+// letters), and positional arguments are each paarsed in the order they are supplied. If a positional
+// argument is of a slice type, it will swallow all remaining arguments, including long and short options.
+//
+// Single- and double-dash options found before any tool commands are parsed for the Options structure.
+//
+// Tool commands break the parsing off, and calls the command with the remaining arguments after running
+//  any handlers for the pre-command options.
+//
+// Options criteria:
+// - Short options start with a single dash ("-").
+// - Short boolean options don't need to take a value.
+// - Short boolean options require an equal sign ("=") after the option with a truthy or falsy value.
+// - Truthy values are "true", "yes", "on", "1", and "t".
+// - Falsy values are everything else.
+// - Short options can be combined ("-a -b" can be written as "-ab").
+// - Combined short options allow only the last one to take a value. The ones before must be booleans.
+//
+// - Long options start with a double dash ("--").
+// - Long options are followed by either whitespace or an equal sign ("--foo bar" or "--foo=bar").
+func (opt *Options) Parse(args []string) error {
+	if len(os.Args) == 1 {
+		return ErrNoArgs
 	}
 
-	err := opt.ParseArgs(os.Args[1:])
+	err := opt.parseArgs(args)
 	if err != nil {
 		return err
 	}
@@ -41,27 +60,7 @@ func (opt *Options) Parse(emptyhelp bool) error {
 	return nil
 }
 
-// ParseArgs parses the supplied string slice as CLI arguments.
-// Tool commands, short options (single dash and one letter), long options (double dash and one or more
-// letters), and positional arguments are each paarsed in the order they are supplied. If a positional
-// argument is of a slice type, it will swallow all remaining arguments, including long and short options.
-//
-// Single- and double-dash options found before any tool commands are parsed for the Options structure.
-//
-// Tool commands break the parsing off, and calls the command with the remaining arguments after running
-//  any handlers for the pre-command options.
-// Options criteria:
-// - Short options start with a single dash ("-").
-// - Short boolean options don't need to take a value.
-// - Short boolean options require an equal sign ("=") after the option with a truthy or falsy value.
-// - Truthy values are "true", "yes", "on", "1", and "t".
-// - Falsy values are everything else.
-// - Short options can be combined ("-a -b" can be written as "-ab").
-// - Combined short options allow only the last one to take a value. The ones before must be booleans.
-//
-// - Long options start with a double dash ("--").
-// - Long options are followed by either whitespace or an equal sign ("--foo bar" or "--foo=bar").
-func (opt *Options) ParseArgs(args []string) error {
+func (opt *Options) parseArgs(args []string) error {
 	unknown := []string{}
 	pos := opt.positional
 	for i, arg := range args {
@@ -132,7 +131,7 @@ func (opt *Options) ParseArgs(args []string) error {
 						continue
 					}
 
-					return fmt.Errorf("--%s: %w", o.LongName, ErrMissingArgument)
+					return fmt.Errorf("--%s: %w", o.LongName, ErrMissingParam)
 
 				case VarInt:
 					if a[1] != "" {
@@ -156,7 +155,7 @@ func (opt *Options) ParseArgs(args []string) error {
 						continue
 					}
 
-					return fmt.Errorf("--%s: %w", o.LongName, ErrMissingArgument)
+					return fmt.Errorf("--%s: %w", o.LongName, ErrMissingParam)
 
 				case VarFloat:
 					if a[1] != "" {
@@ -180,7 +179,7 @@ func (opt *Options) ParseArgs(args []string) error {
 						continue
 					}
 
-					return fmt.Errorf("--%s: %w", o.LongName, ErrMissingArgument)
+					return fmt.Errorf("--%s: %w", o.LongName, ErrMissingParam)
 
 				default:
 					return fmt.Errorf("--%s: %w", o.LongName, ErrUnknownType)
@@ -236,7 +235,7 @@ func (opt *Options) ParseArgs(args []string) error {
 							continue
 						}
 
-						return fmt.Errorf("-%c: %w", c, ErrMissingArgument)
+						return fmt.Errorf("-%c: %w", c, ErrMissingParam)
 
 					case VarInt:
 						if a[0] == string(c) && a[1] != "" {
@@ -260,7 +259,7 @@ func (opt *Options) ParseArgs(args []string) error {
 							continue
 						}
 
-						return fmt.Errorf("-%c: %w", c, ErrMissingArgument)
+						return fmt.Errorf("-%c: %w", c, ErrMissingParam)
 
 					case VarFloat:
 						if a[0] == string(c) && a[1] != "" {
@@ -284,7 +283,7 @@ func (opt *Options) ParseArgs(args []string) error {
 							continue
 						}
 
-						return fmt.Errorf("-%c: %w", c, ErrMissingArgument)
+						return fmt.Errorf("-%c: %w", c, ErrMissingParam)
 
 					} // switch o.Type
 				} else {
