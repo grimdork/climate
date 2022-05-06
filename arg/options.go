@@ -12,18 +12,21 @@ type Options struct {
 	order []string
 	// Remainder contains args not parsed as options, commands or positional args.
 	Remainder []string
+	appname   string
 	// hashelp is true if default help is defined.
 	hashelp bool
 }
 
 // New options instance.
-func New() *Options {
+// name - Name of the program.
+func New(name string) *Options {
 	opt := &Options{
 		short:    make(map[string]*Option),
 		long:     make(map[string]*Option),
 		posmap:   make(map[string]*Option),
 		groups:   make(map[string]*Group),
 		commands: make(map[string]*Command),
+		appname:  name,
 	}
 
 	opt.AddGroup("default")
