@@ -3,7 +3,6 @@ package arg
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"text/tabwriter"
 )
 
@@ -18,8 +17,7 @@ func (opt *Options) PrintHelp() {
 	w := &tabwriter.Writer{}
 	w.Init(os.Stdout, 8, 8, 1, '\t', 0)
 	w.Write([]byte("Usage:\n  "))
-	name := filepath.Base(os.Args[0])
-	w.Write([]byte(name))
+	w.Write([]byte(opt.appname))
 
 	count := 0
 	for _, g := range opt.groups {
