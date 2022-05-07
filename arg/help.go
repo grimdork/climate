@@ -8,7 +8,7 @@ import (
 
 // SetDefaultHelp sets the default help text.
 func (opt *Options) SetDefaultHelp() {
-	opt.SetOption("", "h", "help", "Print this help message.", nil, false, VarBool, nil)
+	opt.SetOption("", "", "help", "Print this help message.", nil, false, VarBool, nil)
 	opt.hashelp = true
 }
 
