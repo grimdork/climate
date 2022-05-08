@@ -244,7 +244,7 @@ func TestCommand(t *testing.T) {
 
 	args := []string{"moo", "--help"}
 	err := opt.Parse(args)
-	if err != nil {
+	if err != nil && err != arg.ErrRunCommand {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.Fail()
 	}
@@ -376,4 +376,79 @@ func TestCompletions(t *testing.T) {
 	}
 
 	t.Logf("Completions:\n%s", comp)
+}
+
+func TestStringChoices(t *testing.T) {
+	opt := arg.New(appname)
+	err := opt.SetOption("", "w", "word", "A number in word form.", "", false, arg.VarString, []any{"one", "two", "three"})
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	args := []string{"-w", "one"}
+	err = opt.Parse(args)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	args = []string{"--word", "four"}
+	err = opt.Parse(args)
+	if err == nil {
+		t.Errorf("Expected error for illegal choice, but got none")
+		t.FailNow()
+	}
+
+	t.Log("String choices fail where expected.")
+}
+
+func TestIntChoices(t *testing.T) {
+	opt := arg.New(appname)
+	err := opt.SetOption("", "n", "number", "An integer.", "", false, arg.VarInt, []any{1, 1, 1})
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	args := []string{"-n", "1"}
+	err = opt.Parse(args)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	args = []string{"--number", "4"}
+	err = opt.Parse(args)
+	if err == nil {
+		t.Errorf("Expected error for illegal choice, but got none")
+		t.FailNow()
+	}
+
+	t.Log("Integer choices fail where expected.")
+}
+
+func TestFloatChoices(t *testing.T) {
+	opt := arg.New(appname)
+	err := opt.SetOption("", "p", "pi", "Your definition of pi.", "", false, arg.VarFloat, []any{3.14, 3.141, 3.145})
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	args := []string{"-p", "3.14"}
+	err = opt.Parse(args)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	args = []string{"--pi", "3.0"}
+	err = opt.Parse(args)
+	if err == nil {
+		t.Errorf("Expected error for illegal choice, but got none")
+		t.FailNow()
+	}
+
+	t.Log("Float choices fail where expected.")
 }

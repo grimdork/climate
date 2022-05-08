@@ -7,6 +7,8 @@ var (
 	ErrRunCommand = errors.New("command run")
 	// ErrNoArgs is returned when no arguments are provided.
 	ErrNoArgs = errors.New("no arguments provided")
+	// ErrIllegalChoice is returned when the argument isn't in the approved list of choices.
+	ErrIllegalChoice = errors.New("illegal choice")
 	// ErrMissingRequired is returned when a required option is missing.
 	ErrMissingRequired = errors.New("missing required option")
 	// ErrMissingParam is returned when an option is missing an argument.
