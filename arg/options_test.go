@@ -90,7 +90,7 @@ func TestSortGroup(t *testing.T) {
 		t.Logf("ShortName: %s LongName: %s", o.ShortName, o.LongName)
 	}
 
-	if list[0].ShortName != "f" || list[1].ShortName != "h" || list[2].ShortName != "p" || list[3].ShortName != "v" {
+	if list[0].LongName != "help" || list[1].ShortName != "f" || list[2].ShortName != "p" || list[3].ShortName != "v" {
 		t.Log("Sort order not the same as expected.")
 		t.FailNow()
 	}
@@ -241,7 +241,7 @@ func moocmd(args []string) error {
 
 func TestCommand(t *testing.T) {
 	opt := arg.New(appname)
-	opt.SetCommand("moo", "Have you mooed today?", "", moocmd, nil)
+	_ = opt.SetCommand("moo", "Have you mooed today?", "", moocmd, nil)
 	opt.PrintHelp()
 
 	args := []string{"moo", "--help"}
@@ -349,5 +349,26 @@ func TestPositionalFloatSlice(t *testing.T) {
 		t.Fail()
 	} else {
 		t.Logf("Pis are as expected: %+v", pis)
+	}
+}
+
+func TestCompletions(t *testing.T) {
+	opt := arg.New(appname)
+	err := opt.SetOption("", "p", "pi", "Your definition of pi.", 3.14, false, arg.VarFloat, nil)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	cmd := opt.SetCommand("moo", "Have you mooed today?", "", moocmd, nil)
+	if cmd == nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	comp := opt.Completions()
+	if comp == "" {
+		t.Errorf("Expected completions, but got nothing")
+		t.Fail()
 	}
 }
