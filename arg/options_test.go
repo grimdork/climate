@@ -366,9 +366,16 @@ func TestCompletions(t *testing.T) {
 		t.FailNow()
 	}
 
-	comp := opt.Completions()
+	comp, err := opt.Completions("testrun")
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
 	if comp == "" {
 		t.Errorf("Expected completions, but got nothing")
-		t.Fail()
+		t.FailNow()
 	}
+
+	t.Logf("Completions:\n%s", comp)
 }
