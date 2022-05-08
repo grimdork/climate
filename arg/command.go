@@ -9,13 +9,13 @@ type Command struct {
 	// Func to execute the command.
 	Func ToolCommand
 	// Options for this command.
-	Options []*Option
+	Options *Options
 	// Aliases for this command.
 	Aliases []string
 }
 
 // ToolCommand function signature.
-type ToolCommand func(args []string) error
+type ToolCommand func(*Options, []string) error
 
 // SetCommand to a group.
 func (opt *Options) SetCommand(name, help, group string, fn ToolCommand, aliases []string) *Command {

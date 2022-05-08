@@ -75,7 +75,7 @@ func (opt *Options) parseArgs(args []string) error {
 				return fmt.Errorf("%s: %s", arg, ErrMissingFunc)
 			}
 
-			fn(args[i+1:])
+			fn(cmd.Options, args[i+1:])
 			return nil
 		}
 

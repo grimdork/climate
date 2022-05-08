@@ -233,7 +233,7 @@ const moo = `                 (__)
 ..."Have you mooed today?"...
 `
 
-func moocmd(args []string) error {
+func moocmd(opt *arg.Options, args []string) error {
 	println(moo)
 	fmt.Printf("Args: %+v\n", args)
 	return nil
