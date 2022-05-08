@@ -3,6 +3,8 @@ package arg
 import "errors"
 
 var (
+	// ErrRunCommand is not really an error, but indicates a command was run.
+	ErrRunCommand = errors.New("command run")
 	// ErrNoArgs is returned when no arguments are provided.
 	ErrNoArgs = errors.New("no arguments provided")
 	// ErrMissingRequired is returned when a required option is missing.

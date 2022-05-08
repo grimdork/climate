@@ -77,7 +77,7 @@ func (opt *Options) parseArgs(args []string) error {
 
 			cmd.Options.Args = args[i+1:]
 			fn(cmd.Options)
-			return nil
+			return ErrRunCommand
 		}
 
 		if len(arg) < 2 && len(pos) < 0 {
