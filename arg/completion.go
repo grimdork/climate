@@ -37,7 +37,7 @@ type CompOpt struct {
 // Completions returns a string containing the completion script.
 func (opt *Options) Completions(appname string) (string, error) {
 	buf := str.NewStringer()
-	tpl := template.New("completions")
+	tpl := template.New("")
 	tpl = tpl.Delims("##", "@@")
 	tpl, err := tpl.Parse(script)
 	if err != nil {
