@@ -70,7 +70,7 @@ func TestSortGroup(t *testing.T) {
 	opt.SetOption("", "v", "verbose", "Show more details in output.", false, false, arg.VarBool, nil)
 	opt.SetOption("", "f", "file", "Full file path.", "", false, arg.VarString, nil)
 	opt.SetOption("", "p", "port", "Port number.", 0, false, arg.VarInt, nil)
-	opt.SetDefaultHelp()
+	opt.SetDefaultHelp(false)
 	g := opt.GetGroup("default")
 	if g == nil {
 		t.Errorf("Group 'default' should exist, but does not.")

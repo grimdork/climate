@@ -6,9 +6,13 @@ import (
 	"text/tabwriter"
 )
 
-// SetDefaultHelp sets the default help text.
-func (opt *Options) SetDefaultHelp() {
-	opt.SetOption("", "", "help", "Print this help message.", nil, false, VarBool, nil)
+// SetDefaultHelp sets the default help option, optionally with a short "-h" flag.
+func (opt *Options) SetDefaultHelp(full bool) {
+	short := ""
+	if full {
+		short = "h"
+	}
+	opt.SetOption("", short, "help", "Print this help message.", nil, false, VarBool, nil)
 	opt.hashelp = true
 }
 
