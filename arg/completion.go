@@ -55,23 +55,21 @@ func (opt *Options) Completions(appname string) (string, error) {
 
 	for _, c := range opt.commands {
 		cmd := CompCmd{Name: c.Name}
+		if c.Options != nil {
+			for _, o := range c.Options.short {
+				cmd.Options = append(cmd.Options, CompOpt{Name: "-" + o.ShortName})
+			}
+
+			for _, o := range c.Options.long {
+				cmd.Options = append(cmd.Options, CompOpt{Name: "--" + o.LongName})
+			}
+		}
 		cl.Commands = append(cl.Commands, cmd)
-		if c.Options == nil {
-			continue
-		}
-
-		for _, o := range c.Options.short {
-			cmd.Options = append(cmd.Options, CompOpt{Name: "-" + o.ShortName})
-		}
-
-		for _, o := range c.Options.long {
-			cmd.Options = append(cmd.Options, CompOpt{Name: "--" + o.LongName})
-		}
 	}
 
 	err = tpl.Execute(buf, cl)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	return buf.String(), nil
