@@ -15,7 +15,7 @@ type Command struct {
 }
 
 // ToolCommand function signature.
-type ToolCommand func(*Options, []string) error
+type ToolCommand func(*Options) error
 
 // SetCommand to a group.
 func (opt *Options) SetCommand(name, help, group string, fn ToolCommand, aliases []string) *Command {

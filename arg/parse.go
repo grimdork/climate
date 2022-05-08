@@ -75,7 +75,8 @@ func (opt *Options) parseArgs(args []string) error {
 				return fmt.Errorf("%s: %s", arg, ErrMissingFunc)
 			}
 
-			fn(cmd.Options, args[i+1:])
+			cmd.Options.Args = args[i+1:]
+			fn(cmd.Options)
 			return nil
 		}
 
@@ -374,7 +375,7 @@ func (opt *Options) parseArgs(args []string) error {
 		}
 		unknown = unknown[1:]
 	}
-	opt.Remainder = unknown
+	opt.Args = unknown
 
 	for _, o := range opt.short {
 		if o.Required && o.Value == nil {

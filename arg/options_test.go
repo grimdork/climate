@@ -1,7 +1,6 @@
 package arg_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/grimdork/climate/arg"
@@ -233,9 +232,8 @@ const moo = `                 (__)
 ..."Have you mooed today?"...
 `
 
-func moocmd(opt *arg.Options, args []string) error {
+func moocmd(opt *arg.Options) error {
 	println(moo)
-	fmt.Printf("Args: %+v\n", args)
 	return nil
 }
 

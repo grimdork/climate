@@ -10,9 +10,10 @@ type Options struct {
 	commands   map[string]*Command
 	// Order of groups.
 	order []string
-	// Remainder contains args not parsed as options, commands or positional args.
-	Remainder []string
-	appname   string
+	// Args contains args not parsed as options, commands or positional args.
+	Args []string
+
+	appname string
 	// hashelp is true if default help is defined.
 	hashelp bool
 }
