@@ -19,4 +19,4 @@ At the moment, just the convenience function Get(), which returns the value of a
 Helper to get typical directory paths for configuration data. Basically makes dot-directories in $HOME (most systems) for config directories in $HOME/Library/Application Support (macOS).
 
 ## str
-Currently just an extended strings.Builder which can write out all common variable types, maps and slices with the same function.
+Currently just an extended strings.Builder which can write out all common variable types, maps and slices with the same function. Also satisfies the io.Writer interface.
