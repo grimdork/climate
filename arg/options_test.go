@@ -364,7 +364,7 @@ func TestCompletions(t *testing.T) {
 		t.FailNow()
 	}
 
-	comp, err := opt.Completions("testrun")
+	comp, err := opt.Completions()
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()

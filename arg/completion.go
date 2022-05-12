@@ -35,7 +35,7 @@ type CompOpt struct {
 }
 
 // Completions returns a string containing the completion script.
-func (opt *Options) Completions(appname string) (string, error) {
+func (opt *Options) Completions() (string, error) {
 	buf := str.NewStringer()
 	tpl := template.New("")
 	tpl = tpl.Delims("##", "@@")
@@ -44,7 +44,7 @@ func (opt *Options) Completions(appname string) (string, error) {
 		return "", err
 	}
 
-	cl := &CompList{AppName: appname}
+	cl := &CompList{AppName: opt.appname}
 	for _, o := range opt.short {
 		cl.Options = append(cl.Options, CompOpt{Name: "-" + o.ShortName})
 	}
