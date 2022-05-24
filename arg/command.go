@@ -33,5 +33,8 @@ func (opt *Options) SetCommand(name, help, group string, fn ToolCommand, aliases
 		g = opt.AddGroup(group)
 	}
 	g.commands = append(g.commands, cmd.Name)
+	for _, a := range aliases {
+		opt.commands[a] = cmd
+	}
 	return cmd
 }
