@@ -81,7 +81,7 @@ func (opt *Options) PrintHelp() {
 
 				w.Write([]byte("\n"))
 			} // for range g.options
-			w.Write([]byte("\n"))
+			w.Write([]byte("\n\n"))
 		}
 
 		if len(g.commands) > 0 {
@@ -105,9 +105,8 @@ func (opt *Options) PrintHelp() {
 					fmt.Fprintf(w, ")\n")
 				}
 			}
-			w.Write([]byte("\n"))
+			w.Write([]byte("\n\n"))
 		}
-		w.Write([]byte("\n"))
 	}
 
 	if len(opt.positional) > 0 {
