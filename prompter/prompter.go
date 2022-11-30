@@ -27,6 +27,8 @@ type Question struct {
 	Question string
 	// Secret sets the question to be a secret, hiding input.
 	Secret bool
+	// Default answer, if any.
+	Default string
 }
 
 // New creates a new Prompter.
@@ -36,6 +38,7 @@ func New(q []Question) *Prompter {
 	for _, q := range q {
 		pr.Questions = append(pr.Questions, q.Question)
 		pr.Secret = append(pr.Secret, q.Secret)
+		pr.Answers = append(pr.Answers, q.Default)
 	}
 
 	return pr
@@ -43,7 +46,6 @@ func New(q []Question) *Prompter {
 
 // Ask the user for input.
 func (pr *Prompter) Ask() error {
-	pr.Answers = make([]string, len(pr.Questions))
 	var t string
 	var err error
 	for i, q := range pr.Questions {
@@ -64,7 +66,9 @@ func (pr *Prompter) Ask() error {
 		}
 
 		t = strings.ToLower(strings.TrimSpace(t))
-		pr.Answers[i] = t
+		if t != "" {
+			pr.Answers[i] = t
+		}
 	}
 
 	return nil
