@@ -18,5 +18,8 @@ At the moment, just the convenience function Get(), which returns the value of a
 ### paths
 Helper to get typical directory paths for configuration data. Basically makes dot-directories in $HOME (most systems) for config directories in $HOME/Library/Application Support (macOS).
 
+## prompter
+A simple tool to ask question in the terminal. Provide questions, and optionally default answers and whether the reply should be hidden.
+
 ## str
 Currently just an extended strings.Builder which can write out all common variable types, maps and slices with the same function. Also satisfies the io.Writer interface.
