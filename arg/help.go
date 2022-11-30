@@ -107,6 +107,7 @@ func (opt *Options) PrintHelp() {
 			}
 			w.Write([]byte("\n"))
 		}
+		w.Write([]byte("\n"))
 	}
 
 	if len(opt.positional) > 0 {
