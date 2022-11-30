@@ -49,7 +49,7 @@ func (pr *Prompter) Ask() error {
 	var t string
 	var err error
 	for i, q := range pr.Questions {
-		fmt.Printf("%s: ", q)
+		fmt.Printf("%s [%s]: ", q, pr.Answers[i])
 		if pr.Secret[i] {
 			sec, err := term.ReadPassword(int(syscall.Stdin))
 			println()
