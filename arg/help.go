@@ -52,7 +52,7 @@ func (opt *Options) PrintHelp() {
 
 	for _, g := range opt.groups {
 		if len(g.options) > 0 {
-			if g.Name == "default" {
+			if g.Name == GroupDefault {
 				w.Write([]byte("Main options:\n"))
 			} else {
 				fmt.Fprintf(w, "%s options:\n", g.Name)
@@ -85,7 +85,7 @@ func (opt *Options) PrintHelp() {
 		}
 
 		if len(g.commands) > 0 {
-			if g.Name == "default" {
+			if g.Name == GroupDefault {
 				w.Write([]byte("Main commands:\n"))
 			} else {
 				fmt.Fprintf(w, "%s commands:\n", g.Name)

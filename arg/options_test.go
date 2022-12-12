@@ -13,14 +13,14 @@ func TestRemoveFirstGroup(t *testing.T) {
 	opt.AddGroup("Two")
 	opt.AddGroup("Three")
 	t.Logf("%v", opt)
-	opt.RemoveGroup("default")
+	opt.RemoveGroup(arg.GroupDefault)
 	t.Logf("%v", opt)
 	if opt.GroupCount() != 2 {
 		t.Errorf("Expected 2 groups, but got %d", opt.GroupCount())
 		t.Fail()
 	}
 
-	g := opt.GetGroup("default")
+	g := opt.GetGroup(arg.GroupDefault)
 	if g != nil {
 		t.Errorf("Group 'default' should not exist, but does.")
 		t.Fail()
@@ -71,7 +71,7 @@ func TestSortGroup(t *testing.T) {
 	opt.SetOption("", "f", "file", "Full file path.", "", false, arg.VarString, nil)
 	opt.SetOption("", "p", "port", "Port number.", 0, false, arg.VarInt, nil)
 	opt.SetDefaultHelp(false)
-	g := opt.GetGroup("default")
+	g := opt.GetGroup(arg.GroupDefault)
 	if g == nil {
 		t.Errorf("Group 'default' should exist, but does not.")
 		t.FailNow()

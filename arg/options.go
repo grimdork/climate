@@ -30,7 +30,7 @@ func New(name string) *Options {
 		appname:  name,
 	}
 
-	opt.AddGroup("default")
+	opt.AddGroup(GroupDefault)
 	return opt
 }
 
@@ -49,7 +49,7 @@ func (opt *Options) AddGroup(group string) *Group {
 // GetGroup returns a pointer to a group.
 func (opt *Options) GetGroup(name string) *Group {
 	if name == "" {
-		return opt.groups["default"]
+		return opt.groups[GroupDefault]
 	}
 
 	g := opt.groups[name]
