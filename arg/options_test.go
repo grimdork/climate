@@ -452,3 +452,42 @@ func TestFloatChoices(t *testing.T) {
 
 	t.Log("Float choices fail where expected.")
 }
+
+func TestPositionalString(t *testing.T) {
+	opt := arg.New(appname)
+	err := opt.SetPositional("WORD", "A number in word form.", "", false, arg.VarString)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	args := []string{"one"}
+	err = opt.Parse(args)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	p := opt.GetPosString("WORD")
+	if p != args[0] {
+		t.Errorf("Expected '%s', but got '%s'", args[0], p)
+		t.FailNow()
+	}
+
+	t.Logf("'%s' = '%s'", args[0], p)
+	args = []string{"four"}
+	err = opt.Parse(args)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	p = opt.GetPosString("WORD")
+	if p != args[0] {
+		t.Errorf("Expected '%s', but got '%s'", args[0], p)
+		t.FailNow()
+	}
+
+	t.Logf("'%s' = '%s'", args[0], p)
+	t.Log("Positional strings work as expected.")
+}

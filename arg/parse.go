@@ -29,7 +29,8 @@ func (opt *Options) ShowOptions() {
 // Single- and double-dash options found before any tool commands are parsed for the Options structure.
 //
 // Tool commands break the parsing off, and calls the command with the remaining arguments after running
-//  any handlers for the pre-command options.
+//
+//	any handlers for the pre-command options.
 //
 // Options criteria:
 // - Short options start with a single dash ("-").
@@ -117,7 +118,7 @@ func (opt *Options) parseArgs(args []string) error {
 						}
 					}
 
-					// It's a standalone boolean option, so just set it to teue. Phew!
+					// It's a standalone boolean option, so just set it to true. Phew!
 					o.Value = true
 
 				case VarString:
