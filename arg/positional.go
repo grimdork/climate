@@ -66,7 +66,7 @@ func (opt *Options) GetPosStringSlice(placeholder string) []string {
 	}
 
 	if o.Value == nil {
-		return o.Default.([]string)
+		return []string{}
 	}
 
 	return o.Value.([]string)

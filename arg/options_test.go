@@ -498,3 +498,39 @@ func TestPositionalStringAndSlice(t *testing.T) {
 
 	t.Log("Positional strings work as expected.")
 }
+
+func TestPositionalNoSlice(t *testing.T) {
+	opt := arg.New(appname)
+	err := opt.SetPositional("WORD", "Just a word - any word.", "", false, arg.VarString)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	err = opt.SetPositional("ARGS", "The rest of the arguments.", "", false, arg.VarString)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	args := []string{"one"}
+	err = opt.Parse(args)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	p := opt.GetPosString("WORD")
+	if p != args[0] {
+		t.Errorf("Expected '%s', but got '%s'", args[0], p)
+		t.FailNow()
+	}
+
+	s := opt.GetPosStringSlice("ARGS")
+	if len(s) != 0 {
+		t.Errorf("Expected 0 args, but got %d", len(s))
+		t.FailNow()
+	}
+
+	t.Log("Positional string arguments with no supplied args work as expected.")
+}
