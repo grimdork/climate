@@ -112,7 +112,7 @@ func (opt *Options) PrintHelp() {
 	if len(opt.positional) > 0 {
 		w.Write([]byte("Positional arguments:\n"))
 		for _, o := range opt.positional {
-			fmt.Fprintf(w, "\t%s\t%s", o.Placeholder, o.Help)
+			fmt.Fprintf(w, "\t%s\t%s\n", o.Placeholder, o.Help)
 		}
 		w.Write([]byte("\n"))
 	}
