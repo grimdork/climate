@@ -453,15 +453,21 @@ func TestFloatChoices(t *testing.T) {
 	t.Log("Float choices fail where expected.")
 }
 
-func TestPositionalString(t *testing.T) {
+func TestPositionalStringAndSlice(t *testing.T) {
 	opt := arg.New(appname)
-	err := opt.SetPositional("WORD", "A number in word form.", "", false, arg.VarString)
+	err := opt.SetPositional("WORD", "Just a word - any word.", "", false, arg.VarString)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
 		t.FailNow()
 	}
 
-	args := []string{"one"}
+	err = opt.SetPositional("ARGS", "The rest of the arguments.", "", false, arg.VarStringSlice)
+	if err != nil {
+		t.Errorf("Expected no error, but got %s", err.Error())
+		t.FailNow()
+	}
+
+	args := []string{"one", "two", "three"}
 	err = opt.Parse(args)
 	if err != nil {
 		t.Errorf("Expected no error, but got %s", err.Error())
@@ -474,20 +480,21 @@ func TestPositionalString(t *testing.T) {
 		t.FailNow()
 	}
 
-	t.Logf("'%s' = '%s'", args[0], p)
-	args = []string{"four"}
-	err = opt.Parse(args)
-	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
+	s := opt.GetPosStringSlice("ARGS")
+	if len(s) != len(args[1:]) {
+		t.Errorf("Expected %d args, but got %d", len(args[1:]), len(s))
 		t.FailNow()
 	}
 
-	p = opt.GetPosString("WORD")
-	if p != args[0] {
-		t.Errorf("Expected '%s', but got '%s'", args[0], p)
-		t.FailNow()
+	t.Logf("First arg (%s) = '%s'", args[0], p)
+	for i, v := range s {
+		if v != args[i+1] {
+			t.Errorf("Expected '%s', but got '%s'", args[i+1], v)
+			t.FailNow()
+		} else {
+			t.Logf("Arg %d (%s) = '%s'", i+2, args[i+1], v)
+		}
 	}
 
-	t.Logf("'%s' = '%s'", args[0], p)
 	t.Log("Positional strings work as expected.")
 }
