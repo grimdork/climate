@@ -44,6 +44,48 @@ const (
 	VarStringSlice
 )
 
+// ValidDefault returns true if the default value is usable.
+func (o *Option) ValidDefault() bool {
+	switch o.Value.(type) {
+	case bool:
+		if o.Type != VarBool {
+			return false
+		}
+
+	case int:
+		if o.Type != VarInt {
+			return false
+		}
+
+	case []int:
+		if o.Type != VarIntSlice {
+			return false
+		}
+
+	case float64:
+		if o.Type != VarFloat {
+			return false
+		}
+
+	case []float64:
+		if o.Type != VarFloatSlice {
+			return false
+		}
+
+	case string:
+		if o.Type != VarString {
+			return false
+		}
+
+	case []string:
+		if o.Type != VarStringSlice {
+			return false
+		}
+	}
+
+	return true
+}
+
 // SetOption sets an option.
 func (opt *Options) SetOption(group, short, long, help string, defaultvalue any, required bool, t uint8, choices []any) error {
 	if len(short) > 1 {

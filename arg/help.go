@@ -75,7 +75,7 @@ func (opt *Options) PrintHelp() {
 					w.Write([]byte(" (required)"))
 				}
 
-				if o.Default != nil {
+				if o.ValidDefault() {
 					fmt.Fprintf(w, " (default: %v)", o.Default)
 				}
 

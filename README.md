@@ -9,6 +9,12 @@ Only Unix-like systems are supported. Windows support is not planned until I nee
 ### arg
 This is a simple option parser with no dependencies outside the Go stdlib. The goal is to have the typical, most common use cases supported, including nested tool commands, and to be compilable with TinyGo.
 
+Currently supports:
+- Short and long options
+- Commands
+- Positional arguments
+- Catch-all positional arguments (last args become a slice)
+
 ## cfmt
 Colour formatting, printf style.
 

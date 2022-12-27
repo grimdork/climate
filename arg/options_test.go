@@ -16,14 +16,14 @@ func TestRemoveFirstGroup(t *testing.T) {
 	opt.RemoveGroup(arg.GroupDefault)
 	t.Logf("%v", opt)
 	if opt.GroupCount() != 2 {
-		t.Errorf("Expected 2 groups, but got %d", opt.GroupCount())
-		t.Fail()
+		t.Fatalf("Expected 2 groups, but got %d", opt.GroupCount())
+		t.FailNow()
 	}
 
 	g := opt.GetGroup(arg.GroupDefault)
 	if g != nil {
-		t.Errorf("Group 'default' should not exist, but does.")
-		t.Fail()
+		t.Fatalf("Group 'default' should not exist, but does.")
+		t.FailNow()
 	}
 }
 
@@ -35,14 +35,14 @@ func TestRemoveMiddleGroup(t *testing.T) {
 	opt.RemoveGroup("Two")
 	t.Logf("%v", opt)
 	if opt.GroupCount() != 2 {
-		t.Errorf("Expected 2 groups, but got %d", opt.GroupCount())
-		t.Fail()
+		t.Fatalf("Expected 2 groups, but got %d", opt.GroupCount())
+		t.FailNow()
 	}
 
 	g := opt.GetGroup("Two")
 	if g != nil {
-		t.Errorf("Group 'Two' should not exist, but does.")
-		t.Fail()
+		t.Fatalf("Group 'Two' should not exist, but does.")
+		t.FailNow()
 	}
 }
 
@@ -54,27 +54,26 @@ func TestRemoveLastGroup(t *testing.T) {
 	opt.RemoveGroup("Three")
 	t.Logf("%v", opt)
 	if opt.GroupCount() != 2 {
-		t.Errorf("Expected 2 groups, but got %d", opt.GroupCount())
-		t.Fail()
+		t.Fatalf("Expected 2 groups, but got %d", opt.GroupCount())
+		t.FailNow()
 	}
 
 	g := opt.GetGroup("Three")
 	if g != nil {
-		t.Errorf("Group 'Three' should not exist, but does.")
-		t.Fail()
+		t.Fatalf("Group 'Three' should not exist, but does.")
+		t.FailNow()
 	}
 }
 
 func TestSortGroup(t *testing.T) {
 	opt := arg.New(appname)
-	opt.SetOption("", "v", "verbose", "Show more details in output.", false, false, arg.VarBool, nil)
-	opt.SetOption("", "f", "file", "Full file path.", "", false, arg.VarString, nil)
-	opt.SetOption("", "p", "port", "Port number.", 0, false, arg.VarInt, nil)
+	opt.SetOption(arg.GroupDefault, "v", "verbose", "Show more details in output.", false, false, arg.VarBool, nil)
+	opt.SetOption(arg.GroupDefault, "f", "file", "Full file path.", "", false, arg.VarString, nil)
+	opt.SetOption(arg.GroupDefault, "p", "port", "Port number.", 0, false, arg.VarInt, nil)
 	opt.SetDefaultHelp(false)
 	g := opt.GetGroup(arg.GroupDefault)
 	if g == nil {
-		t.Errorf("Group 'default' should exist, but does not.")
-		t.FailNow()
+		t.Fatalf("Group 'default' should exist, but does not.")
 	}
 
 	t.Log("Unsorted:")
@@ -91,35 +90,34 @@ func TestSortGroup(t *testing.T) {
 
 	if list[0].LongName != "help" || list[1].ShortName != "f" || list[2].ShortName != "p" || list[3].ShortName != "v" {
 		t.Log("Sort order not the same as expected.")
-		t.FailNow()
 	}
 }
 
-func TestAutoGroup(t *testing.T) {
+func TestGroupNames(t *testing.T) {
 	opt := arg.New(appname)
 	opt.SetOption("General", "v", "verbose", "Show more details in output.", false, false, arg.VarBool, nil)
 	list := opt.GetGroups()
 	if list[1].Name != "General" {
-		t.Errorf("Expected 'General' group, but got %s", list[1].Name)
-		t.Fail()
+		t.Fatalf("Expected 'General' group, but got %s", list[1].Name)
+		t.FailNow()
 	}
 }
 
 func TestLongShort(t *testing.T) {
-	err := arg.New(appname).SetOption("", "verbose", "", "", false, false, arg.VarBool, nil)
+	err := arg.New(appname).SetOption(arg.GroupDefault, "verbose", "", "", false, false, arg.VarBool, nil)
 	if err == nil {
-		t.Errorf("Expected error, but long short worked.")
-		t.Fail()
+		t.Fatalf("Expected error, but long short worked.")
+		t.FailNow()
 	} else {
 		t.Log("Long short failed as expected.")
 	}
 }
 
 func TestShortLong(t *testing.T) {
-	err := arg.New(appname).SetOption("", "", "v", "", false, false, arg.VarBool, nil)
+	err := arg.New(appname).SetOption(arg.GroupDefault, "", "v", "", false, false, arg.VarBool, nil)
 	if err == nil {
-		t.Errorf("Expected error, but short long worked.")
-		t.Fail()
+		t.Fatalf("Expected error, but short long worked.")
+		t.FailNow()
 	} else {
 		t.Log("Short long failed as expected.")
 	}
@@ -127,23 +125,20 @@ func TestShortLong(t *testing.T) {
 
 func TestBool(t *testing.T) {
 	opt := arg.New(appname)
-	err := opt.SetOption("", "v", "verbose", "Show more details in output.", false, false, arg.VarBool, nil)
+	err := opt.SetOption(arg.GroupDefault, "v", "verbose", "Show more details in output.", false, false, arg.VarBool, nil)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	opt.PrintHelp()
 	args := []string{"-v"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	if !opt.GetBool("v") {
-		t.Errorf("Expected verbose to be true, but got false.")
-		t.FailNow()
+		t.Fatalf("Expected verbose to be true, but got false.")
 	} else {
 		t.Log("Verbose is true as expected.")
 	}
@@ -151,23 +146,23 @@ func TestBool(t *testing.T) {
 
 func TestString(t *testing.T) {
 	opt := arg.New(appname)
-	err := opt.SetOption("", "f", "file", "Full file path.", nil, false, arg.VarString, nil)
+	err := opt.SetOption(arg.GroupDefault, "f", "file", "Full file path.", nil, false, arg.VarString, nil)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.Fail()
+		t.Fatalf("Expected no error, but got %s", err.Error())
+		t.FailNow()
 	}
 
 	opt.PrintHelp()
 	args := []string{"-f", "test.txt"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.Fail()
+		t.Fatalf("Expected no error, but got %s", err.Error())
+		t.FailNow()
 	}
 
 	if opt.GetString("f") != "test.txt" {
-		t.Errorf("Expected 'test.txt', but got %s", opt.GetString("f"))
-		t.Fail()
+		t.Fatalf("Expected 'test.txt', but got %s", opt.GetString("f"))
+		t.FailNow()
 	} else {
 		t.Log("File path is as expected.")
 	}
@@ -175,24 +170,22 @@ func TestString(t *testing.T) {
 
 func TestInt(t *testing.T) {
 	opt := arg.New(appname)
-	err := opt.SetOption("", "p", "port", "Port number.", 3000, false, arg.VarInt, nil)
+	err := opt.SetOption(arg.GroupDefault, "p", "port", "Port number.", 3000, false, arg.VarInt, nil)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	opt.PrintHelp()
 	args := []string{"-p", "4000"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	if opt.GetInt("p") != 4000 {
-		t.Errorf("Expected -p=4000, but got %d", opt.GetInt("p"))
+		t.Fatalf("Expected -p=4000, but got %d", opt.GetInt("p"))
 		opt.ShowOptions()
-		t.Fail()
+		t.FailNow()
 	} else {
 		t.Log("Port number is as expected.")
 	}
@@ -200,24 +193,22 @@ func TestInt(t *testing.T) {
 
 func TestFloat(t *testing.T) {
 	opt := arg.New(appname)
-	err := opt.SetOption("", "p", "pi", "Your definition of pi.", 3.14, false, arg.VarFloat, nil)
+	err := opt.SetOption(arg.GroupDefault, "p", "pi", "Your definition of pi.", 3.14, false, arg.VarFloat, nil)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	opt.PrintHelp()
 	args := []string{"-p", "3.14159"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	if opt.GetFloat("p") != 3.14159 {
-		t.Errorf("Expected -p=3.14159, but got %f", opt.GetFloat("p"))
+		t.Fatalf("Expected -p=3.14159, but got %f", opt.GetFloat("p"))
 		opt.ShowOptions()
-		t.Fail()
+		t.FailNow()
 	} else {
 		t.Log("Pi is as expected.")
 	}
@@ -245,8 +236,8 @@ func TestCommand(t *testing.T) {
 	args := []string{"moo", "--help"}
 	err := opt.Parse(args)
 	if err != nil && err != arg.ErrRunCommand {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.Fail()
+		t.Fatalf("Expected no error, but got %s", err.Error())
+		t.FailNow()
 	}
 }
 
@@ -254,22 +245,21 @@ func TestPositional(t *testing.T) {
 	opt := arg.New(appname)
 	err := opt.SetPositional("FILE", "Full file path.", nil, false, arg.VarString)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	opt.PrintHelp()
 	args := []string{"test.txt"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.Fail()
+		t.Fatalf("Expected no error, but got %s", err.Error())
+		t.FailNow()
 	}
 
 	s := opt.GetPosString("FILE")
 	if s != "test.txt" {
-		t.Errorf("Expected 'test.txt', but got %s", s)
-		t.Fail()
+		t.Fatalf("Expected 'test.txt', but got %s", s)
+		t.FailNow()
 	} else {
 		t.Log("File path is as expected.")
 	}
@@ -279,22 +269,21 @@ func TestPositionalStringSlice(t *testing.T) {
 	opt := arg.New(appname)
 	err := opt.SetPositional("FILE", "Full file path.", nil, false, arg.VarStringSlice)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	opt.PrintHelp()
 	args := []string{"test.txt", "test2.txt"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.Fail()
+		t.Fatalf("Expected no error, but got %s", err.Error())
+		t.FailNow()
 	}
 
 	files := opt.GetPosStringSlice("FILE")
 	if len(files) != 2 {
-		t.Errorf("Expected 2 files, but got %d", len(files))
-		t.Fail()
+		t.Fatalf("Expected 2 files, but got %d", len(files))
+		t.FailNow()
 	} else {
 		t.Logf("File paths are as expected: %+v", files)
 	}
@@ -304,22 +293,21 @@ func TestPositionalIntSlice(t *testing.T) {
 	opt := arg.New(appname)
 	err := opt.SetPositional("PORT", "Port number.", 3000, false, arg.VarIntSlice)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	opt.PrintHelp()
 	args := []string{"4000", "5000"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.Fail()
+		t.Fatalf("Expected no error, but got %s", err.Error())
+		t.FailNow()
 	}
 
 	ports := opt.GetPosIntSlice("PORT")
 	if len(ports) != 2 {
-		t.Errorf("Expected 2 ports, but got %d", len(ports))
-		t.Fail()
+		t.Fatalf("Expected 2 ports, but got %d", len(ports))
+		t.FailNow()
 	} else {
 		t.Logf("Ports are as expected: %+v", ports)
 	}
@@ -329,22 +317,21 @@ func TestPositionalFloatSlice(t *testing.T) {
 	opt := arg.New(appname)
 	err := opt.SetPositional("PI", "Your definition of pi.", 3.14, false, arg.VarFloatSlice)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	opt.PrintHelp()
 	args := []string{"3.14159", "3.1415926535"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.Fail()
+		t.Fatalf("Expected no error, but got %s", err.Error())
+		t.FailNow()
 	}
 
 	pis := opt.GetPosFloatSlice("PI")
 	if len(pis) != 2 {
-		t.Errorf("Expected 2 pis, but got %d", len(pis))
-		t.Fail()
+		t.Fatalf("Expected 2 pis, but got %d", len(pis))
+		t.FailNow()
 	} else {
 		t.Logf("Pis are as expected: %+v", pis)
 	}
@@ -352,27 +339,23 @@ func TestPositionalFloatSlice(t *testing.T) {
 
 func TestCompletions(t *testing.T) {
 	opt := arg.New(appname)
-	err := opt.SetOption("", "p", "pi", "Your definition of pi.", 3.14, false, arg.VarFloat, nil)
+	err := opt.SetOption(arg.GroupDefault, "p", "pi", "Your definition of pi.", 3.14, false, arg.VarFloat, nil)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	cmd := opt.SetCommand("moo", "Have you mooed today?", "", moocmd, nil)
 	if cmd == nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	comp, err := opt.Completions()
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	if comp == "" {
-		t.Errorf("Expected completions, but got nothing")
-		t.FailNow()
+		t.Fatalf("Expected completions, but got nothing")
 	}
 
 	t.Logf("Completions:\n%s", comp)
@@ -382,22 +365,19 @@ func TestStringChoices(t *testing.T) {
 	opt := arg.New(appname)
 	err := opt.SetOption("", "w", "word", "A number in word form.", "", false, arg.VarString, []any{"one", "two", "three"})
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	args := []string{"-w", "one"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	args = []string{"--word", "four"}
 	err = opt.Parse(args)
 	if err == nil {
-		t.Errorf("Expected error for illegal choice, but got none")
-		t.FailNow()
+		t.Fatalf("Expected error for illegal choice, but got none")
 	}
 
 	t.Log("String choices fail where expected.")
@@ -405,24 +385,21 @@ func TestStringChoices(t *testing.T) {
 
 func TestIntChoices(t *testing.T) {
 	opt := arg.New(appname)
-	err := opt.SetOption("", "n", "number", "An integer.", "", false, arg.VarInt, []any{1, 1, 1})
+	err := opt.SetOption(arg.GroupDefault, "n", "number", "An integer.", "", false, arg.VarInt, []any{1, 1, 1})
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	args := []string{"-n", "1"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	args = []string{"--number", "4"}
 	err = opt.Parse(args)
 	if err == nil {
-		t.Errorf("Expected error for illegal choice, but got none")
-		t.FailNow()
+		t.Fatalf("Expected error for illegal choice, but got none")
 	}
 
 	t.Log("Integer choices fail where expected.")
@@ -430,24 +407,21 @@ func TestIntChoices(t *testing.T) {
 
 func TestFloatChoices(t *testing.T) {
 	opt := arg.New(appname)
-	err := opt.SetOption("", "p", "pi", "Your definition of pi.", "", false, arg.VarFloat, []any{3.14, 3.141, 3.145})
+	err := opt.SetOption(arg.GroupDefault, "p", "pi", "Your definition of pi.", "", false, arg.VarFloat, []any{3.14, 3.141, 3.145})
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	args := []string{"-p", "3.14"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	args = []string{"--pi", "3.0"}
 	err = opt.Parse(args)
 	if err == nil {
-		t.Errorf("Expected error for illegal choice, but got none")
-		t.FailNow()
+		t.Fatalf("Expected error for illegal choice, but got none")
 	}
 
 	t.Log("Float choices fail where expected.")
@@ -457,40 +431,34 @@ func TestPositionalStringAndSlice(t *testing.T) {
 	opt := arg.New(appname)
 	err := opt.SetPositional("WORD", "Just a word - any word.", "", false, arg.VarString)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	err = opt.SetPositional("ARGS", "The rest of the arguments.", "", false, arg.VarStringSlice)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	args := []string{"one", "two", "three"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error, but got %s", err.Error())
 	}
 
 	p := opt.GetPosString("WORD")
 	if p != args[0] {
-		t.Errorf("Expected '%s', but got '%s'", args[0], p)
-		t.FailNow()
+		t.Fatalf("Expected '%s', but got '%s'", args[0], p)
 	}
 
 	s := opt.GetPosStringSlice("ARGS")
 	if len(s) != len(args[1:]) {
-		t.Errorf("Expected %d args, but got %d", len(args[1:]), len(s))
-		t.FailNow()
+		t.Fatalf("Expected %d args, but got %d", len(args[1:]), len(s))
 	}
 
 	t.Logf("First arg (%s) = '%s'", args[0], p)
 	for i, v := range s {
 		if v != args[i+1] {
-			t.Errorf("Expected '%s', but got '%s'", args[i+1], v)
-			t.FailNow()
+			t.Fatalf("Expected '%s', but got '%s'", args[i+1], v)
 		} else {
 			t.Logf("Arg %d (%s) = '%s'", i+2, args[i+1], v)
 		}
@@ -503,34 +471,94 @@ func TestPositionalNoSlice(t *testing.T) {
 	opt := arg.New(appname)
 	err := opt.SetPositional("WORD", "Just a word - any word.", "", false, arg.VarString)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
 	}
 
 	err = opt.SetPositional("ARGS", "The rest of the arguments.", "", false, arg.VarString)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
 	}
 
 	args := []string{"one"}
 	err = opt.Parse(args)
 	if err != nil {
-		t.Errorf("Expected no error, but got %s", err.Error())
-		t.FailNow()
+		t.Fatalf("Expected no error parsing options, but got %s", err.Error())
 	}
 
 	p := opt.GetPosString("WORD")
 	if p != args[0] {
-		t.Errorf("Expected '%s', but got '%s'", args[0], p)
-		t.FailNow()
+		t.Fatalf("Expected '%s', but got '%s'", args[0], p)
 	}
 
 	s := opt.GetPosStringSlice("ARGS")
 	if len(s) != 0 {
-		t.Errorf("Expected 0 args, but got %d", len(s))
-		t.FailNow()
+		t.Fatalf("Expected 0 args, but got %d", len(s))
 	}
 
 	t.Log("Positional string arguments with no supplied args work as expected.")
+}
+
+func TestDefault(t *testing.T) {
+	opt := arg.New(appname)
+	err := opt.SetOption(arg.GroupDefault, "n", "number", "An integer.", 42, false, arg.VarInt, nil)
+	if err != nil {
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
+	}
+
+	o := opt.GetOption("number")
+	if !o.ValidDefault() {
+		t.Fatalf("Expected default '%d' to be valid, but it is not.", o.Default)
+	}
+
+	err = opt.SetOption(arg.GroupDefault, "f", "float", "A float.", 3.1415926535, false, arg.VarFloat, nil)
+	if err != nil {
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
+	}
+
+	o = opt.GetOption("float")
+	if !o.ValidDefault() {
+		t.Fatalf("Expected default '%f' to be valid, but it is not.", o.Default)
+	}
+
+	err = opt.SetOption(arg.GroupDefault, "s", "string", "A string.", "Hello, world!", false, arg.VarString, nil)
+	if err != nil {
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
+	}
+
+	o = opt.GetOption("string")
+	if !o.ValidDefault() {
+		t.Fatalf("Expected default '%s' to be valid, but it is not.", o.Default)
+	}
+
+	err = opt.SetOption(arg.GroupDefault, "b", "bool", "A boolean.", true, false, arg.VarBool, nil)
+	if err != nil {
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
+	}
+
+	o = opt.GetOption("bool")
+	if !o.ValidDefault() {
+		t.Fatalf("Expected default '%t' to be valid, but it is not.", o.Default)
+	}
+
+	err = opt.SetOption(arg.GroupDefault, "l", "list", "A list of strings.", []string{}, false, arg.VarStringSlice, nil)
+	if err != nil {
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
+	}
+
+	o = opt.GetOption("list")
+	if !o.ValidDefault() {
+		t.Fatalf("Expected default '%v' to be valid, but it is not.", o.Default)
+	}
+
+	err = opt.SetOption(arg.GroupDefault, "l", "floatlist", "A list of floats.", []float64{}, false, arg.VarFloatSlice, nil)
+	if err != nil {
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
+	}
+
+	o = opt.GetOption("floatlist")
+	if !o.ValidDefault() {
+		t.Fatalf("Expected default '%v' to be valid, but it is not.", o.Default)
+	}
+
+	t.Log("Default value works as expected.")
 }
