@@ -44,7 +44,7 @@ const (
 	VarStringSlice
 )
 
-// ValidDefault returns true if the default value is usable.
+// ValidDefault returns true if the default value is usable (not the zero-value).
 func (o *Option) ValidDefault() bool {
 	switch o.Value.(type) {
 	case bool:
@@ -53,32 +53,32 @@ func (o *Option) ValidDefault() bool {
 		}
 
 	case int:
-		if o.Type != VarInt {
+		if o.Type != VarInt && o.Default.(int) != 0 {
 			return false
 		}
 
 	case []int:
-		if o.Type != VarIntSlice {
+		if o.Type != VarIntSlice && len(o.Default.([]int)) > 0 {
 			return false
 		}
 
 	case float64:
-		if o.Type != VarFloat {
+		if o.Type != VarFloat && o.Default.(float64) != 0.0 {
 			return false
 		}
 
 	case []float64:
-		if o.Type != VarFloatSlice {
+		if o.Type != VarFloatSlice && len(o.Default.([]float64)) > 0 {
 			return false
 		}
 
 	case string:
-		if o.Type != VarString {
+		if o.Type != VarString && o.Default.(string) != "" {
 			return false
 		}
 
 	case []string:
-		if o.Type != VarStringSlice {
+		if o.Type != VarStringSlice && len(o.Default.([]string)) > 0 {
 			return false
 		}
 	}
