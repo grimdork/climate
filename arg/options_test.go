@@ -500,64 +500,74 @@ func TestPositionalNoSlice(t *testing.T) {
 
 func TestDefault(t *testing.T) {
 	opt := arg.New(appname)
-	err := opt.SetOption(arg.GroupDefault, "n", "number", "An integer.", 42, false, arg.VarInt, nil)
+	err := opt.SetOption(arg.GroupDefault, "n", "number", "An integer.", 0, false, arg.VarInt, nil)
 	if err != nil {
 		t.Fatalf("Expected no error creating option, but got %s", err.Error())
 	}
 
 	o := opt.GetOption("number")
-	if !o.ValidDefault() {
-		t.Fatalf("Expected default '%d' to be valid, but it is not.", o.Default)
+	if o.ValidDefault() {
+		t.Fatal("Expected default integer 0 to fail, but it's valid.")
 	}
 
-	err = opt.SetOption(arg.GroupDefault, "f", "float", "A float.", 3.1415926535, false, arg.VarFloat, nil)
+	err = opt.SetOption(arg.GroupDefault, "n", "numberlist", "A list of integers.", []int{}, false, arg.VarIntSlice, nil)
+	if err != nil {
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
+	}
+
+	o = opt.GetOption("numberlist")
+	if o.ValidDefault() {
+		t.Fatalf("Expected default int slice '%v' to fail, but it's valid.", o.Default)
+	}
+
+	err = opt.SetOption(arg.GroupDefault, "f", "float", "A float.", 0.0, false, arg.VarFloat, nil)
 	if err != nil {
 		t.Fatalf("Expected no error creating option, but got %s", err.Error())
 	}
 
 	o = opt.GetOption("float")
-	if !o.ValidDefault() {
-		t.Fatalf("Expected default '%f' to be valid, but it is not.", o.Default)
+	if o.ValidDefault() {
+		t.Fatal("Expected default float 0.0 to fail, but it's valid.")
 	}
 
-	err = opt.SetOption(arg.GroupDefault, "s", "string", "A string.", "Hello, world!", false, arg.VarString, nil)
+	err = opt.SetOption(arg.GroupDefault, "f", "floatlist", "A list of floats.", []float64{}, false, arg.VarFloatSlice, nil)
+	if err != nil {
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
+	}
+
+	o = opt.GetOption("floatlist")
+	if o.ValidDefault() {
+		t.Fatalf("Expected default float slice '%v' to fail, but it's valid.", o.Default)
+	}
+
+	err = opt.SetOption(arg.GroupDefault, "s", "string", "A string.", "", false, arg.VarString, nil)
 	if err != nil {
 		t.Fatalf("Expected no error creating option, but got %s", err.Error())
 	}
 
 	o = opt.GetOption("string")
-	if !o.ValidDefault() {
-		t.Fatalf("Expected default '%s' to be valid, but it is not.", o.Default)
+	if o.ValidDefault() {
+		t.Fatal("Expected default empty string to fail, but it's valid.")
 	}
 
-	err = opt.SetOption(arg.GroupDefault, "b", "bool", "A boolean.", true, false, arg.VarBool, nil)
+	err = opt.SetOption(arg.GroupDefault, "s", "stringlist", "A list of strings.", []string{}, false, arg.VarStringSlice, nil)
+	if err != nil {
+		t.Fatalf("Expected no error creating option, but got %s", err.Error())
+	}
+
+	o = opt.GetOption("stringlist")
+	if o.ValidDefault() {
+		t.Fatal("Expected default empty string slice to fail, but it's valid.")
+	}
+
+	err = opt.SetOption(arg.GroupDefault, "b", "bool", "A boolean.", false, false, arg.VarBool, nil)
 	if err != nil {
 		t.Fatalf("Expected no error creating option, but got %s", err.Error())
 	}
 
 	o = opt.GetOption("bool")
 	if !o.ValidDefault() {
-		t.Fatalf("Expected default '%t' to be valid, but it is not.", o.Default)
-	}
-
-	err = opt.SetOption(arg.GroupDefault, "l", "list", "A list of strings.", []string{}, false, arg.VarStringSlice, nil)
-	if err != nil {
-		t.Fatalf("Expected no error creating option, but got %s", err.Error())
-	}
-
-	o = opt.GetOption("list")
-	if !o.ValidDefault() {
-		t.Fatalf("Expected default '%v' to be valid, but it is not.", o.Default)
-	}
-
-	err = opt.SetOption(arg.GroupDefault, "l", "floatlist", "A list of floats.", []float64{}, false, arg.VarFloatSlice, nil)
-	if err != nil {
-		t.Fatalf("Expected no error creating option, but got %s", err.Error())
-	}
-
-	o = opt.GetOption("floatlist")
-	if !o.ValidDefault() {
-		t.Fatalf("Expected default '%v' to be valid, but it is not.", o.Default)
+		t.Fatal("Expected default false to pass, but it's invalid.")
 	}
 
 	t.Log("Default value works as expected.")

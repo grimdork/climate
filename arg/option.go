@@ -46,44 +46,58 @@ const (
 
 // ValidDefault returns true if the default value is usable (not the zero-value).
 func (o *Option) ValidDefault() bool {
-	switch o.Value.(type) {
+	switch o.Default.(type) {
 	case bool:
 		if o.Type != VarBool {
 			return false
 		}
 
+		return true
+
 	case int:
-		if o.Type != VarInt && o.Default.(int) != 0 {
+		if o.Type != VarInt || o.Default.(int) == 0 {
 			return false
 		}
+
+		return true
 
 	case []int:
-		if o.Type != VarIntSlice && len(o.Default.([]int)) > 0 {
+		if o.Type != VarIntSlice || len(o.Default.([]int)) == 0 {
 			return false
 		}
+
+		return true
 
 	case float64:
-		if o.Type != VarFloat && o.Default.(float64) != 0.0 {
+		if o.Type != VarFloat || o.Default.(float64) == 0.0 {
 			return false
 		}
+
+		return true
 
 	case []float64:
-		if o.Type != VarFloatSlice && len(o.Default.([]float64)) > 0 {
+		if o.Type != VarFloatSlice || len(o.Default.([]float64)) == 0 {
 			return false
 		}
+
+		return true
 
 	case string:
-		if o.Type != VarString && o.Default.(string) != "" {
+		if o.Type != VarString || o.Default.(string) == "" {
 			return false
 		}
+
+		return true
 
 	case []string:
-		if o.Type != VarStringSlice && len(o.Default.([]string)) > 0 {
+		if o.Type != VarStringSlice || len(o.Default.([]string)) == 0 {
 			return false
 		}
+
+		return true
 	}
 
-	return true
+	return false
 }
 
 // SetOption sets an option.
