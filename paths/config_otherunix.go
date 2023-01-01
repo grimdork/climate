@@ -4,8 +4,6 @@ package paths
 
 import (
 	"os/user"
-	"path/filepath"
-	"strings"
 )
 
 func basePath() (string, error) {
