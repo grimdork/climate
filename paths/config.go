@@ -12,7 +12,7 @@ type Paths struct {
 	ServerBase string
 }
 
-// New returns a ConfigPaths struct.
+// New returns a Paths struct.
 func New(appname string) (*Paths, error) {
 	cp := &Paths{
 		AppName: appname,

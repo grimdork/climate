@@ -20,14 +20,3 @@ func basePath() (string, error) {
 func baseServerPath() (string, error) {
 	return "/etc", nil
 }
-
-// Path to application-specific configuration directory.
-func (cp *ConfigPath) Path() string {
-	if cp.dirty {
-		cp.Reset()
-		cp.WriteString(filepath.Join(cp.base, "."+strings.ToLower(cp.name)))
-		cp.dirty = false
-	}
-
-	return cp.String()
-}
