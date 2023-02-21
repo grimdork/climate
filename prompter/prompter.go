@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 	"syscall"
 
 	"golang.org/x/term"
@@ -65,7 +64,6 @@ func (pr *Prompter) Ask() error {
 			}
 		}
 
-		t = strings.ToLower(strings.TrimSpace(t))
 		if t != "" {
 			pr.Answers[i] = t
 		}
