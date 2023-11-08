@@ -70,7 +70,7 @@ func (pr *Prompter) Ask() error {
 		if t == "" {
 			pr.Answers[i] = pr.Defaults[i]
 		} else {
-			pr.Answers[i] = t
+			pr.Answers[i] = t[:len(t)-1]
 		}
 	}
 
