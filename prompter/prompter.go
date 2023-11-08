@@ -19,7 +19,6 @@ type Prompter struct {
 	// Answers from the user.
 	Answers []string
 	// Defaults for each question.
-	Defaults []string
 }
 
 // Question is a question to ask the user.
@@ -40,7 +39,6 @@ func New(q []Question) *Prompter {
 		pr.Questions = append(pr.Questions, q.Question)
 		pr.Secret = append(pr.Secret, q.Secret)
 		pr.Answers = append(pr.Answers, q.Default)
-		pr.Defaults = append(pr.Defaults, q.Default)
 	}
 
 	return pr
@@ -67,10 +65,12 @@ func (pr *Prompter) Ask() error {
 			}
 		}
 
-		if t == "" {
-			pr.Answers[i] = pr.Defaults[i]
-		} else {
-			pr.Answers[i] = t[:len(t)-1]
+		if len(t) > 0 {
+			t = t[:len(t)-1]
+		}
+
+		if t != "" {
+			pr.Answers[i] = t
 		}
 	}
 
