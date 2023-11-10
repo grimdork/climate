@@ -65,7 +65,7 @@ func (pr *Prompter) Ask() error {
 			}
 		}
 
-		if len(t) > 0 {
+		if len(t) > 0 && !pr.Secret[i] {
 			t = t[:len(t)-1]
 		}
 
