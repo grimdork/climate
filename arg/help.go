@@ -104,6 +104,7 @@ func (opt *Options) PrintHelp() {
 					}
 					fmt.Fprintf(w, ")\n")
 				}
+				w.Write([]byte("\n"))
 			}
 			w.Write([]byte("\n\n"))
 		}
