@@ -143,7 +143,13 @@ func (opt *Options) SetOption(group, short, long, help string, defaultvalue any,
 // HelpOrFail parses the CLI arguments, then prints the help text and exits if the -h flag is set,
 // or prints an error and exits with exit code 2 if something went wrong.
 func (opt *Options) HelpOrFail() {
-	err := opt.Parse(os.Args[1:])
+	opt.HelpOrFailArgs(os.Args[1:])
+}
+
+// HelpOrFailArgs works like HelpOrFail(), but takes a string slice to parse. Use os.Args[1:] to mimic HelpOrFail(),
+// and increase the number for sub-commands.
+func (opt *Options) HelpOrFailArgs(args []string) {
+	err := opt.Parse(args)
 	if err != nil {
 		// -h was supplied somewhere on the command line, so exit cleanly after printing help.
 		if err == ErrNoArgs {
