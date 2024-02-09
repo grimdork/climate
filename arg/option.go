@@ -1,6 +1,9 @@
 package arg
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 // Option definition.
 type Option struct {
@@ -135,4 +138,22 @@ func (opt *Options) SetOption(group, short, long, help string, defaultvalue any,
 	}
 
 	return nil
+}
+
+// HelpOrFail parses the CLI arguments, then prints the help text and exits if the -h flag is set,
+// or prints an error and exits with exit code 2 if something went wrong.
+func (opt *Options) HelpOrFail() {
+	err := opt.Parse(os.Args[1:])
+	if err != nil {
+		// -h was supplied somewhere on the command line, so exit cleanly after printing help.
+		if err == ErrNoArgs {
+			opt.PrintHelp()
+			os.Exit(0)
+		}
+
+		// Some other error occurred, probably not an issue with input arguments, so just print the error and exit.
+		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
+		os.Exit(2)
+	}
+	// If we got this far, everything is fine and the program can proceed.
 }
