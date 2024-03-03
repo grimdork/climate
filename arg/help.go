@@ -102,7 +102,7 @@ func (opt *Options) PrintHelp() {
 							fmt.Fprintf(w, ",%s", alias)
 						}
 					}
-					fmt.Fprintf(w, ")\n")
+					fmt.Fprintf(w, ")")
 				}
 				w.Write([]byte("\n"))
 			}
