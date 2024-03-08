@@ -103,7 +103,12 @@ func (o *Option) ValidDefault() bool {
 	return false
 }
 
-// SetOption sets an option.
+// SetFlag is a shortcut to create a bool option defaulting to false.
+func (opt *Options) SetFlag(group, short, long, help string) error {
+	return opt.SetOption(group, short, long, help, false, false, VarString, nil)
+}
+
+// SetOption sets an option with parameters, or a flag.
 func (opt *Options) SetOption(group, short, long, help string, defaultvalue any, required bool, t uint8, choices []any) error {
 	if len(short) > 1 {
 		return fmt.Errorf("-%s: %w", short, ErrLongShort)
