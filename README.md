@@ -18,6 +18,10 @@ Currently supports:
 ### cfmt
 Colour formatting, printf style.
 
+### daemon
+A few utility functions for daemon style programs (servers). The most important function is BreakChannel, which returns a channel that waits for Ctrl-C and returns. Use it like this:
+	<-daemon.BreakChannel()
+
 ### env
 At the moment, just the convenience function Get(), which returns the value of an environment variable or a supplied alternative.
 
