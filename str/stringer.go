@@ -70,7 +70,7 @@ func (s *Stringer) WriteStrings(v ...string) (int, error) {
 // Integers - int and int64 are the only approved types, and untyped whole numbers will be parsed as int
 // Floating point numbers - all numbers with a decimal point are interpreted as float64, with the fewest necessary decimal places
 // Maps & slices - commas are not on by default, and maps will have "=" between each key-value pair
-func (s *Stringer) WriteI(v ...interface{}) (int, error) {
+func (s *Stringer) WriteI(v ...any) (int, error) {
 	var err error
 	var size, c int
 
@@ -85,7 +85,7 @@ func (s *Stringer) WriteI(v ...interface{}) (int, error) {
 }
 
 // writeX can recurse deeply.
-func (s *Stringer) writeX(x interface{}) (int, error) {
+func (s *Stringer) writeX(x any) (int, error) {
 	var err error
 	var size, c int
 	switch reflect.TypeOf(x).Kind() {
