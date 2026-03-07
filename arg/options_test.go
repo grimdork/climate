@@ -346,7 +346,7 @@ func TestCompletions(t *testing.T) {
 
 	cmd := opt.SetCommand("moo", "Have you mooed today?", "", moocmd, nil)
 	if cmd == nil {
-		t.Fatalf("Expected no error, but got %s", err.Error())
+		t.Fatal("Expected command, but got nil.")
 	}
 
 	comp, err := opt.Completions()
