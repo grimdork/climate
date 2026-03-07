@@ -9,11 +9,13 @@ import (
 )
 
 // Print with colours, but no other formatting.
+// Skips colours if the user has disabled them via the NO_COLOR envvar or we're not in a terminal.
 func Print(s string) {
 	colour(os.Stdout, s)
 }
 
 // Printf with colours uses fmt.Printf().
+// Skips colours if the user has disabled them via the NO_COLOR envvar or we're not in a terminal.
 func Printf(s string, v ...any) {
 	buf := strings.Builder{}
 	colour(&buf, s)
