@@ -12,15 +12,29 @@ func UInt(n uint64, si bool) string {
 	if si {
 		unit = 1000
 	}
+
 	if num < unit {
-		return fmt.Sprintf("%dB", int(num))
+		return fmt.Sprintf("%.0f B", num)
 	}
+
 	exp := int(math.Log(num) / math.Log(unit))
-	pre := "kMGTPE"
-	pre = pre[exp-1 : exp]
-	if !si {
-		pre = pre + "i"
+	// Safety check for prefix range
+	if exp > 6 {
+		exp = 6
 	}
-	r := n / uint64(math.Pow(unit, float64(exp)))
-	return fmt.Sprintf("%d %sB", r, pre)
+
+	pre := "kMGTPE"[exp-1 : exp]
+	suffix := "B"
+	if !si {
+		suffix = "iB"
+	}
+
+	// Calculate value with one decimal place for better readability
+	val := num / math.Pow(unit, float64(exp))
+
+	// If it's a whole number, don't show .0
+	if val == math.Floor(val) {
+		return fmt.Sprintf("%.0f %s%s", val, pre, suffix)
+	}
+	return fmt.Sprintf("%.1f %s%s", val, pre, suffix)
 }
