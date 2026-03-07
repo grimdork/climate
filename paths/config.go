@@ -1,6 +1,8 @@
 package paths
 
-import "fmt"
+import (
+	"path/filepath"
+)
 
 // Paths holds OS-specific paths for data.
 type Paths struct {
@@ -40,9 +42,9 @@ func (cp *Paths) SetBase(s string) error {
 			return err
 		}
 
-		cp.UserBase = fmt.Sprintf("%s/%s", cp.UserBase, cp.AppName)
+		cp.UserBase = filepath.Join(cp.UserBase, cp.AppName)
 	} else {
-		cp.UserBase = fmt.Sprintf("%s/%s", s, cp.AppName)
+		cp.UserBase = filepath.Join(s, cp.AppName)
 	}
 
 	return nil
@@ -57,9 +59,9 @@ func (cp *Paths) SetServerBase(s string) error {
 			return err
 		}
 
-		cp.ServerBase = fmt.Sprintf("%s/%s", cp.ServerBase, cp.AppName)
+		cp.ServerBase = filepath.Join(cp.ServerBase, cp.AppName)
 	} else {
-		cp.ServerBase = fmt.Sprintf("%s/%s", s, cp.AppName)
+		cp.ServerBase = filepath.Join(s, cp.AppName)
 	}
 
 	return nil
