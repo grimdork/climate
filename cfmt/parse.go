@@ -50,7 +50,7 @@ func colour(dst io.Writer, f string) {
 			case "white":
 				dst.Write([]byte(White))
 
-			case "grey":
+			case "grey", "gray":
 				dst.Write([]byte(Grey))
 			case "lred":
 				dst.Write([]byte(LightRed))
@@ -85,7 +85,7 @@ func colour(dst io.Writer, f string) {
 			case "bgwhite":
 				dst.Write([]byte(BGWhite))
 
-			case "bggrey":
+			case "bggrey", "bggray":
 				dst.Write([]byte(BGGrey))
 			case "bglred":
 				dst.Write([]byte(BGLightRed))
