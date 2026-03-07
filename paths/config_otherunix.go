@@ -3,16 +3,24 @@
 package paths
 
 import (
+	"os"
 	"os/user"
+	"path/filepath"
 )
 
 func basePath() (string, error) {
+	xdg := os.Getenv("XDG_CONFIG_HOME")
+	if xdg != "" {
+		return xdg, nil
+	}
+
+	// Fall back to $HOME/.config
 	u, err := user.Current()
 	if err != nil {
 		return "", err
 	}
 
-	return u.HomeDir, nil
+	return filepath.Join(u.HomeDir, ".config"), nil
 }
 
 func baseServerPath() (string, error) {
