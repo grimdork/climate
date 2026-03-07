@@ -80,7 +80,7 @@ func (opt *Options) parseArgs(args []string) error {
 			return fn(cmd.Options)
 		}
 
-		if len(arg) < 2 && len(pos) < 0 {
+		if len(arg) < 2 && len(pos) == 0 {
 			unknown = append(unknown, arg)
 			continue
 		}
