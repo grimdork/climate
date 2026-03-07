@@ -96,14 +96,19 @@ func (s *Stringer) writeX(x any) (int, error) {
 		} else {
 			c, err = s.WriteString("false")
 		}
+
 	case reflect.String:
 		c, err = s.WriteString(x.(string))
+
 	case reflect.Int:
 		c, err = s.WriteString(strconv.FormatInt(int64(x.(int)), 10))
+
 	case reflect.Int64:
 		c, err = s.WriteString(strconv.FormatInt(x.(int64), 10))
+
 	case reflect.Float64:
 		c, err = s.WriteString(strconv.FormatFloat(x.(float64), 'f', -1, 64))
+
 	case reflect.Slice:
 		v := reflect.ValueOf(x)
 		for i := 0; i < v.Len(); i++ {
@@ -121,37 +126,45 @@ func (s *Stringer) writeX(x any) (int, error) {
 				size++
 			}
 		}
+
 	case reflect.Map:
 		v := reflect.ValueOf(x)
 		m := v.MapRange()
-		mapsize := len(v.MapKeys())
+		mapsize := v.Len()
 		i := 0
 		for m.Next() {
+			// Write Key
 			c, err = s.writeX(m.Key().Interface())
 			if err != nil {
 				return size, err
 			}
 			size += c
+
+			// Write Equals Symbol
 			err = s.WriteByte(s.equals)
 			if err != nil {
 				return size, err
 			}
 			size++
+
+			// Write Value
 			c, err = s.writeX(m.Value().Interface())
 			if err != nil {
 				return size, err
 			}
 			size += c
-			c = 0
+
+			// Add separator only if mapComma is true AND this is not the last element
 			if s.mapComma && i < (mapsize-1) {
 				err = s.WriteByte(s.comma)
 				if err != nil {
 					return size, err
 				}
+				size++ // Only increment size if we actually wrote the byte
 			}
-			size++
 			i++
 		}
+
 	default:
 	}
 	size += c
