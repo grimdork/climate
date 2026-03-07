@@ -6,8 +6,6 @@ import (
 	"os"
 	"strings"
 	"unicode"
-
-	"github.com/grimdork/climate/str"
 )
 
 // Print with colours, but no other formatting.
@@ -17,12 +15,20 @@ func Print(s string) {
 
 // Printf with colours uses fmt.Printf().
 func Printf(s string, v ...any) {
-	buf := str.NewStringer()
-	colour(buf, s)
+	buf := strings.Builder{}
+	colour(&buf, s)
 	fmt.Printf(buf.String(), v...)
 }
 
 func colour(dst io.Writer, f string) {
+	// If the user has disabled colour or we're not in a terminal, just write the string as-is.
+	if !shouldColor() {
+		dst.Write([]byte(f))
+		dst.Write([]byte("\n"))
+		return
+	}
+
+	// Process the input string character by character.
 	for len(f) > 0 {
 		c := f[0]
 		if c == '%' {
@@ -155,4 +161,24 @@ func parseKeyword(f string) (string, string) {
 		}
 	}
 	return b.String()[1:], in
+}
+
+func shouldColor() bool {
+	// 1. Check if user explicitly disabled it via env var
+	if os.Getenv("NO_COLOR") != "" {
+		return false
+	}
+	// 2. Check if we are actually in a terminal
+	return IsTerminal()
+}
+
+// IsTerminal returns true if the standard output is a terminal.
+func IsTerminal() bool {
+	fileInfo, err := os.Stdout.Stat()
+	if err != nil {
+		return false
+	}
+	// Check if the bit for "Character Device" is set.
+	// Terminals are character devices; pipes and files are not.
+	return (fileInfo.Mode() & os.ModeCharDevice) != 0
 }
