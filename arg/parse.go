@@ -69,6 +69,9 @@ func (opt *Options) ParseAndRun(args []string) {
 	err := opt.Parse(os.Args)
 	if err != nil {
 		if err == ErrNoArgs {
+			if opt.hashelp {
+				opt.PrintHelp()
+			}
 			os.Exit(1)
 		}
 
