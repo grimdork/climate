@@ -1,7 +1,6 @@
 package str
 
 import (
-	"reflect"
 	"strconv"
 	"strings"
 )
@@ -16,7 +15,7 @@ type Stringer struct {
 }
 
 // NewStringer returns a new Stringer with the default settings.
-// - Comma separator ) ","
+// - Comma separator ","
 // - Equals symbol "="
 func NewStringer() *Stringer {
 	s := Stringer{
@@ -84,89 +83,119 @@ func (s *Stringer) WriteI(v ...any) (int, error) {
 	return size, nil
 }
 
-// writeX can recurse deeply.
+// writeX handles concrete types without reflect.
 func (s *Stringer) writeX(x any) (int, error) {
-	var err error
+	switch v := x.(type) {
+	case bool:
+		if v {
+			return s.WriteString("true")
+		}
+		return s.WriteString("false")
+
+	case string:
+		return s.WriteString(v)
+
+	case int:
+		return s.WriteString(strconv.FormatInt(int64(v), 10))
+
+	case int64:
+		return s.WriteString(strconv.FormatInt(v, 10))
+
+	case float64:
+		return s.WriteString(strconv.FormatFloat(v, 'f', -1, 64))
+
+	case []bool:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []string:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []int:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []int64:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []float64:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []any:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+
+	case map[string]string:
+		return s.writeMap(len(v), mapIter(v))
+	case map[string]int:
+		return s.writeMap(len(v), mapIter(v))
+	case map[string]any:
+		return s.writeMap(len(v), mapIter(v))
+	case map[int]string:
+		return s.writeMap(len(v), mapIter(v))
+	case map[int]int:
+		return s.writeMap(len(v), mapIter(v))
+	case map[int]any:
+		return s.writeMap(len(v), mapIter(v))
+
+	default:
+		return 0, nil
+	}
+}
+
+func (s *Stringer) writeSlice(length int, get func(int) any) (int, error) {
 	var size, c int
-	switch reflect.TypeOf(x).Kind() {
-	case reflect.Bool:
-		t := reflect.ValueOf(x).Interface().(bool)
-		if t {
-			c, err = s.WriteString("true")
-		} else {
-			c, err = s.WriteString("false")
+	var err error
+	for i := 0; i < length; i++ {
+		c, err = s.writeX(get(i))
+		if err != nil {
+			return size, err
 		}
-
-	case reflect.String:
-		c, err = s.WriteString(x.(string))
-
-	case reflect.Int:
-		c, err = s.WriteString(strconv.FormatInt(int64(x.(int)), 10))
-
-	case reflect.Int64:
-		c, err = s.WriteString(strconv.FormatInt(x.(int64), 10))
-
-	case reflect.Float64:
-		c, err = s.WriteString(strconv.FormatFloat(x.(float64), 'f', -1, 64))
-
-	case reflect.Slice:
-		v := reflect.ValueOf(x)
-		for i := 0; i < v.Len(); i++ {
-			c, err = s.writeX(v.Index(i).Interface())
-			if err != nil {
-				return size, err
-			}
-			size += c
-			c = 0
-			if s.sliceComma && i < (v.Len()-1) {
-				err = s.WriteByte(s.comma)
-				if err != nil {
-					return size, err
-				}
-				size++
-			}
-		}
-
-	case reflect.Map:
-		v := reflect.ValueOf(x)
-		m := v.MapRange()
-		mapsize := v.Len()
-		i := 0
-		for m.Next() {
-			// Write Key
-			c, err = s.writeX(m.Key().Interface())
-			if err != nil {
-				return size, err
-			}
-			size += c
-
-			// Write Equals Symbol
-			err = s.WriteByte(s.equals)
+		size += c
+		if s.sliceComma && i < length-1 {
+			err = s.WriteByte(s.comma)
 			if err != nil {
 				return size, err
 			}
 			size++
+		}
+	}
+	return size, nil
+}
 
-			// Write Value
-			c, err = s.writeX(m.Value().Interface())
+type mapEntry struct {
+	key, val any
+}
+
+func mapIter[K comparable, V any](m map[K]V) []mapEntry {
+	entries := make([]mapEntry, 0, len(m))
+	for k, v := range m {
+		entries = append(entries, mapEntry{k, v})
+	}
+	return entries
+}
+
+func (s *Stringer) writeMap(length int, entries []mapEntry) (int, error) {
+	var size, c int
+	var err error
+	for i, e := range entries {
+		c, err = s.writeX(e.key)
+		if err != nil {
+			return size, err
+		}
+		size += c
+
+		err = s.WriteByte(s.equals)
+		if err != nil {
+			return size, err
+		}
+		size++
+
+		c, err = s.writeX(e.val)
+		if err != nil {
+			return size, err
+		}
+		size += c
+
+		if s.mapComma && i < length-1 {
+			err = s.WriteByte(s.comma)
 			if err != nil {
 				return size, err
 			}
-			size += c
-
-			// Add separator only if mapComma is true AND this is not the last element
-			if s.mapComma && i < (mapsize-1) {
-				err = s.WriteByte(s.comma)
-				if err != nil {
-					return size, err
-				}
-				size++ // Only increment size if we actually wrote the byte
-			}
-			i++
+			size++
 		}
-
-	default:
 	}
-	size += c
-	return size, err
+	return size, nil
 }
