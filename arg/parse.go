@@ -267,8 +267,8 @@ func (opt *Options) parseArgs(args []string) error {
 
 					case VarString:
 						if a[0] == string(c) && a[1] != "" {
-							if !hasChoice(o.Value.(string), o.Choices) {
-								return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
+							if !hasChoice(a[1], o.Choices) {
+								return fmt.Errorf("%s=%v: %w", arg, a[1], ErrIllegalChoice)
 							}
 							o.Value = a[1]
 							continue
