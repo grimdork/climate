@@ -1,7 +1,7 @@
 # climate/loglines
-Opinionaed, simple logging.
+Opinionated, simple logging.
 
-`loglines`has two functions for general log lines and errors, plus a function to make a very specifically formatted timestamp. The timestamp is in the format `<dayname> <mon> <day> HH:MM:SS.<nanoseconds> <year>` and is printed to stdout or stderr, depending on the function used.
+`loglines`has two functions for general log lines and errors, plus a function to make a very specifically formatted timestamp. The timestamp is in the format `<dayname> <mon> <day> HH:MM:SS.<microseconds> <year>` and is printed to stdout or stderr, depending on the function used.
 
 ## Installation
 ```bash
