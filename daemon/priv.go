@@ -1,4 +1,3 @@
-// Drop privileges.
 package daemon
 
 import (
