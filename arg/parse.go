@@ -66,16 +66,9 @@ func (opt *Options) Parse(args []string) error {
 // ParseAndRun is a helper method that calls Parse, runs any commands and exits the program on error.
 // It does not return any error, but is instead intended as the error handler.
 func (opt *Options) ParseAndRun(args []string) {
-	if len(opt.Args) == 0 {
-		if opt.hashelp {
-			opt.PrintHelp()
-		}
-		os.Exit(1)
-	}
-
 	err := opt.Parse(os.Args)
 	if err != nil {
-		if err == ErrNoArgs {
+		if err == ErrNoArgs || len(opt.Args) == 0 {
 			if opt.hashelp {
 				opt.PrintHelp()
 			}
