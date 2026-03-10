@@ -5,7 +5,7 @@ Simple utilities for long-running processes and graceful shutdowns.
 
 ## Installation
 ```bash
-go get [github.com/grimdork/climate/daemon](https://github.com/grimdork/climate/daemon)
+go get github.com/grimdork/climate/daemon
 ```
 
 ## Core Features
@@ -18,7 +18,7 @@ package main
 
 import (
 	"fmt"
-	"[github.com/grimdork/climate/daemon](https://github.com/grimdork/climate/daemon)"
+	"github.com/grimdork/climate/daemon"
 )
 
 func main() {

@@ -5,7 +5,7 @@ A type-aware, recursive extension of strings.Builder.
 
 ## Installation
 ```bash
-go get [github.com/grimdork/climate/str](https://github.com/grimdork/climate/str)
+go get github.com/grimdork/climate/str
 ```
 
 ## Features

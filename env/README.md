@@ -5,7 +5,7 @@ Lightweight environment variable fetching with fallbacks.
 
 ## Installation
 ```bash
-go get [github.com/grimdork/climate/env](https://github.com/grimdork/climate/env)
+go get github.com/grimdork/climate/env
 ```
 
 ## Why use env?

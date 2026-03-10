@@ -5,7 +5,7 @@ Cross-platform directory resolution for configuration and data.
 
 ## Installation
 ```bash
-go get [github.com/grimdork/climate/paths](https://github.com/grimdork/climate/paths)
+go get github.com/grimdork/climate/paths
 ```
 
 ## Why use paths?

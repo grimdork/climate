@@ -5,7 +5,7 @@ A simple, interactive tool for terminal-based user input.
 
 ## Installation
 ```bash
-go get [github.com/grimdork/climate/prompter](https://github.com/grimdork/climate/prompter)
+go get github.com/grimdork/climate/prompter
 ```
 
 ## Core Features

@@ -5,7 +5,7 @@ Simple ANSI color formatting using printf-style templates.
 
 ## Installation
 ```bash
-go get [github.com/grimdork/climate/cfmt](https://github.com/grimdork/climate/cfmt)
+go get github.com/grimdork/climate/cfmt
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ The package uses a simple `{{.Color}}` syntax. Always remember to include {{.Res
 ```go
 package main
 
-import "[github.com/grimdork/climate/cfmt](https://github.com/grimdork/climate/cfmt)"
+import "github.com/grimdork/climate/cfmt"
 
 func main() {
 	// Simple colored output

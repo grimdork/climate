@@ -17,7 +17,7 @@ Minimalist toolkit for Go command-line applications.
 | Package | Description |
 | :--- | :--- |
 | **[`arg`](./arg)** | No-dependency option parser with subcommands and positionals. |
-| **[`cfmt`](./cfmt)** | `printf` wrapper with easy `{{.Color}}` template formatting. |
+| **[`cfmt`](./cfmt)** | `printf` wrapper with easy `%color` formatting. |
 | **[`daemon`](./daemon)** | Lifecycle utilities for background services and signal handling. |
 | **[`prompter`](./prompter)** | Interactive user prompts with support for masked secrets. |
 | **[`paths`](./paths)** | Resolves standard config paths (XDG on Linux, Library on macOS). |
@@ -32,7 +32,7 @@ Minimalist toolkit for Go command-line applications.
 
 ### Installation
 ```bash
-go get [github.com/grimdork/climate](https://github.com/grimdork/climate)
+go get github.com/grimdork/climate
 ```
 
 Or just type \<package>.\<function> and let `goimports` add it and `go mod tidy` download it like a sane person would.
@@ -60,8 +60,8 @@ Use ANSI colours with Printf.
 ```go
 import "github.com/grimdork/climate/cfmt"
 
-cfmt.Printf("{{.Red}}Error:{{.Reset}} file not found: '%s'\n", fn)
-cfmt.Print("{{.Green}}Success!{{.Reset}} Process completed.\n")
+cfmt.Printf("%red Error:%reset file not found: '%s'\n", fn)
+cfmt.Print("%green Success!%reset Process completed.\n")
 ```
 
 ## Signal Handling (daemon)
