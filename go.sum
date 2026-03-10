@@ -1,3 +1,5 @@
+github.com/grimdork/str v1.0.1 h1:1LJRk0SHB65LgiUFGHm9eq/WNpZYbNXJ733peg9/K2A=
+github.com/grimdork/str v1.0.1/go.mod h1:MoFNACllXqLUTqGL6gWvB3dyyyyt5Jn5IFMEPfIgLgs=
 golang.org/x/sys v0.2.0 h1:ljd4t30dBnAvMZaQCevtY0xLLD0A+bRZXbgLMLU1F/A=
 golang.org/x/sys v0.2.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.2.0 h1:z85xZCsEl7bi/KwbNADeBYoOP0++7W1ipu+aGnpwzRM=

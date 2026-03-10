@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/grimdork/climate/loglines"
 )
 
 // ShowOptions shows the values of all options. Used for debugging.
@@ -59,6 +61,24 @@ func (opt *Options) Parse(args []string) error {
 	}
 
 	return nil
+}
+
+// ParseAndRun is a helper method that calls Parse, runs any commands and exits the program on error.
+// It does not return any error, but is instead intended as the error handler.
+func (opt *Options) ParseAndRun(args []string) {
+	err := opt.Parse(os.Args)
+	if err != nil {
+		if err == ErrNoArgs {
+			os.Exit(1)
+		}
+
+		if err == ErrRunCommand {
+			os.Exit(0)
+		}
+
+		loglines.Err("Error parsing arguments: %v\n", err)
+		os.Exit(1)
+	}
 }
 
 func (opt *Options) parseArgs(args []string) error {
