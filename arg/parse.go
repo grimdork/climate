@@ -66,7 +66,7 @@ func (opt *Options) Parse(args []string) error {
 // ParseAndRun is a helper method that calls Parse, runs any commands and exits the program on error.
 // It does not return any error, but is instead intended as the error handler.
 func (opt *Options) ParseAndRun(args []string) {
-	err := opt.Parse(os.Args)
+	err := opt.Parse(args)
 	if err != nil {
 		if err == ErrNoArgs || len(opt.Args) == 0 {
 			if opt.hashelp {
@@ -147,7 +147,7 @@ func (opt *Options) parseArgs(args []string) error {
 					if a[1] != "" {
 						o.Value = a[1]
 						if !hasChoice(o.Value.(string), o.Choices) {
-							return fmt.Errorf("%s=%v: %W", arg, o.Value, ErrIllegalChoice)
+							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
 						}
 						continue
 					}
@@ -155,7 +155,7 @@ func (opt *Options) parseArgs(args []string) error {
 					if len(args) > i+1 {
 						o.Value = args[i+1]
 						if !hasChoice(o.Value.(string), o.Choices) {
-							return fmt.Errorf("%s=%v: %W", arg, o.Value, ErrIllegalChoice)
+							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
 						}
 						args[i+1] = ""
 						continue
@@ -167,7 +167,7 @@ func (opt *Options) parseArgs(args []string) error {
 					if a[1] != "" {
 						v, err := strconv.Atoi(a[1])
 						if !hasChoice(v, o.Choices) {
-							return fmt.Errorf("%s=%v: %W", arg, o.Value, ErrIllegalChoice)
+							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
 						}
 						if err != nil {
 							return err
@@ -180,7 +180,7 @@ func (opt *Options) parseArgs(args []string) error {
 					if len(args) > i+1 {
 						v, err := strconv.Atoi(args[i+1])
 						if !hasChoice(v, o.Choices) {
-							return fmt.Errorf("%s=%v: %W", arg, o.Value, ErrIllegalChoice)
+							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
 						}
 						if err != nil {
 							return err
@@ -197,7 +197,7 @@ func (opt *Options) parseArgs(args []string) error {
 					if a[1] != "" {
 						v, err := strconv.ParseFloat(a[1], 64)
 						if !hasChoice(v, o.Choices) {
-							return fmt.Errorf("%s=%v: %W", arg, o.Value, ErrIllegalChoice)
+							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
 						}
 						if err != nil {
 							return err
@@ -210,7 +210,7 @@ func (opt *Options) parseArgs(args []string) error {
 					if len(args) > i+1 {
 						v, err := strconv.ParseFloat(args[i+1], 64)
 						if !hasChoice(v, o.Choices) {
-							return fmt.Errorf("%s=%v: %W", arg, o.Value, ErrIllegalChoice)
+							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
 						}
 						if err != nil {
 							return err
@@ -429,13 +429,7 @@ func (opt *Options) parseArgs(args []string) error {
 		unknown = append(unknown, arg)
 	}
 
-	for _, arg := range unknown {
-		if arg != "" {
-		}
-		unknown = unknown[1:]
-	}
 	opt.Args = unknown
-
 	for _, o := range opt.short {
 		if o.Required && o.Value == nil {
 			return fmt.Errorf("-%s: %w", o.ShortName, ErrMissingRequired)
