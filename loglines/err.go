@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/grimdork/str"
+	"github.com/grimdork/climate/str"
 )
 
 // Err prints formatted messages to stderr, starting with a nicely formatted timestamp.

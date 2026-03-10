@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/grimdork/str"
+	"github.com/grimdork/climate/str"
 )
 
 // Msg prints formatted messages to stdout, starting with a nicely formatted timestamp.
