@@ -8,7 +8,7 @@ import (
 )
 
 // Err prints formatted messages to stderr, starting with a nicely formatted timestamp.
-func Err(f string, v ...interface{}) {
+func Err(f string, v ...any) {
 	b := str.NewStringer()
 	b.WriteStrings(
 		NowString(),

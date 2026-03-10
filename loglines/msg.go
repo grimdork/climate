@@ -8,7 +8,7 @@ import (
 )
 
 // Msg prints formatted messages to stdout, starting with a nicely formatted timestamp.
-func Msg(f string, v ...interface{}) {
+func Msg(f string, v ...any) {
 	b := str.NewStringer()
 	b.WriteStrings(
 		NowString(),
