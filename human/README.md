@@ -5,39 +5,40 @@
 
 ## Installation
 ```bash
-go get [github.com/grimdork/climate/human](https://github.com/grimdork/climate/human)
-Usage
-1. Binary Formatting (Default)
+go get github.com/grimdork/climate/human
+```
 
-Used by most operating systems (Windows, Linux) to represent file sizes. It uses the iB suffix (KiB, MiB) to denote base-1024.
+## Usage
+### Binary Formatting (Default)
+The old way, still preferred by some. It uses base-1024 and units like KiB, MiB, etc.
 
-Go
+```Go
 package main
 
 import (
-    "fmt"
-    "[github.com/grimdork/climate/human](https://github.com/grimdork/climate/human)"
+	"fmt"
+	"github.com/grimdork/climate/human"
 )
 
 func main() {
-    size := uint64(1572864)
-    fmt.Println(human.UInt(size, false)) // Output: 1.5 MiB
+	size := uint64(1572864)
+	fmt.Println(human.UInt(size, false)) // Output: 1.5 MiB
 }
-2. SI Formatting (Decimal)
+```
 
-Standardized by storage manufacturers and used by macOS. It uses base-1000.
+### SI Formatting (Decimal)
+Standardized by storage manufacturers and used more recently in operating systems. It uses base-1000.
 
-Go
+```Go
 size := uint64(1500000)
 fmt.Println(human.UInt(size, true)) // Output: 1.5 MB
-Features
-Auto-Scaling: Automatically chooses the best unit from Bytes to Exabytes.
+```
 
-Smart Precision: Shows decimals only when necessary for a cleaner look.
+## Features
+- Auto-scaling: Automatically chooses the best unit from Bytes to Exabytes.
+- Smart precision: Shows decimals only when necessary for a cleaner look.
+- TinyGo compatible: Uses standard `math` functions; no heavy dependencies.
+- Zero dependencies: Pure Go standard library.
 
-TinyGo Compatible: Uses standard math functions; no heavy dependencies.
-
-Zero Dependencies: Pure Go standard library.
-
-Why use human?
-Raw bytes are hard to read at a glance. human turns 124155123 into 118.4 MiB, making your CLI tool's output much more accessible to users.
+## Why use `human`?
+Raw bytes are hard to read at a glance. `human` turns 124155123 into 118.4 MiB, making your CLI tool's output much more accessible to users.
