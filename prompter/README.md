@@ -8,41 +8,66 @@ A simple, interactive tool for terminal-based user input.
 go get github.com/grimdork/climate/prompter
 ```
 
-## Core Features
+## Usage
 
-### Basic questions
-Ask a question and provide a fallback value if the user provides no input.
+### Define questions and ask
+```go
+package main
 
-```Go
-name := prompter.Ask("What is your name?", "Guest", false)
-fmt.Printf("Hello, %s!\n", name)
+import (
+	"fmt"
+	"github.com/grimdork/climate/prompter"
+)
+
+func main() {
+	pr := prompter.New([]prompter.Question{
+		{Question: "Username", Default: "admin"},
+		{Question: "Password", Secret: true},
+	})
+
+	err := pr.Ask()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("User: %s\n", pr.Answers[0])
+	fmt.Printf("Pass: %s\n", pr.Answers[1])
+}
 ```
 
-### Secure input (passwords)
-Mask the user's keystrokes for sensitive information.
+Output:
+```
+Username [admin]: alice
+Password []:
+User: alice
+Pass: s3cret
+```
+
+If the user presses Enter without typing anything, the default value is kept.
+
+### Secret input
+Any question with `Secret: true` will suppress terminal echo, so typed characters are not visible. This uses raw terminal ioctl — no external dependencies.
+
+### Testing with custom I/O
+For testing or automation, use `NewWithReader` to inject a custom input source:
 
 ```go
-// The third argument 'true' enables hidden input
-dbPass := prompter.Ask("Database Password:", "", true)
+input := strings.NewReader("testuser\n")
+fakePass := func() ([]byte, error) {
+	return []byte("testpass"), nil
+}
+
+pr := prompter.NewWithReader([]prompter.Question{
+	{Question: "User", Default: "admin"},
+	{Question: "Pass", Secret: true},
+}, input, nil, fakePass)
+
+pr.Ask()
+// pr.Answers[0] == "testuser"
+// pr.Answers[1] == "testpass"
 ```
 
-### Smart Defaults
-If a default value is provided, it is typically displayed in brackets:
-```
-What is your name? [Guest]:
-```
+Parameters: input reader, output writer (nil discards prompts), and an optional password reader function (nil falls back to reading a line from the input).
 
-If the user simply presses Enter, the default value is returned.
-
-## Technical Details
-### Handling "Hidden" Input
-
-Under the hood, prompter uses terminal escape codes or raw mode (depending on the OS) to ensure that characters typed by the user do not echo back to the screen. This is essential for:
-
-- Database credentials
-- API keys
-- Authentication tokens
-
----
-
-Unlike larger libraries that pull in heavy terminal-control dependencies, prompter stays lean. It uses standard os.Stdin and bufio.Scanner patterns, making it highly compatible with TinyGo and small-footprint binaries.
+## Platform support
+Works on macOS, Linux, FreeBSD, NetBSD, OpenBSD, and Dragonfly BSD.
