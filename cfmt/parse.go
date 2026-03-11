@@ -216,6 +216,9 @@ func colour(dst io.Writer, f string) {
 
 // parseKeyword returns the parsed keyword and the rest of the input string.
 func parseKeyword(f string) (string, string) {
+	// Parse tags consisting only of ASCII lowercase letters (a-z).
+	// This prevents uppercase letters from being swallowed as part of the tag
+	// when a tag is immediately followed by camel-case or PascalCase text.
 	var b strings.Builder
 	if len(f) == 0 {
 		return "", f
@@ -223,17 +226,17 @@ func parseKeyword(f string) (string, string) {
 
 	b.WriteByte(f[0])
 	in := f[1:]
-	loop := true
-	for len(in) > 0 && loop {
-		if !unicode.IsLetter(rune(in[0])) {
-			loop = false
-			if len(in) > 1 && in[0] == ' ' {
-				in = in[1:]
-			}
-		} else {
-			b.WriteByte(in[0])
-			in = in[1:]
+	for len(in) > 0 {
+		c := in[0]
+		if c < 'a' || c > 'z' {
+			break
 		}
+		b.WriteByte(c)
+		in = in[1:]
+	}
+	// If the next character is a single space, consume it so callers don't need to include it.
+	if len(in) > 0 && in[0] == ' ' {
+		in = in[1:]
 	}
 	return b.String()[1:], in
 }
