@@ -1,7 +1,7 @@
 # climate/cfmt
-Simple ANSI color formatting using printf-style templates.
+Simple ANSI colour formatting using printf-style templates.
 
-`cfmt` allows you to add color and style to your terminal output using a `%keyword` syntax. It handles the ANSI escape codes for you, keeping your Go code free of messy control characters.
+`cfmt` allows you to add colour and style to your terminal output using a `%keyword` syntax. It handles the ANSI escape codes for you, keeping your Go code free of messy control characters.
 
 ## Installation
 ```bash
@@ -11,8 +11,6 @@ go get github.com/grimdork/climate/cfmt
 ## Usage
 Color and style tags use a `%` prefix followed by a keyword. The keyword ends at the first non-letter character. Always include `%reset` after colored output to prevent color bleeding into the rest of the terminal.
 
-**Note:** Both `Print` and `Printf` automatically append a newline.
-
 ### Basic Example
 ```go
 package main
@@ -20,12 +18,12 @@ package main
 import "github.com/grimdork/climate/cfmt"
 
 func main() {
-	// Simple colored output
-	cfmt.Printf("%red Error:%reset file not found: '%s'", fn)
-	cfmt.Print("%green Success!%reset Configuration loaded")
+	// Print and Printf work like fmt.Print and fmt.Printf — no automatic newline
+	cfmt.Printf("%red Error:%reset file not found: '%s'\n", fn)
+	cfmt.Print("%green Success!%reset Configuration loaded\n")
 
-	// Combine styles
-	cfmt.Printf("%bold %yellow Warning:%reset This action is permanent.")
+	// Println adds a newline for you
+	cfmt.Println("%bold %yellow Warning:%reset This action is permanent.")
 }
 ```
 

@@ -92,7 +92,7 @@ func TestTagMapping(t *testing.T) {
 }
 
 func TestNoColorPath(t *testing.T) {
-	// When not in a terminal, colour strips tags and outputs plain text + newline
+	// When not in a terminal, colour strips tags and outputs plain text without appending newline
 	var b strings.Builder
 	colour(&b, "%red Error:%reset file not found")
 	result := b.String()
@@ -105,6 +105,9 @@ func TestNoColorPath(t *testing.T) {
 	}
 	if !strings.Contains(result, "file not found") {
 		t.Error("expected 'file not found' in output")
+	}
+	if strings.HasSuffix(result, "\n") {
+		t.Error("Print/colour should not append newline")
 	}
 }
 

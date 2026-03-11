@@ -14,6 +14,12 @@ func Print(s string) {
 	colour(os.Stdout, s)
 }
 
+// Println prints with colours and appends a newline.
+func Println(s string) {
+	colour(os.Stdout, s)
+	os.Stdout.Write([]byte("\n"))
+}
+
 // Printf with colours uses fmt.Printf().
 // Skips colours if the user has disabled them via the NO_COLOR envvar or we're not in a terminal.
 func Printf(s string, v ...any) {
@@ -26,7 +32,6 @@ func colour(dst io.Writer, f string) {
 	// If the user has disabled colour or we're not in a terminal, just write the string as-is.
 	if !shouldColor() {
 		dst.Write([]byte(f))
-		dst.Write([]byte("\n"))
 		return
 	}
 
@@ -138,7 +143,6 @@ func colour(dst io.Writer, f string) {
 			f = f[1:]
 		}
 	}
-	dst.Write([]byte("\n"))
 }
 
 // parseKeyword returns the parsed keyword and the rest of the input string.
