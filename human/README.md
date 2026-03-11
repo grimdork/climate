@@ -27,7 +27,7 @@ func main() {
 ```
 
 ### SI Formatting (Decimal)
-Standardized by storage manufacturers and used more recently in operating systems. It uses base-1000.
+Standardised by storage manufacturers and used more recently in operating systems. It uses base-1000.
 
 ```Go
 size := uint64(1500000)

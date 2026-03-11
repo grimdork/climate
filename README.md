@@ -8,7 +8,7 @@ Minimalist toolkit for Go command-line applications.
 `climate` is a collection of modular packages designed to help you build fast, small, and robust command-line tools. Every package depends **only on the Go standard library**, making it the perfect companion for **TinyGo** projects and high-performance system utilities.
 
 > [!IMPORTANT]
-> Currently optimized for Unix-like systems (Linux, macOS, BSD). Windows support is not a priority.
+> Currently optimised for Unix-like systems (Linux, macOS, BSD). Windows support is not a priority.
 
 ---
 
@@ -17,7 +17,7 @@ Minimalist toolkit for Go command-line applications.
 | Package | Description |
 | :--- | :--- |
 | **[`arg`](./arg)** | No-dependency option parser with subcommands and positionals. |
-| **[`cfmt`](./cfmt)** | `printf` wrapper with easy `%color` formatting. |
+| **[`cfmt`](./cfmt)** | `printf` wrapper with easy `%colour` formatting. |
 | **[`daemon`](./daemon)** | Lifecycle utilities for background services and signal handling. |
 | **[`prompter`](./prompter)** | Interactive user prompts with support for masked secrets. |
 | **[`paths`](./paths)** | Resolves standard config paths (XDG on Linux, Library on macOS). |
@@ -54,7 +54,7 @@ func main() {
 }
 ```
 
-## Color formatting (cfmt)
+## Colour formatting (cfmt)
 Use ANSI colours with Printf.
 
 ```go

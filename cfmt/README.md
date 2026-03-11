@@ -9,7 +9,7 @@ go get github.com/grimdork/climate/cfmt
 ```
 
 ## Usage
-Color and style tags use a `%` prefix followed by a keyword. The keyword ends at the first non-letter character. Always include `%reset` after colored output to prevent color bleeding into the rest of the terminal.
+Colour and style tags use a `%` prefix followed by a keyword. The keyword ends at the first non-letter character. Always include `%reset` after coloured output to prevent colour bleeding into the rest of the terminal.
 
 ### Basic Example
 ```go
@@ -28,7 +28,7 @@ func main() {
 ```
 
 ### Printf with format verbs
-Color tags and standard Go format verbs work together:
+Colour tags and standard Go format verbs work together:
 ```go
 cfmt.Printf("%cyan Status:%reset %s (%d items)", status, count)
 ```

@@ -151,7 +151,7 @@ script, err := opt.Completions()
 ```
 
 ## Option groups
-Organize options into named groups for cleaner help output:
+Organise options into named groups for cleaner help output:
 ```go
 opt.AddGroup("Database")
 opt.SetOption("Database", "H", "db-host", "Database host.", "localhost", false, arg.VarString, nil)

@@ -41,8 +41,8 @@ fmt.Println(s.String())
 // Output: go;cli;minimal
 ```
 
-### Map serialization
-Maps are written as key=value pairs. Customize the joiner and separator:
+### Map serialisation
+Maps are written as key=value pairs. Customise the joiner and separator:
 ```go
 s := str.NewStringer()
 s.SetMapComma(true).SetEquals(':').SetComma('|')
