@@ -16,10 +16,6 @@ type CompList struct {
 	Commands []CompCmd
 }
 
-type opt interface {
-	CompList | CompCmd
-}
-
 // CompCmd is a completion for a tool command.
 type CompCmd struct {
 	// Name op the command.
