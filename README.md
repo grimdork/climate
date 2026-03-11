@@ -139,7 +139,7 @@ host := env.Get("DB_HOST", "localhost")
 
 ## Core Philosophy
 - Standard library only: Don't pull in other 3rd party dependencies.
-- TinyGo compatibility: Prioritise low-allocation and small-binary footprints. While reflect is used sparingly in some packages, the core logic is designed to be as "TinyGo-friendly" as possible.
+- TinyGo compatibility: Prioritise low-allocation and small-binary footprints. No use of reflect; all type handling is done via type switches and generics.
 - Unix focus: Made for the systems I actually use every day.
 
 ## License

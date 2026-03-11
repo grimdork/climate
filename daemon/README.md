@@ -1,17 +1,15 @@
 # climate/daemon
 Simple utilities for long-running processes and graceful shutdowns.
 
-`daemon` provides helpers for programs that need to run in the background or stay active until interrupted. Its primary feature is a clean, channel-based way to handle system interrupts (like `Ctrl+C`).
+`daemon` provides helpers for programs that need to run in the background or stay active until interrupted.
 
 ## Installation
 ```bash
 go get github.com/grimdork/climate/daemon
 ```
 
-## Core Features
-
-### Graceful Shutdown with BreakChannel
-Instead of manually setting up os/signal notify patterns, BreakChannel returns a channel that blocks until the program receives a termination signal (SIGINT or SIGTERM).
+## Graceful shutdown with BreakChannel
+Returns a channel that blocks until the program receives SIGINT or SIGTERM. Also cleans up the `^C` output from the terminal.
 
 ```go
 package main
@@ -22,17 +20,26 @@ import (
 )
 
 func main() {
-	println("Server starting... Press Ctrl+C to stop.")
+	fmt.Println("Server starting... Press Ctrl+C to stop.")
 
-	// Do your setup here (start database, listeners, etc.)
+	// Start listeners, workers, etc.
 
-	// Block until Ctrl+C is pressed
 	<-daemon.BreakChannel()
 
-	println("\nShutting down gracefully...")
-	// Perform cleanup here
+	fmt.Println("Shutting down gracefully...")
+	// Cleanup here
 }
 ```
 
-### TODO
-- Context version
+## Privilege dropping with DegradeToUser
+Drop from root to a specified user. Useful for services that bind to privileged ports before switching to a less privileged account.
+
+```go
+err := daemon.DegradeToUser("www-data")
+if err != nil {
+	// Either not running as root (daemon.ErrorNotRoot) or user lookup failed
+	log.Fatal(err)
+}
+```
+
+Sets the effective UID and primary GID of the specified user. Returns `daemon.ErrorNotRoot` if the process is not running as root.

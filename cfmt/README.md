@@ -1,7 +1,7 @@
 # climate/cfmt
 Simple ANSI color formatting using printf-style templates.
 
-`cfmt` allows you to add color and style to your terminal output using a clean, readable template syntax. It handles the ANSI escape codes for you, keeping your Go code free of messy control characters.
+`cfmt` allows you to add color and style to your terminal output using a `%keyword` syntax. It handles the ANSI escape codes for you, keeping your Go code free of messy control characters.
 
 ## Installation
 ```bash
@@ -9,7 +9,9 @@ go get github.com/grimdork/climate/cfmt
 ```
 
 ## Usage
-The package uses a simple `{{.Color}}` syntax. Always remember to include {{.Reset}} to prevent color bleeding into the rest of the terminal.
+Color and style tags use a `%` prefix followed by a keyword. The keyword ends at the first non-letter character. Always include `%reset` after colored output to prevent color bleeding into the rest of the terminal.
+
+**Note:** Both `Print` and `Printf` automatically append a newline.
 
 ### Basic Example
 ```go
@@ -19,20 +21,29 @@ import "github.com/grimdork/climate/cfmt"
 
 func main() {
 	// Simple colored output
-	cfmt.Printf("{{.Red}}Error:{{.Reset}} file not found\n")
-	cfmt.Printf("{{.Green}}Success:{{.Reset}} Configuration loaded\n")
+	cfmt.Printf("%red Error:%reset file not found: '%s'", fn)
+	cfmt.Print("%green Success!%reset Configuration loaded")
 
-	// Using styles
-	cfmt.Printf("{{.Bold}}{{.Yellow}}Warning:{{.Reset}} This action is permanent.\n")
+	// Combine styles
+	cfmt.Printf("%bold %yellow Warning:%reset This action is permanent.")
 }
 ```
 
+### Printf with format verbs
+Color tags and standard Go format verbs work together:
+```go
+cfmt.Printf("%cyan Status:%reset %s (%d items)", status, count)
+```
+
+### NO_COLOR support
+`cfmt` respects the `NO_COLOR` environment variable. If set, or if stdout is not a terminal, all color tags are stripped and output is plain text. You can check this yourself with `cfmt.IsTerminal()`.
+
 ### Available Tags
-| Category|	Tags |
-| :---- | :---- |
-| Reset | {{.reset}} (Clears all formatting) |
-| Text | {{.black}}, {{.red}}, {{.green}}, {{.yellow}}, {{.blue}}, {{.magenta}}, {{.cyan}}, {{.white}} |
-| Light text | {{.grey}}, {{.gray}}, {{.lred}}, {{.lgreen}}, {{.Lyellow}}, {{.lblue}}, {{.lmagenta}}, {{.lcyan}}, {{.lwhite}} |
-| Background | {{.bgblack}}, {{.bgred}}, {{.bggreen}}, {{.bgyellow}}, {{.bgblue}}, {{.bgmagenta}}, {{.bgcyan}}, {{.bgwhite}}
-| Light background | {{.bggrey}}, {{.bggray}}, {{.bglred}}, {{.bglgreen}}, {{.bglyellow}}, {{.bglblue}}, {{.bglmagenta}}, {{.bglcyan}}, {{.bglwhite}}
-| Styles | {{.bold}}, {{.fuzzy}}, {{.italic}}, {{.under}}, {{.blink}}, {{.fast}}, {{.reverse}} {{.conceal}}, {{.strike}} |
+| Category | Tags |
+| :--- | :--- |
+| Reset | `%reset` |
+| Text | `%black`, `%red`, `%green`, `%yellow`, `%blue`, `%magenta`, `%cyan`, `%white` |
+| Light text | `%grey`/`%gray`, `%lred`, `%lgreen`, `%lyellow`, `%lblue`, `%lmagenta`, `%lcyan`, `%lwhite` |
+| Background | `%bgblack`, `%bgred`, `%bggreen`, `%bgyellow`, `%bgblue`, `%bgmagenta`, `%bgcyan`, `%bgwhite` |
+| Light bg | `%bggrey`/`%bggray`, `%bglred`, `%bglgreen`, `%bglyellow`, `%bglblue`, `%bglmagenta`, `%bglcyan`, `%bglwhite` |
+| Styles | `%bold`, `%fuzzy`, `%italic`, `%under`, `%blink`, `%fast`, `%reverse`, `%conceal`, `%strike` |
