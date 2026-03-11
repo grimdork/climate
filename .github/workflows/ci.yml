@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Test (linux, macOS)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        go: [1.26, 1.25]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ matrix.go }}-${{ hashFiles('**/go.sum') }}
+      - name: Install staticcheck
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/dominikh/go-tools/master/install.sh | bash -s -- staticcheck
+      - name: Build and test
+        run: |
+          go mod tidy
+          go vet ./...
+          staticcheck ./...
+          go test ./... -v
+      - name: Run gofmt check
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then echo "gofmt needs to be run"; gofmt -l .; exit 1; fi
