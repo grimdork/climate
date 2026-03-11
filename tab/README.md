@@ -54,3 +54,16 @@ fmt.Print(output)
 ```
 
 Handles quoted fields, commas inside values, and all standard CSV rules via Go's `encoding/csv`.
+
+### TSV input
+`TabulateTSV` and `SplitColumnsTSV` parse tab-separated values and preserve empty cells. Use these when your data may contain empty fields between consecutive tabs.
+```go
+tsv := "a\tb\tc\n1\t\t3\n4\t5\t\n"
+output, _ := tab.TabulateTSV(tsv)
+fmt.Print(output)
+// a   b   c
+// 1       3
+// 4   5
+```
+
+If you prefer the whitespace-driven behaviour (collapsing consecutive whitespace), keep using `Tabulate(input, false)`.

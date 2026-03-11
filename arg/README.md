@@ -152,6 +152,15 @@ script, err := opt.Completions()
 
 ## Option groups
 Organise options into named groups for cleaner help output:
+
+### Tests
+This project includes unit tests for the `arg` package that cover option parsing, choice validation, positional arguments, completions, and more. Run them with:
+
+```bash
+go test ./arg -v
+```
+
+Contributions adding edge-case tests for long option parsing and environment variable behaviour are welcome.
 ```go
 opt.AddGroup("Database")
 opt.SetOption("Database", "H", "db-host", "Database host.", "localhost", false, arg.VarString, nil)
