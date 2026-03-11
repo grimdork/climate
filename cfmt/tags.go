@@ -1,0 +1,92 @@
+package cfmt
+
+// tagCode returns the ANSI code for a recognised tag or empty string if unknown.
+func tagCode(key string) string {
+	switch key {
+	case "reset":
+		return Reset
+	case "black":
+		return Black
+	case "red":
+		return Red
+	case "green":
+		return Green
+	case "yellow":
+		return Yellow
+	case "blue":
+		return Blue
+	case "magenta":
+		return Magenta
+	case "cyan":
+		return Cyan
+	case "white":
+		return White
+	case "grey", "gray":
+		return Grey
+	case "lred":
+		return LightRed
+	case "lgreen":
+		return LightGreen
+	case "lyellow":
+		return LightYellow
+	case "lblue":
+		return LightBlue
+	case "lmagenta":
+		return LightMagenta
+	case "lcyan":
+		return LightCyan
+	case "lwhite":
+		return LightWhite
+	case "bgblack":
+		return BGBlack
+	case "bgred":
+		return BGRed
+	case "bggreen":
+		return BGGreen
+	case "bgyellow":
+		return BGYellow
+	case "bgblue":
+		return BGBlue
+	case "bgmagenta":
+		return BGMagenta
+	case "bgcyan":
+		return BGCyan
+	case "bgwhite":
+		return BGWhite
+	case "bggrey", "bggray":
+		return BGGrey
+	case "bglred":
+		return BGLightRed
+	case "bglgreen":
+		return BGLightGreen
+	case "bglyellow":
+		return BGLightYellow
+	case "bglblue":
+		return BGLightBlue
+	case "bglmagenta":
+		return BGLightMagenta
+	case "bglcyan":
+		return BGLightCyan
+	case "bglwhite":
+		return BGLightWhite
+	case "bold":
+		return Bold
+	case "fuzzy":
+		return Fuzzy
+	case "italic":
+		return Italic
+	case "under":
+		return Underscore
+	case "blink":
+		return Blink
+	case "fast":
+		return FastBlink
+	case "reverse":
+		return Reverse
+	case "conceal":
+		return Concealed
+	case "strike":
+		return Strikethrough
+	}
+	return ""
+}

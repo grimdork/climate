@@ -110,100 +110,23 @@ func colour(dst io.Writer, f string) {
 		if c == '%' {
 			var key string
 			key, f = parseKeyword(f)
-			switch key {
-			case "reset":
-				dst.Write([]byte(Reset))
+			// Attempt to match the longest valid tag prefix within key.
+			matched := ""
+			remaining := ""
+			for l := len(key); l > 0; l-- {
+				cand := key[:l]
+				if code := tagCode(cand); code != "" {
+					matched = cand
+					remaining = key[l:]
+					// write code and set f to remaining+f
+					dst.Write([]byte(code))
+					f = remaining + f
+					break
+				}
+			}
 
-			// Text colour
-			case "black":
-				dst.Write([]byte(Black))
-			case "red":
-				dst.Write([]byte(Red))
-			case "green":
-				dst.Write([]byte(Green))
-			case "yellow":
-				dst.Write([]byte(Yellow))
-			case "blue":
-				dst.Write([]byte(Blue))
-			case "magenta":
-				dst.Write([]byte(Magenta))
-			case "cyan":
-				dst.Write([]byte(Cyan))
-			case "white":
-				dst.Write([]byte(White))
-
-			case "grey", "gray":
-				dst.Write([]byte(Grey))
-			case "lred":
-				dst.Write([]byte(LightRed))
-			case "lgreen":
-				dst.Write([]byte(LightGreen))
-			case "lyellow":
-				dst.Write([]byte(LightYellow))
-			case "lblue":
-				dst.Write([]byte(LightBlue))
-			case "lmagenta":
-				dst.Write([]byte(LightMagenta))
-			case "lcyan":
-				dst.Write([]byte(LightCyan))
-			case "lwhite":
-				dst.Write([]byte(LightWhite))
-
-			// Background colour
-			case "bgblack":
-				dst.Write([]byte(BGBlack))
-			case "bgred":
-				dst.Write([]byte(BGRed))
-			case "bggreen":
-				dst.Write([]byte(BGGreen))
-			case "bgyellow":
-				dst.Write([]byte(BGYellow))
-			case "bgblue":
-				dst.Write([]byte(BGBlue))
-			case "bgmagenta":
-				dst.Write([]byte(BGMagenta))
-			case "bgcyan":
-				dst.Write([]byte(BGCyan))
-			case "bgwhite":
-				dst.Write([]byte(BGWhite))
-
-			case "bggrey", "bggray":
-				dst.Write([]byte(BGGrey))
-			case "bglred":
-				dst.Write([]byte(BGLightRed))
-			case "bglgreen":
-				dst.Write([]byte(BGLightGreen))
-			case "bglyellow":
-				dst.Write([]byte(BGLightYellow))
-			case "bglblue":
-				dst.Write([]byte(BGLightBlue))
-			case "bglmagenta":
-				dst.Write([]byte(BGLightMagenta))
-			case "bglcyan":
-				dst.Write([]byte(BGLightCyan))
-			case "bglwhite":
-				dst.Write([]byte(BGLightWhite))
-
-			// Other styling
-			case "bold":
-				dst.Write([]byte(Bold))
-			case "fuzzy":
-				dst.Write([]byte(Fuzzy))
-			case "italic":
-				dst.Write([]byte(Italic))
-			case "under":
-				dst.Write([]byte(Underscore))
-			case "blink":
-				dst.Write([]byte(Blink))
-			case "fast":
-				dst.Write([]byte(FastBlink))
-			case "reverse":
-				dst.Write([]byte(Reverse))
-			case "conceal":
-				dst.Write([]byte(Concealed))
-			case "strike":
-				dst.Write([]byte(Strikethrough))
-			default:
+			if matched == "" {
+				// unknown tag — write it verbatim
 				dst.Write([]byte("%"))
 				dst.Write([]byte(key))
 			}
@@ -217,28 +140,26 @@ func colour(dst io.Writer, f string) {
 // parseKeyword returns the parsed keyword and the rest of the input string.
 func parseKeyword(f string) (string, string) {
 	// Parse tags consisting only of ASCII lowercase letters (a-z).
-	// This prevents uppercase letters from being swallowed as part of the tag
-	// when a tag is immediately followed by camel-case or PascalCase text.
-	var b strings.Builder
+	// Returns the letters after the leading '%' and the rest of the string.
 	if len(f) == 0 {
 		return "", f
 	}
-
-	b.WriteByte(f[0])
 	in := f[1:]
-	for len(in) > 0 {
-		c := in[0]
+	i := 0
+	for i < len(in) {
+		c := in[i]
 		if c < 'a' || c > 'z' {
 			break
 		}
-		b.WriteByte(c)
-		in = in[1:]
+		i++
 	}
+	key := in[:i]
+	rest := in[i:]
 	// If the next character is a single space, consume it so callers don't need to include it.
-	if len(in) > 0 && in[0] == ' ' {
-		in = in[1:]
+	if len(rest) > 0 && rest[0] == ' ' {
+		rest = rest[1:]
 	}
-	return b.String()[1:], in
+	return key, rest
 }
 
 func shouldColor() bool {
