@@ -175,6 +175,62 @@ opt.SetOption("Database", "P", "db-port", "Database port.", 5432, false, arg.Var
 - `arg.ErrMissingParam` — an option that expects a value didn't get one
 - `arg.ErrUnknownOption` — unrecognised flag encountered
 
+### Examples: parsing failures
+Below are brief examples showing how parsing errors surface. The library returns `error` values; callers should inspect them and handle logging, help display, or program exit as appropriate.
+
+1) Missing required option
+```go
+opt := arg.New("app")
+opt.SetOption(arg.GroupDefault, "u", "user", "User name", "", true, arg.VarString, nil)
+err := opt.Parse([]string{"app"})
+if err != nil {
+    if errors.Is(err, arg.ErrMissingRequired) {
+        fmt.Fprintln(os.Stderr, "Required option missing: --user")
+        opt.PrintHelp()
+        os.Exit(2)
+    }
+}
+```
+
+2) Illegal choice value
+```go
+opt := arg.New("app")
+opt.SetOption(arg.GroupDefault, "m", "mode", "Run mode", "dev", false, arg.VarString, []any{"dev","prod"})
+err := opt.Parse([]string{"app", "--mode", "test"})
+if err != nil {
+    if errors.Is(err, arg.ErrIllegalChoice) {
+        fmt.Fprintf(os.Stderr, "Invalid choice for --mode: %v\n", err)
+        os.Exit(2)
+    }
+}
+```
+
+3) Unknown option (example of how unknown flags are reported)
+```go
+opt := arg.New("app")
+err := opt.Parse([]string{"app", "--nope"})
+if err != nil {
+    if errors.Is(err, arg.ErrUnknownOption) {
+        fmt.Fprintf(os.Stderr, "Unknown option: %v\n", err)
+        opt.PrintHelp()
+        os.Exit(2)
+    }
+}
+```
+
+### Completion failures
+Generation of shell completion scripts can fail only due to I/O issues or internal state problems. When using `Completions()`, check the returned error and surface it.
+
+```go
+script, err := opt.Completions()
+if err != nil {
+    // I/O or state error generating the completion script
+    fmt.Fprintf(os.Stderr, "Failed to generate completions: %v\n", err)
+    os.Exit(2)
+}
+fmt.Println(script)
+```
+
 ## Variable types
 | Constant | Go type | Getter |
 | :--- | :--- | :--- |
