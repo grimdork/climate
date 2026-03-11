@@ -142,5 +142,8 @@ host := env.Get("DB_HOST", "localhost")
 - TinyGo compatibility: Prioritise low-allocation and small-binary footprints. No use of reflect; all type handling is done via type switches and generics.
 - Unix focus: Made for the systems I actually use every day.
 
+Minimum Go version
+- This project supports Go 1.25 as the minimum toolchain to preserve TinyGo compatibility. CI tests multiple Go versions (1.25 and 1.26) to catch regressions, but the module remains compatible with Go 1.25.
+
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
