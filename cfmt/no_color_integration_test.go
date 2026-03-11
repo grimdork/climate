@@ -1,11 +1,11 @@
 package cfmt_test
 
 import (
+	"github.com/grimdork/climate/cfmt"
 	"io"
 	"os"
 	"strings"
 	"testing"
-	"github.com/grimdork/climate/cfmt"
 )
 
 func TestNO_COLOREnvDisablesEscapes(t *testing.T) {

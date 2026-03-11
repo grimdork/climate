@@ -28,10 +28,79 @@ func Printf(s string, v ...any) {
 	fmt.Printf(buf.String(), v...)
 }
 
+// Sprintf returns the formatted string with colour tags resolved when appropriate.
+// Behaviour mirrors Printf but returns the string instead of printing it.
+func Sprintf(s string, v ...any) string {
+	// If the string contains colour tags like %red, they conflict with fmt verbs.
+	// Replace colour tags with placeholder tokens, run fmt.Sprintf, then restore tags
+	// and run the colour parser.
+	escaped := strings.Builder{}
+	tokens := map[string]string{}
+	tokIdx := 0
+	for i := 0; i < len(s); {
+		if s[i] == '%' && i+1 < len(s) && isLetter(s[i+1]) {
+			j := i + 1
+			for j < len(s) && isLetter(s[j]) {
+				j++
+			}
+			// Only treat as a colour tag if the tag length is > 1 (avoid catching format verbs like %s)
+			if j-(i+1) > 1 {
+				tag := s[i:j]
+				token := fmt.Sprintf("\x00COL%03d\x00", tokIdx)
+				tokens[token] = tag
+				escaped.WriteString(token)
+				tokIdx++
+				i = j
+				continue
+			}
+		}
+		escaped.WriteByte(s[i])
+		i++
+
+	}
+
+	formatted := fmt.Sprintf(escaped.String(), v...)
+
+	// Restore tokens to their original %tag form
+	for token, tag := range tokens {
+		formatted = strings.ReplaceAll(formatted, token, tag)
+	}
+
+	buf := strings.Builder{}
+	colour(&buf, formatted)
+	return buf.String()
+}
+
+func isLetter(b byte) bool {
+	c := rune(b)
+	return unicode.IsLetter(c)
+}
+
+func stripTags(f string) string {
+	var b strings.Builder
+	for i := 0; i < len(f); {
+		if f[i] == '%' && i+1 < len(f) && unicode.IsLetter(rune(f[i+1])) {
+			j := i + 1
+			for j < len(f) && unicode.IsLetter(rune(f[j])) {
+				j++
+			}
+			// skip optional single space after tag
+			if j < len(f) && f[j] == ' ' {
+				j++
+			}
+			i = j
+			continue
+		}
+		b.WriteByte(f[i])
+		i++
+	}
+	return b.String()
+}
+
 func colour(dst io.Writer, f string) {
-	// If the user has disabled colour or we're not in a terminal, just write the string as-is.
+	// If the user has disabled colour or we're not in a terminal, strip tags and write plain text.
 	if !shouldColor() {
-		dst.Write([]byte(f))
+		dst.Write([]byte(stripTags(f)))
 		return
 	}
 
@@ -170,7 +239,7 @@ func parseKeyword(f string) (string, string) {
 }
 
 func shouldColor() bool {
-	// 1. Check if user explicitly disabled it via env var
+	// 1. Check if user explicitly disabled it via NO_COLOR env var
 	if os.Getenv("NO_COLOR") != "" {
 		return false
 	}
