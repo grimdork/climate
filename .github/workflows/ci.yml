@@ -28,9 +28,11 @@ jobs:
       - name: Install staticcheck
         run: |
           curl -sSfL https://raw.githubusercontent.com/dominikh/go-tools/master/install.sh | bash -s -- staticcheck
+      - name: Run tidy (make tidy)
+        run: |
+          make tidy
       - name: Build and test
         run: |
-          go mod tidy
           go vet ./...
           staticcheck ./...
           go test ./... -v
