@@ -108,3 +108,33 @@ func formatRows(rows [][]string) (string, error) {
 	w.Flush()
 	return b.String(), nil
 }
+
+// SplitColumnsTSV reads TSV input and preserves empty cells. Returns rows as [][]string.
+func SplitColumnsTSV(input string) ([][]string, error) {
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	var rows [][]string
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
+			continue
+		}
+		fields := strings.Split(line, "\t")
+		rows = append(rows, fields)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	return rows, nil
+}
+
+// TabulateTSV parses an input string as TSV (tab-separated values) and preserves empty cells.
+// Unlike Tabulate which splits on any whitespace, TabulateTSV will treat consecutive tabs as empty columns.
+func TabulateTSV(input string) (string, error) {
+	rows, err := SplitColumnsTSV(input)
+	if err != nil {
+		return "", err
+	}
+	return formatRows(rows)
+}
