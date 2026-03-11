@@ -3,6 +3,7 @@ package tab
 
 import (
 	"bufio"
+	"encoding/csv"
 	"fmt"
 	"strings"
 	"text/tabwriter"
@@ -16,11 +17,45 @@ func Tabulate(input string, twoColMode bool) (string, error) {
 		return "", err
 	}
 
+	return formatRows(rows)
+}
+
+// TabulateCSV parses CSV input and returns it as aligned columns.
+// The first row is treated as a header and separated from the data by a dashed line.
+func TabulateCSV(input string) (string, error) {
+	r := csv.NewReader(strings.NewReader(input))
+	rows, err := r.ReadAll()
+	if err != nil {
+		return "", err
+	}
+
+	if len(rows) == 0 {
+		return "", nil
+	}
+
+	// Find max width per column across all rows
+	widths := make([]int, len(rows[0]))
+	for _, row := range rows {
+		for i, cell := range row {
+			if i < len(widths) && len(cell) > widths[i] {
+				widths[i] = len(cell)
+			}
+		}
+	}
+
+	// Build separator dashes matching the widest cell in each column
+	dashes := make([]string, len(widths))
+	for i, w := range widths {
+		dashes[i] = strings.Repeat("-", w)
+	}
+
 	var b strings.Builder
-	// minwidth=1, tabwidth=0, padding=2, padchar=' ', flags=0
 	w := tabwriter.NewWriter(&b, 1, 0, 2, ' ', 0)
 
-	for _, row := range rows {
+	fmt.Fprintln(w, strings.Join(rows[0], "\t"))
+	fmt.Fprintln(w, strings.Join(dashes, "\t"))
+
+	for _, row := range rows[1:] {
 		fmt.Fprintln(w, strings.Join(row, "\t"))
 	}
 
@@ -28,7 +63,7 @@ func Tabulate(input string, twoColMode bool) (string, error) {
 	return b.String(), nil
 }
 
-// SplitColumns reads lines fromt the input string, splits them into columns based on whitespace, and returns the rows.
+// SplitColumns reads lines from the input string, splits them into columns based on whitespace, and returns the rows.
 // If twoColMode is true, it treats the first word as the first column and the rest of the line as the second column.
 func SplitColumns(input string, twoColMode bool) ([][]string, error) {
 	scanner := bufio.NewScanner(strings.NewReader(input))
@@ -60,4 +95,16 @@ func SplitColumns(input string, twoColMode bool) ([][]string, error) {
 	}
 
 	return rows, scanner.Err()
+}
+
+func formatRows(rows [][]string) (string, error) {
+	var b strings.Builder
+	w := tabwriter.NewWriter(&b, 1, 0, 2, ' ', 0)
+
+	for _, row := range rows {
+		fmt.Fprintln(w, strings.Join(row, "\t"))
+	}
+
+	w.Flush()
+	return b.String(), nil
 }
