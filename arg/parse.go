@@ -46,9 +46,7 @@ func (opt *Options) ShowOptions() {
 // - Long options start with a double dash ("--").
 // - Long options are followed by either whitespace or an equal sign ("--foo bar" or "--foo=bar").
 func (opt *Options) Parse(args []string) error {
-	fmt.Fprintf(os.Stderr, "[arg.Parse] opt.appname=%q len(args)=%d hashelp=%v\n", opt.appname, len(args), opt.hashelp)
 	if len(args) == 0 {
-		fmt.Fprintf(os.Stderr, "[arg.Parse] no args -> ErrNoArgs\n")
 		// If this Options instance has default help configured, print its help and
 		// indicate the command handled the run. This ensures subcommands that
 		// create their own Options and call Parse(parent.Args) will display their
@@ -61,13 +59,11 @@ func (opt *Options) Parse(args []string) error {
 	}
 
 	err := opt.parseArgs(args)
-	fmt.Fprintf(os.Stderr, "[arg.Parse] parseArgs returned err=%v\n", err)
 	if err != nil {
 		return err
 	}
 
 	if opt.hashelp && opt.GetBool("h") {
-		fmt.Fprintf(os.Stderr, "[arg.Parse] help requested -> PrintHelp\n")
 		opt.PrintHelp()
 		os.Exit(0)
 	}
@@ -78,13 +74,10 @@ func (opt *Options) Parse(args []string) error {
 // ParseAndRun is a helper method that calls Parse, runs any commands and exits the program on error.
 // It does not return any error, but is instead intended as the error handler.
 func (opt *Options) ParseAndRun(args []string) {
-	fmt.Fprintf(os.Stderr, "[arg.ParseAndRun] opt.appname=%q len(args)=%d\n", opt.appname, len(args))
 	err := opt.Parse(args)
-	fmt.Fprintf(os.Stderr, "[arg.ParseAndRun] Parse returned err=%v len(opt.Args)=%d\n", err, len(opt.Args))
 	if err != nil {
 		// If a command handled the error (printed its own help), respect that and exit non-zero
 		if err == ErrHandled {
-			fmt.Fprintf(os.Stderr, "[arg.ParseAndRun] ErrHandled from subcommand -> exit 1 (no parent help)\n")
 			os.Exit(1)
 		}
 
@@ -93,7 +86,6 @@ func (opt *Options) ParseAndRun(args []string) {
 		}
 
 		if err == ErrNoArgs || len(opt.Args) == 0 {
-			fmt.Fprintf(os.Stderr, "[arg.ParseAndRun] No args or no leftover args; hashelp=%v -> PrintHelp on opt %q\n", opt.hashelp, opt.appname)
 			if opt.hashelp {
 				opt.PrintHelp()
 			}
@@ -121,7 +113,6 @@ func (opt *Options) parseArgs(args []string) error {
 			}
 
 			cmd.Options.Args = args[i+1:]
-			fmt.Fprintf(os.Stderr, "[arg.parseArgs] dispatching to command=%q remaining=%d\n", cmd.Name, len(cmd.Options.Args))
 			// Call the command and handle the case where the subcommand Parse reports ErrNoArgs.
 			if err := fn(cmd.Options); err != nil {
 				if err == ErrNoArgs {
