@@ -5,6 +5,9 @@ import "errors"
 var (
 	// ErrRunCommand is not really an error, but indicates a command was run.
 	ErrRunCommand = errors.New("command run")
+	// ErrHandled indicates a command printed its own help or handled the error and the
+	// top-level should not print its own help (non-zero exit expected).
+	ErrHandled = errors.New("handled by command")
 	// ErrNoArgs is returned when no arguments are provided.
 	ErrNoArgs = errors.New("no arguments provided")
 	// ErrIllegalChoice is returned when the argument isn't in the approved list of choices.
