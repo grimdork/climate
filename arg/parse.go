@@ -46,7 +46,7 @@ func (opt *Options) ShowOptions() {
 // - Long options start with a double dash ("--").
 // - Long options are followed by either whitespace or an equal sign ("--foo bar" or "--foo=bar").
 func (opt *Options) Parse(args []string) error {
-	if len(os.Args) == 1 {
+	if len(args) == 0 {
 		return ErrNoArgs
 	}
 
