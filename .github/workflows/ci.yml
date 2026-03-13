@@ -1,10 +1,15 @@
 name: CI
 
+env:
+  # Opt into Node.js 24 for JavaScript-based actions to avoid deprecation warnings
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch: {}
 
 jobs:
   test:
@@ -23,11 +28,18 @@ jobs:
       - name: Cache Go modules
         uses: actions/cache@v4
         with:
-          path: ~/.cache/go-build
-          key: ${{ runner.os }}-go-${{ matrix.go }}-${{ hashFiles('**/go.sum') }}
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          # Use go.mod as the dependency file (go.sum may be absent on some branches)
+          key: ${{ runner.os }}-go-${{ matrix.go }}-${{ hashFiles('**/go.mod') }}
+          restore-keys: |
+            ${{ runner.os }}-go-${{ matrix.go }}-
+            ${{ runner.os }}-go-
       - name: Install staticcheck
         run: |
-          curl -sSfL https://raw.githubusercontent.com/dominikh/go-tools/master/install.sh | bash -s -- staticcheck
+          go install honnef.co/go/tools/cmd/staticcheck@latest
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
       - name: Run tidy (make tidy)
         run: |
           make tidy
