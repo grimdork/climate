@@ -34,7 +34,7 @@ cfmt.Printf("%cyan Status:%reset %s (%d items)", status, count)
 ```
 
 ### NO_COLOR support
-`cfmt` respects the `NO_COLOR` environment variable. If set, or if stdout is not a terminal, all color tags are stripped and output is plain text. You can check this yourself with `cfmt.IsTerminal()`.
+`cfmt` respects the `NO_COLOR` environment variable. If set, or if stdout is not a terminal, all colour tags are stripped and output is plain text. You can check this yourself with `cfmt.IsTerminal()`.
 
 ### Available Tags
 | Category | Tags |
