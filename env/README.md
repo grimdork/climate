@@ -50,7 +50,9 @@ A common pattern is to use env to set the default value of a CLI flag, allowing 
 
 ```go
 // Use the environment variable as the default for an 'arg' option
-p.AddOption("p", "port", "Server port", env.Get("PORT", "8080"))
+// Using SetOption: group, short, long, help, default, required, type, choices
+opt := arg.New("app")
+opt.SetOption(arg.GroupDefault, "p", "port", "Server port", env.Get("PORT", "8080"), false, arg.VarString, nil)
 ```
 
 ## Best Practices

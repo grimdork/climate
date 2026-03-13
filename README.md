@@ -43,14 +43,26 @@ Handle flags, subcommands, and positional arguments without the overhead of heav
 ```go
 package main
 
-import "github.com/grimdork/climate/arg"
+import (
+	"fmt"
+	"os"
+	"github.com/grimdork/climate/arg"
+)
 
 func main() {
-	p := arg.New("mytool")
-	p.AddOption("v", "verbose", "Enable verbose output", false)
-	cmd := p.AddCommand("greet", "Greet a user")
-	cmd.AddPositional("name", "The name to greet", true)
-	p.Parse()
+	opt := arg.New("mytool")
+	opt.SetDefaultHelp(true)
+	// Set a boolean flag (-v, --verbose)
+	opt.SetOption(arg.GroupDefault, "v", "verbose", "Enable verbose output", false, false, arg.VarBool, nil)
+
+	// Create a subcommand and add a positional to its Options
+	cmd := opt.SetCommand("greet", "Greet a user", arg.GroupDefault, nil, nil)
+	cmd.Options.SetPositional("name", "The name to greet", "world", true, arg.VarString)
+
+	err := opt.Parse(os.Args[1:])
+	if err != nil {
+		fmt.Println("Error parsing args:", err)
+	}
 }
 ```
 
