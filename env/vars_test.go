@@ -29,7 +29,7 @@ func TestGetBool(t *testing.T) {
 		alt bool
 		exp bool
 	}{
-		{"", true, true},   // unset -> alt
+		{"", true, true}, // unset -> alt
 		{"true", false, true},
 		{"TRUE", false, true},
 		{"yes", false, true},
@@ -38,7 +38,7 @@ func TestGetBool(t *testing.T) {
 		{"false", true, false},
 		{"0", true, false},
 		{"no", true, false},
-		{"invalid", true, true}, // parse fails -> alt when set
+		{"invalid", true, true},   // parse fails -> alt when set
 		{"\"true\"", false, true}, // quoted true
 	}
 
