@@ -25,7 +25,7 @@ Minimalist toolkit for Go command-line applications.
 | **[`tab`](./tab)** | Clean, elastic tabbed columns for terminal tables. |
 | **[`human`](./human)** | Byte-to-human scaling (1024/1000) for readable metrics. |
 | **[`env`](./env)** | Simple environment variable fetching with default fallbacks. |
-
+| **[`ini`](./ini)** | Dependency-free INI parser with schema and env overrides. |
 ---
 
 ## Quick Start
@@ -145,9 +145,51 @@ fmt.Println(human.UInt(1500000, true))  // "1.5 MB"
 ```go
 import "github.com/grimdork/climate/env"
 
-// Use environment variable or fall back to "localhost"
+// Simple string fallback: returns the env value if set, otherwise the alt.
 host := env.Get("DB_HOST", "localhost")
+
+// Typed helpers: return the supplied alt when the env var is unset or malformed.
+// Safe to inline with existing config values (e.g. INI defaults).
+debug := env.GetBool("DEBUG", false)
+port := env.GetInt("PORT", 5432)
+timeout := env.GetFloat("REQUEST_TIMEOUT", 1.5)
 ```
+
+## INI subpackage (ini)
+
+The ini package provides a small, dependency‑free INI parser/serializer with optional environment overrides and schema support.
+
+Key features:
+- Parse and Marshal INI documents in memory (Unmarshal/Marshal). Unmarshal("") returns an error on empty input.
+- Declare expected types per section/key with DeclareType(section, key, type) and then call Parse(s) to honour those types (use section=="" for top-level properties).
+- Environment overrides: enable env-first lookups with SetEnvFirst(true). Use ForceUpper() to consult UPPER_CASE env keys.
+- Primary getters: GetString/GetBool/GetInt/GetFloat. When env-first is enabled, these consult the environment (using the climate/env helpers) and fall back to the INI value when unset or invalid.
+- Save/Load helpers exist and use the host filesystem; on embedded or TinyGo targets without a filesystem, stubbed or build-tagbed implementations are recommended.
+
+Minimal example:
+```go
+import (
+    "github.com/grimdork/climate/ini"
+)
+
+// Parse into an INI with declared types
+cfg, _ := ini.Unmarshal("port=8080\n[server]\nmax=1024")
+// or declare types before parsing for deterministic typing
+cfg2, _ := ini.New()
+cfg2.DeclareType("", "port", ini.Int)
+cfg2.Parse("port=0x1F\n") // parses port as hex int because we declared Int
+
+// Environment overrides
+cfg.SetEnvFirst(true)
+cfg.ForceUpper() // makes env lookups use upper-case keys
+port := cfg.GetInt("", "port")
+```
+
+Notes:
+- The ini parser preserves integer-vs-float typing by trying integer parsing first, then float.
+- Marshal produces a stable, sorted representation (properties then sections).
+- For TinyGo/embedded use, consider supplying an EnvLookup or build-tagbed stubs for env and filesystem operations so the parsing/formatting code remains usable without an OS.
+
 
 ## Core Philosophy
 - Standard library only: Don't pull in other 3rd party dependencies.
