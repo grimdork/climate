@@ -1,59 +1,54 @@
 # climate/env
-Lightweight environment variable fetching with fallbacks.
+Lightweight environment variable helpers with fallbacks and typed parsing.
 
-`env` provides a clean, single-function interface for retrieving environment variables. It eliminates the boilerplate of checking for empty strings and manually assigning default values.
+`env` provides simple helpers to fetch environment variables with sensible defaults and common parsing conveniences (underscores in numbers, hex ints, localized decimals).
 
 ## Installation
 ```bash
 go get github.com/grimdork/climate/env
 ```
 
-## Why use env?
-Standard Go os.Getenv returns an empty string if a variable is not set. This often leads to repetitive code:
+## API
+- Get(key, alt string) string
+  - Returns the environment value if the variable is set (returns empty string if set to empty). If the variable is not set, returns alt.
+- GetBool(key string, alt bool) bool
+  - If the variable is not set, returns alt. If set, returns true only for explicit truthy values (true/yes/on/1/t); everything else (including empty, quoted non-truthy values, or invalid tokens) is false.
+- GetInt(key string, alt int64) int64
+  - If the variable is not set, returns alt. If set, attempts to parse as int64 (supports +/-, underscores, and 0x/0X hex). On parse failure or overflow, returns 0.
+- GetFloat(key string, alt float64) float64
+  - If the variable is not set, returns alt. If set, attempts to parse as float64 (supports underscores and treats a single comma as decimal separator when no dot is present). On parse failure or NaN/Inf, returns 0.
+
+## Examples
+
+Basic fetching:
 
 ```go
-// The "verbose" way
-port := os.Getenv("PORT")
-if port == "" {
-	port = "8080"
-}
-```
+import "github.com/grimdork/climate/env"
 
-With climate/env, this becomes a one-liner:
-
-```go
 port := env.Get("PORT", "8080")
 ```
 
-## Usage
-
-### Basic fetching
-Retrieve a value or use a supplied alternative if the environment variable is unset or empty.
+Typed helpers:
 
 ```go
-package main
+// Bool with fallback; when set to an invalid value, result is false
+debug := env.GetBool("DEBUG", false)
 
-import (
-	"fmt"
-	"github.com/grimdork/climate/env"
-)
+// Int with fallback (accepts hex, underscores); invalid -> 0
+workers := env.GetInt("WORKERS", 4)
 
-func main() {
-	dbUser := env.Get("DB_USER", "postgres")
-	mode := env.Get("APP_MODE", "development")
-	fmt.Printf("Connecting as %s in %s mode...\n", dbUser, mode)
-}
+// Float with fallback (accepts comma as decimal when no dot present); invalid -> 0
+threshold := env.GetFloat("THRESHOLD", 0.75)
 ```
 
-### Integration with CLI flags
-A common pattern is to use env to set the default value of a CLI flag, allowing users to configure the app via both environment variables and command-line arguments.
+Integration with ini (fallback pattern):
 
 ```go
-// Use the environment variable as the default for an 'arg' option
-// Using SetOption: group, short, long, help, default, required, type, choices
-opt := arg.New("app")
-opt.SetOption(arg.GroupDefault, "p", "port", "Server port", env.Get("PORT", "8080"), false, arg.VarString, nil)
+// Pass the INI-provided value as the alt/fallback so env overrides it when set.
+val := env.Get("SOME_KEY", iniValue)
+num := env.GetInt("NUM_KEY", iniNum)
 ```
 
-## Best Practices
-Environment variables are the preferred way to handle secrets (like API keys) and environment-specific settings (like database URLs). Using env.Get ensures that your application has sensible defaults for development while being fully configurable in production environments like Kubernetes or Docker.
+## Notes
+- The typed helpers distinguish unset (returns alt) from set-but-invalid (returns false/0). This makes them suitable for directly embedding in numeric or boolean calls without extra error handling.
+- Unit tests for the typed helpers live in `env/vars_test.go` and exercise common formats and edge cases.
