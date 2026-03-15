@@ -94,7 +94,44 @@ func (opt *Options) PrintHelp() {
 					}
 				}
 				if len(parts) > 0 {
-					fmt.Fprintf(w, " (choices: %s)", strings.Join(parts, ","))
+					// Pretty-print long choice lists on subsequent indented lines.
+					// Aim for at most 8 items per line, and keep line length <= 80 if possible.
+					maxPerLine := 8
+					if maxPerLine > len(parts) {
+						maxPerLine = len(parts)
+					}
+					chosen := 1
+					// try from maxPerLine down to 1 to find the largest per-line count
+					// that keeps every constructed line <= 80 chars (approx)
+					for n := maxPerLine; n >= 1; n-- {
+						// build sample lines
+						ok := true
+						for i := 0; i < len(parts); i += n {
+							end := i + n
+							if end > len(parts) {
+								end = len(parts)
+							}
+							line := strings.Join(parts[i:end], ",")
+							if len(line) > 80 {
+								ok = false
+								break
+							}
+						}
+						if ok {
+							chosen = n
+							break
+						}
+					}
+					// Print choices on following lines indented under the option text.
+					for i := 0; i < len(parts); i += chosen {
+						end := i + chosen
+						if end > len(parts) {
+							end = len(parts)
+						}
+						fmt.Fprintf(w, "\n\t\t\t  %s", strings.Join(parts[i:end], ","))
+					}
+					// Ensure we finish the line before continuing with defaults/required
+					fmt.Fprintf(w, "")
 				}
 
 				if o.Required {
