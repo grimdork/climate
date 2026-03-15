@@ -3,6 +3,7 @@ package arg
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 )
 
@@ -69,6 +70,23 @@ func (opt *Options) PrintHelp() {
 
 				if o.LongName != "" && o.ShortName == "" {
 					fmt.Fprintf(w, "\t--%s\t%s", o.LongName, o.Help)
+				}
+
+				// choices (if provided) show after the help text
+				if len(o.Choices) > 0 {
+					parts := make([]string, 0, len(o.Choices))
+					for _, c := range o.Choices {
+						parts = append(parts, fmt.Sprintf("%v", c))
+					}
+					fmt.Fprintf(w, " (choices: %s)", strings.Join(parts, ","))
+					// DEBUG: also print to stderr raw choices info for troubleshooting
+					if len(parts) > 0 {
+						sample := parts[0]
+						if len(parts) > 3 {
+							sample = parts[0:3]
+						}
+						fmt.Fprintf(os.Stderr, "DEBUG: option '%s' choices count=%d sample=%v\n", o.LongName+o.ShortName, len(o.Choices), sample)
+					}
 				}
 
 				if o.Required {
