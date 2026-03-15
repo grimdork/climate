@@ -1,10 +1,10 @@
 name: TinyGo build smoke
 
-# Trigger only on tagged commits to avoid frequent heavy matrix runs.
+# Trigger only on tagged commits (semantic versions) to avoid frequent heavy matrix runs.
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
 
 jobs:
   tinygo-build:
@@ -24,5 +24,6 @@ jobs:
         run: tinygo version
       - name: TinyGo smoke build
         run: |
-          echo "Building examples/tinygo-smoke for target=${{ matrix.target }}"
-          tinygo build -o /dev/null -target ${{ matrix.target }} ./examples/tinygo-smoke
+          echo "Building repository root for target=${{ matrix.target }}"
+          # Build a small package or the repository root to ensure cross-compilation works.
+          tinygo build -o /dev/null -target ${{ matrix.target }} ./...

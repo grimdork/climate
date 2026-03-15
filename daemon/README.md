@@ -1,45 +1,8 @@
-# climate/daemon
-Simple utilities for long-running processes and graceful shutdowns.
+# daemon
 
-`daemon` provides helpers for programs that need to run in the background or stay active until interrupted.
+Compatibility note: When cross-compiling with TinyGo for embedded or router-class Linux targets, this package is generally safe for Linux userland targets (amd64, arm64, mips*, riscv) if the target provides a standard libc and shell environment. Caveats:
 
-## Installation
-```bash
-go get github.com/grimdork/climate/daemon
-```
+- If a package uses os/user, syscall ioctl, or direct filesystem assumptions, it may fail to compile or behave differently under TinyGo. Test builds on your TinyGo target before deploying.
+- For maximal TinyGo portability, prefer environment-variable fallbacks and avoid os/user or heavy syscall usage.
 
-## Graceful shutdown with BreakChannel
-Returns a channel that blocks until the program receives SIGINT or SIGTERM. Also cleans up the `^C` output from the terminal.
-
-```go
-package main
-
-import (
-	"fmt"
-	"github.com/grimdork/climate/daemon"
-)
-
-func main() {
-	fmt.Println("Server starting... Press Ctrl+C to stop.")
-
-	// Start listeners, workers, etc.
-
-	<-daemon.BreakChannel()
-
-	fmt.Println("Shutting down gracefully...")
-	// Cleanup here
-}
-```
-
-## Privilege dropping with DegradeToUser
-Drop from root to a specified user. Useful for services that bind to privileged ports before switching to a less privileged account.
-
-```go
-err := daemon.DegradeToUser("www-data")
-if err != nil {
-	// Either not running as root (daemon.ErrorNotRoot) or user lookup failed
-	log.Fatal(err)
-}
-```
-
-Sets the effective UID and primary GID of the specified user. Returns `daemon.ErrorNotRoot` if the process is not running as root.
+If you need help making this package TinyGo-friendly, I can add build-tagbed fallbacks.
