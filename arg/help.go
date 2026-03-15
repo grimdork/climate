@@ -123,15 +123,19 @@ func (opt *Options) PrintHelp() {
 						}
 					}
 					// Print choices on following lines indented under the option text.
+					first := true
 					for i := 0; i < len(parts); i += chosen {
 						end := i + chosen
 						if end > len(parts) {
 							end = len(parts)
 						}
-						fmt.Fprintf(w, "\n\t\t\t  %s", strings.Join(parts[i:end], ","))
+						if first {
+							fmt.Fprintf(w, "\n\t\t  (choices: %s)", strings.Join(parts[i:end], ","))
+							first = false
+						} else {
+							fmt.Fprintf(w, "\n\t\t    %s", strings.Join(parts[i:end], ","))
+						}
 					}
-					// Ensure we finish the line before continuing with defaults/required
-					fmt.Fprintf(w, "")
 				}
 
 				if o.Required {
