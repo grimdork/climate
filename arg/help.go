@@ -77,6 +77,22 @@ func (opt *Options) PrintHelp() {
 				for _, c := range o.Choices {
 					parts = append(parts, fmt.Sprintf("%v", c))
 				}
+				// If the group's stored option has no choices, try the global maps (short/long) as a fallback.
+				if len(parts) == 0 {
+					if o.LongName != "" {
+						if oo := opt.GetOption(o.LongName); oo != nil && len(oo.Choices) > 0 {
+							for _, c := range oo.Choices {
+								parts = append(parts, fmt.Sprintf("%v", c))
+							}
+						}
+					} else if o.ShortName != "" {
+						if oo := opt.GetOption(o.ShortName); oo != nil && len(oo.Choices) > 0 {
+							for _, c := range oo.Choices {
+								parts = append(parts, fmt.Sprintf("%v", c))
+							}
+						}
+					}
+				}
 				if len(parts) > 0 {
 					fmt.Fprintf(w, " (choices: %s)", strings.Join(parts, ","))
 				}
