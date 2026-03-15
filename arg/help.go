@@ -73,20 +73,18 @@ func (opt *Options) PrintHelp() {
 				}
 
 				// choices (if provided) show after the help text
-				if len(o.Choices) > 0 {
-					parts := make([]string, 0, len(o.Choices))
-					for _, c := range o.Choices {
-						parts = append(parts, fmt.Sprintf("%v", c))
-					}
+				parts := make([]string, 0, len(o.Choices))
+				for _, c := range o.Choices {
+					parts = append(parts, fmt.Sprintf("%v", c))
+				}
+				if len(parts) > 0 {
 					fmt.Fprintf(w, " (choices: %s)", strings.Join(parts, ","))
-					// DEBUG: also print to stderr raw choices info for troubleshooting
-					if len(parts) > 0 {
-						sample := parts[0]
-						if len(parts) > 3 {
-							sample = parts[0:3]
-						}
-						fmt.Fprintf(os.Stderr, "DEBUG: option '%s' choices count=%d sample=%v\n", o.LongName+o.ShortName, len(o.Choices), sample)
-					}
+				}
+				// DEBUG: always print option diagnostics to stderr
+				if len(parts) > 0 {
+					fmt.Fprintf(os.Stderr, "DEBUG_PRINTHELP: opt_group=%s long=%s short=%s choices_len=%d sample=%v\n", g.Name, o.LongName, o.ShortName, len(parts), func() interface{} { if len(parts) <= 3 { return parts } return parts[0:3] }())
+				} else {
+					fmt.Fprintf(os.Stderr, "DEBUG_PRINTHELP: opt_group=%s long=%s short=%s choices_len=0\n", g.Name, o.LongName, o.ShortName)
 				}
 
 				if o.Required {
