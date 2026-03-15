@@ -142,7 +142,6 @@ func (opt *Options) SetOption(group, short, long, help string, defaultvalue any,
 		opt.long[long] = o
 	}
 
-
 	return nil
 }
 
