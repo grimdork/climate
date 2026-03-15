@@ -142,13 +142,6 @@ func (opt *Options) SetOption(group, short, long, help string, defaultvalue any,
 		opt.long[long] = o
 	}
 
-	// DEBUG: log pointer addresses for troubleshooting copies
-	if long != "" {
-		fmt.Fprintf(os.Stderr, "DEBUG_SETOPTION: created option ptr=%p long=%s -> opt.long[%s]=%p\n", o, long, long, opt.long[long])
-	}
-	if short != "" {
-		fmt.Fprintf(os.Stderr, "DEBUG_SETOPTION: created option ptr=%p short=%s -> opt.short[%s]=%p\n", o, short, short, opt.short[short])
-	}
 
 	return nil
 }

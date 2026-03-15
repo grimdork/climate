@@ -19,16 +19,6 @@ func (opt *Options) SetDefaultHelp(full bool) {
 
 // PrintHelp builds and prints the help text based on available options.
 func (opt *Options) PrintHelp() {
-	// SENTINEL to confirm this PrintHelp is executed in the built binary.
-	fmt.Fprintln(os.Stderr, "SENTINEL_PRINTHELP")
-	// Dump opt.long and opt.short map keys + pointers for diagnosis
-	for k, v := range opt.long {
-		fmt.Fprintf(os.Stderr, "PRINTHELP_LONG: key=%s ptr=%p choices_len=%d\n", k, v, len(v.Choices))
-	}
-	for k, v := range opt.short {
-		fmt.Fprintf(os.Stderr, "PRINTHELP_SHORT: key=%s ptr=%p choices_len=%d\n", k, v, len(v.Choices))
-	}
-
 	w := &tabwriter.Writer{}
 	w.Init(os.Stdout, 8, 8, 1, '\t', 0)
 	w.Write([]byte("Usage:\n  "))
@@ -108,7 +98,11 @@ func (opt *Options) PrintHelp() {
 				}
 				// DEBUG: always print option diagnostics to stderr
 				if len(parts) > 0 {
-					fmt.Fprintf(os.Stderr, "DEBUG_PRINTHELP: group=%s opt_ptr=%p long=%s short=%s choices_len=%d sample=%v\n", g.Name, o, o.LongName, o.ShortName, len(parts), func() interface{} { if len(parts) <= 3 { return parts } return parts[0:3] }())
+					sample := parts
+					if len(parts) > 3 {
+						sample = parts[0:3]
+					}
+					fmt.Fprintf(os.Stderr, "DEBUG_PRINTHELP: group=%s opt_ptr=%p long=%s short=%s choices_len=%d sample=%v\n", g.Name, o, o.LongName, o.ShortName, len(parts), sample)
 				} else {
 					fmt.Fprintf(os.Stderr, "DEBUG_PRINTHELP: group=%s opt_ptr=%p long=%s short=%s choices_len=0\n", g.Name, o, o.LongName, o.ShortName)
 				}
