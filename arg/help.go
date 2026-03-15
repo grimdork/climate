@@ -19,6 +19,16 @@ func (opt *Options) SetDefaultHelp(full bool) {
 
 // PrintHelp builds and prints the help text based on available options.
 func (opt *Options) PrintHelp() {
+	// SENTINEL to confirm this PrintHelp is executed in the built binary.
+	fmt.Fprintln(os.Stderr, "SENTINEL_PRINTHELP")
+	// Dump opt.long and opt.short map keys + pointers for diagnosis
+	for k, v := range opt.long {
+		fmt.Fprintf(os.Stderr, "PRINTHELP_LONG: key=%s ptr=%p choices_len=%d\n", k, v, len(v.Choices))
+	}
+	for k, v := range opt.short {
+		fmt.Fprintf(os.Stderr, "PRINTHELP_SHORT: key=%s ptr=%p choices_len=%d\n", k, v, len(v.Choices))
+	}
+
 	w := &tabwriter.Writer{}
 	w.Init(os.Stdout, 8, 8, 1, '\t', 0)
 	w.Write([]byte("Usage:\n  "))
