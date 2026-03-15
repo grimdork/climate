@@ -201,3 +201,12 @@ Minimum Go version
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+## TinyGo support
+
+This repository includes a TinyGo smoke-test example and CI workflow on the  branch. The  package is intentionally minimal and avoids filesystem/network APIs so it can be cross-compiled to resource-constrained devices (router-class hardware) such as linux/amd64, linux/arm64 and MIPS targets.
+
+Notes:
+- TinyGo builds are performed in CI only on tagged commits (see .github/workflows/tinygo.yml).
+- Targeted devices are expected to run a shell (bash/zsh) and have limited RAM/storage; the example is kept small to reflect that.
+- If you plan to run binaries on-device, test on representative hardware or use QEMU-based runners.
