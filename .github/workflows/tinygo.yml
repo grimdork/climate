@@ -1,0 +1,28 @@
+name: TinyGo build smoke
+
+# Trigger only on tagged commits to avoid frequent heavy matrix runs.
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  tinygo-build:
+    name: TinyGo matrix build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tinygo: [ '0.29.0' ]
+        target: [ 'linux/amd64', 'linux/arm64', 'linux/mipsle', 'linux/mips64', 'linux/riscv64' ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install TinyGo
+        uses: 18430429/setup-tinygo@v1
+        with:
+          tinygo-version: ${{ matrix.tinygo }}
+      - name: Show tinygo
+        run: tinygo version
+      - name: TinyGo smoke build
+        run: |
+          echo "Building examples/tinygo-smoke for target=${{ matrix.target }}"
+          tinygo build -o /dev/null -target ${{ matrix.target }} ./examples/tinygo-smoke
