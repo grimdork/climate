@@ -96,27 +96,6 @@ func (opt *Options) PrintHelp() {
 				if len(parts) > 0 {
 					fmt.Fprintf(w, " (choices: %s)", strings.Join(parts, ","))
 				}
-				// DEBUG: always print option diagnostics to stderr
-				if len(parts) > 0 {
-					sample := parts
-					if len(parts) > 3 {
-						sample = parts[0:3]
-					}
-					fmt.Fprintf(os.Stderr, "DEBUG_PRINTHELP: group=%s opt_ptr=%p long=%s short=%s choices_len=%d sample=%v\n", g.Name, o, o.LongName, o.ShortName, len(parts), sample)
-				} else {
-					fmt.Fprintf(os.Stderr, "DEBUG_PRINTHELP: group=%s opt_ptr=%p long=%s short=%s choices_len=0\n", g.Name, o, o.LongName, o.ShortName)
-				}
-				// Also print pointers for opt.long/opt.short entries (if present)
-				if o.LongName != "" {
-					if oo := opt.GetOption(o.LongName); oo != nil {
-						fmt.Fprintf(os.Stderr, "DEBUG_PRINTHELP: opt.long[%s]=%p\n", o.LongName, oo)
-					}
-				}
-				if o.ShortName != "" {
-					if oo := opt.GetOption(o.ShortName); oo != nil {
-						fmt.Fprintf(os.Stderr, "DEBUG_PRINTHELP: opt.short[%s]=%p\n", o.ShortName, oo)
-					}
-				}
 
 				if o.Required {
 					w.Write([]byte(" (required)"))
