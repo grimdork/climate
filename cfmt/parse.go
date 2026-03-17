@@ -84,10 +84,6 @@ func stripTags(f string) string {
 			for j < len(f) && unicode.IsLetter(rune(f[j])) {
 				j++
 			}
-			// skip optional single space after tag
-			if j < len(f) && f[j] == ' ' {
-				j++
-			}
 			i = j
 			continue
 		}
@@ -155,10 +151,6 @@ func parseKeyword(f string) (string, string) {
 	}
 	key := in[:i]
 	rest := in[i:]
-	// If the next character is a single space, consume it so callers don't need to include it.
-	if len(rest) > 0 && rest[0] == ' ' {
-		rest = rest[1:]
-	}
 	return key, rest
 }
 
