@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	opt := arg.New("greet")
+	opt := arg.New("greet", "Say hello to someone")
 	opt.SetDefaultHelp(true)
 	opt.SetOption(arg.GroupDefault, "v", "verbose", "Show more details.", false, false, arg.VarBool, nil)
 	opt.SetPositional("name", "Name to greet.", "world", true, arg.VarString)
@@ -91,7 +91,7 @@ Retrieve with `GetPosString`, `GetPosInt`, `GetPosFloat`, `GetPosBool`, and thei
 
 ```go
 func main() {
-	opt := arg.New("server")
+	opt := arg.New("server", "Run the server and handle requests")
 	opt.SetDefaultHelp(true)
 	opt.SetFlag(arg.GroupDefault, "v", "verbose", "Verbose logging.")
 
@@ -180,7 +180,7 @@ Below are brief examples showing how parsing errors surface. The library returns
 
 1) Missing required option
 ```go
-opt := arg.New("app")
+opt := arg.New("app", "Example application")
 opt.SetOption(arg.GroupDefault, "u", "user", "User name", "", true, arg.VarString, nil)
 err := opt.Parse([]string{"app"})
 if err != nil {
@@ -194,7 +194,7 @@ if err != nil {
 
 2) Illegal choice value
 ```go
-opt := arg.New("app")
+opt := arg.New("app", "Example application")
 opt.SetOption(arg.GroupDefault, "m", "mode", "Run mode", "dev", false, arg.VarString, []any{"dev","prod"})
 err := opt.Parse([]string{"app", "--mode", "test"})
 if err != nil {
@@ -207,7 +207,7 @@ if err != nil {
 
 3) Unknown option (example of how unknown flags are reported)
 ```go
-opt := arg.New("app")
+opt := arg.New("app", "Example application")
 err := opt.Parse([]string{"app", "--nope"})
 if err != nil {
     if errors.Is(err, arg.ErrUnknownOption) {

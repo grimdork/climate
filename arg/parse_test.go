@@ -7,7 +7,7 @@ import (
 )
 
 func TestLongOptionParsing(t *testing.T) {
-	p := New("testprog")
+	p := New("testprog", "")
 	// Create options: name, default, required, type, choices
 	if err := p.SetOption(GroupDefault, "v", "verbose", "Enable verbose output", false, false, VarBool, nil); err != nil {
 		t.Fatalf("SetOption failed: %v", err)
@@ -26,7 +26,7 @@ func TestLongOptionParsing(t *testing.T) {
 }
 
 func TestChoiceValidationErrorUsesWrapping(t *testing.T) {
-	p := New("testprog")
+	p := New("testprog", "")
 	if err := p.SetOption(GroupDefault, "c", "choice", "Choice option", "a", false, VarString, []any{"a", "b"}); err != nil {
 		t.Fatalf("SetOption failed: %v", err)
 	}

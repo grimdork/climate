@@ -14,13 +14,16 @@ type Options struct {
 	Args []string
 
 	appname string
+	// appdesc is a short one-line description shown in help output.
+	appdesc string
 	// hashelp is true if default help is defined.
 	hashelp bool
 }
 
 // New options instance.
 // name - Name of the program.
-func New(name string) *Options {
+// desc - Short one-line description of the program shown in help.
+func New(name, desc string) *Options {
 	opt := &Options{
 		short:    make(map[string]*Option),
 		long:     make(map[string]*Option),
@@ -28,6 +31,7 @@ func New(name string) *Options {
 		groups:   make(map[string]*Group),
 		commands: make(map[string]*Command),
 		appname:  name,
+		appdesc:  desc,
 	}
 
 	opt.AddGroup(GroupDefault)

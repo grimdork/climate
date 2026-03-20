@@ -24,6 +24,12 @@ func (opt *Options) PrintHelp() {
 	w.Write([]byte("Usage:\n  "))
 	w.Write([]byte(opt.appname))
 
+	// Print inline application description if available (same line as appname).
+	if opt.appdesc != "" {
+		w.Write([]byte(" — "))
+		w.Write([]byte(opt.appdesc))
+	}
+
 	count := 0
 	for _, g := range opt.groups {
 		count += len(g.options)

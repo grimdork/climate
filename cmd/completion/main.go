@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	opt := arg.New("rep")
+	opt := arg.New("rep", "Generate shell completions for rep")
 	opt.SetDefaultHelp(true)
 	opt.SetOption("", "f", "float", "A floating point number.", nil, false, arg.VarFloat, nil)
 	cmd := opt.SetCommand("one", "Command one.", "", one, nil)

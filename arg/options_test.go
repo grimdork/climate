@@ -9,7 +9,7 @@ import (
 const appname = "testrun"
 
 func TestRemoveFirstGroup(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	opt.AddGroup("Two")
 	opt.AddGroup("Three")
 	t.Logf("%v", opt)
@@ -28,7 +28,7 @@ func TestRemoveFirstGroup(t *testing.T) {
 }
 
 func TestRemoveMiddleGroup(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	opt.AddGroup("Two")
 	opt.AddGroup("Three")
 	t.Logf("%v", opt)
@@ -47,7 +47,7 @@ func TestRemoveMiddleGroup(t *testing.T) {
 }
 
 func TestRemoveLastGroup(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	opt.AddGroup("Two")
 	opt.AddGroup("Three")
 	t.Logf("%v", opt)
@@ -66,7 +66,7 @@ func TestRemoveLastGroup(t *testing.T) {
 }
 
 func TestSortGroup(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	opt.SetOption(arg.GroupDefault, "v", "verbose", "Show more details in output.", false, false, arg.VarBool, nil)
 	opt.SetOption(arg.GroupDefault, "f", "file", "Full file path.", "", false, arg.VarString, nil)
 	opt.SetOption(arg.GroupDefault, "p", "port", "Port number.", 0, false, arg.VarInt, nil)
@@ -94,7 +94,7 @@ func TestSortGroup(t *testing.T) {
 }
 
 func TestGroupNames(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	opt.SetOption("General", "v", "verbose", "Show more details in output.", false, false, arg.VarBool, nil)
 	list := opt.GetGroups()
 	if list[1].Name != "General" {
@@ -104,7 +104,7 @@ func TestGroupNames(t *testing.T) {
 }
 
 func TestLongShort(t *testing.T) {
-	err := arg.New(appname).SetOption(arg.GroupDefault, "verbose", "", "", false, false, arg.VarBool, nil)
+	err := arg.New(appname, "").SetOption(arg.GroupDefault, "verbose", "", "", false, false, arg.VarBool, nil)
 	if err == nil {
 		t.Fatalf("Expected error, but long short worked.")
 		t.FailNow()
@@ -114,7 +114,7 @@ func TestLongShort(t *testing.T) {
 }
 
 func TestShortLong(t *testing.T) {
-	err := arg.New(appname).SetOption(arg.GroupDefault, "", "v", "", false, false, arg.VarBool, nil)
+	err := arg.New(appname, "").SetOption(arg.GroupDefault, "", "v", "", false, false, arg.VarBool, nil)
 	if err == nil {
 		t.Fatalf("Expected error, but short long worked.")
 		t.FailNow()
@@ -124,7 +124,7 @@ func TestShortLong(t *testing.T) {
 }
 
 func TestBool(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetOption(arg.GroupDefault, "v", "verbose", "Show more details in output.", false, false, arg.VarBool, nil)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -145,7 +145,7 @@ func TestBool(t *testing.T) {
 }
 
 func TestString(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetOption(arg.GroupDefault, "f", "file", "Full file path.", nil, false, arg.VarString, nil)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -169,7 +169,7 @@ func TestString(t *testing.T) {
 }
 
 func TestInt(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetOption(arg.GroupDefault, "p", "port", "Port number.", 3000, false, arg.VarInt, nil)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -192,7 +192,7 @@ func TestInt(t *testing.T) {
 }
 
 func TestFloat(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetOption(arg.GroupDefault, "p", "pi", "Your definition of pi.", 3.14, false, arg.VarFloat, nil)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -229,7 +229,7 @@ func moocmd(opt *arg.Options) error {
 }
 
 func TestCommand(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	_ = opt.SetCommand("moo", "Have you mooed today?", "", moocmd, nil)
 	opt.PrintHelp()
 
@@ -242,7 +242,7 @@ func TestCommand(t *testing.T) {
 }
 
 func TestPositional(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetPositional("FILE", "Full file path.", nil, false, arg.VarString)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -266,7 +266,7 @@ func TestPositional(t *testing.T) {
 }
 
 func TestPositionalStringSlice(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetPositional("FILE", "Full file path.", nil, false, arg.VarStringSlice)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -290,7 +290,7 @@ func TestPositionalStringSlice(t *testing.T) {
 }
 
 func TestPositionalIntSlice(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetPositional("PORT", "Port number.", 3000, false, arg.VarIntSlice)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -314,7 +314,7 @@ func TestPositionalIntSlice(t *testing.T) {
 }
 
 func TestPositionalFloatSlice(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetPositional("PI", "Your definition of pi.", 3.14, false, arg.VarFloatSlice)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -338,7 +338,7 @@ func TestPositionalFloatSlice(t *testing.T) {
 }
 
 func TestCompletions(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetOption(arg.GroupDefault, "p", "pi", "Your definition of pi.", 3.14, false, arg.VarFloat, nil)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -362,7 +362,7 @@ func TestCompletions(t *testing.T) {
 }
 
 func TestStringChoices(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetOption("", "w", "word", "A number in word form.", "", false, arg.VarString, []any{"one", "two", "three"})
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -384,7 +384,7 @@ func TestStringChoices(t *testing.T) {
 }
 
 func TestIntChoices(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetOption(arg.GroupDefault, "n", "number", "An integer.", "", false, arg.VarInt, []any{1, 1, 1})
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -406,7 +406,7 @@ func TestIntChoices(t *testing.T) {
 }
 
 func TestFloatChoices(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetOption(arg.GroupDefault, "p", "pi", "Your definition of pi.", "", false, arg.VarFloat, []any{3.14, 3.141, 3.145})
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -428,7 +428,7 @@ func TestFloatChoices(t *testing.T) {
 }
 
 func TestPositionalStringAndSlice(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetPositional("WORD", "Just a word - any word.", "", false, arg.VarString)
 	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
@@ -468,7 +468,7 @@ func TestPositionalStringAndSlice(t *testing.T) {
 }
 
 func TestPositionalNoSlice(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetPositional("WORD", "Just a word - any word.", "", false, arg.VarString)
 	if err != nil {
 		t.Fatalf("Expected no error creating option, but got %s", err.Error())
@@ -499,7 +499,7 @@ func TestPositionalNoSlice(t *testing.T) {
 }
 
 func TestDefault(t *testing.T) {
-	opt := arg.New(appname)
+	opt := arg.New(appname, "")
 	err := opt.SetOption(arg.GroupDefault, "n", "number", "An integer.", 0, false, arg.VarInt, nil)
 	if err != nil {
 		t.Fatalf("Expected no error creating option, but got %s", err.Error())

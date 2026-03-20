@@ -50,7 +50,7 @@ import (
 )
 
 func main() {
-	opt := arg.New("mytool")
+	opt := arg.New("mytool", "Short one-line description of mytool")
 	opt.SetDefaultHelp(true)
 	// Set a boolean flag (-v, --verbose)
 	opt.SetOption(arg.GroupDefault, "v", "verbose", "Enable verbose output", false, false, arg.VarBool, nil)

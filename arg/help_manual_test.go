@@ -7,7 +7,7 @@ import (
 )
 
 func TestPrintHelpShowsChoices(t *testing.T) {
-	opt := arg.New("testapp")
+	opt := arg.New("testapp", "")
 	opt.SetDefaultHelp(true)
 	op := []any{"dev", "prod", "test"}
 	opt.SetOption(arg.GroupDefault, "m", "mode", "Run mode.", "dev", false, arg.VarString, op)

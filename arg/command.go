@@ -23,7 +23,7 @@ func (opt *Options) SetCommand(name, help, group string, fn ToolCommand, aliases
 		Name:    name,
 		Help:    help,
 		Func:    fn,
-		Options: New(opt.appname + " " + name),
+		Options: New(opt.appname+" "+name, ""),
 		Aliases: aliases,
 	}
 
