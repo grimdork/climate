@@ -21,14 +21,12 @@ func (opt *Options) SetDefaultHelp(full bool) {
 func (opt *Options) PrintHelp() {
 	w := &tabwriter.Writer{}
 	w.Init(os.Stdout, 8, 8, 1, '\t', 0)
+	// Print application description on its own line before Usage, if available.
+	if opt.appdesc != "" {
+		w.Write([]byte(opt.appdesc + "\n\n"))
+	}
 	w.Write([]byte("Usage:\n  "))
 	w.Write([]byte(opt.appname))
-
-	// Print inline application description if available (same line as appname).
-	if opt.appdesc != "" {
-		w.Write([]byte(" — "))
-		w.Write([]byte(opt.appdesc))
-	}
 
 	count := 0
 	for _, g := range opt.groups {
