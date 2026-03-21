@@ -47,15 +47,10 @@ func (opt *Options) ShowOptions() {
 // - Long options are followed by either whitespace or an equal sign ("--foo bar" or "--foo=bar").
 func (opt *Options) Parse(args []string) error {
 	if len(args) == 0 {
-		// If this Options instance has default help configured, print its help and
-		// indicate the command handled the run. This ensures subcommands that
-		// create their own Options and call Parse(parent.Args) will display their
-		// own help instead of falling back to parent help.
-		if opt.hashelp {
-			opt.PrintHelp()
-			return ErrRunCommand
-		}
-		return ErrNoArgs
+		// When no args are supplied, don't print help automatically. Let the caller decide how
+		// to handle empty args. Return ErrNonFatal so callers can treat this as a non-fatal
+		// signal (i.e. nothing to do) instead of an error that forces printing help or exiting.
+		return ErrNonFatal
 	}
 
 	err := opt.parseArgs(args)
@@ -81,7 +76,13 @@ func (opt *Options) ParseAndRun(args []string) {
 			os.Exit(1)
 		}
 
+		// If a command ran successfully and signalled it handled the run, exit zero
 		if err == ErrRunCommand {
+			os.Exit(0)
+		}
+
+		// ErrNonFatal indicates nothing to do; exit successfully without printing help.
+		if err == ErrNonFatal {
 			os.Exit(0)
 		}
 

@@ -27,7 +27,8 @@ func main() {
 
 	err := opt.Parse(os.Args[1:])
 	if err != nil {
-		if err == arg.ErrNoArgs {
+		// ErrNonFatal means "nothing to do" (no args) and is not an error — just continue.
+		if err == arg.ErrNoArgs || err == arg.ErrNonFatal {
 			return
 		}
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
@@ -102,6 +103,7 @@ func main() {
 
 	err := opt.Parse(os.Args[1:])
 	if err != nil {
+		// Treat ErrNoArgs and ErrRunCommand as handled by the caller.
 		if err == arg.ErrNoArgs || err == arg.ErrRunCommand {
 			return
 		}
@@ -144,6 +146,8 @@ Parses args, prints help on no args, exits on error:
 opt.HelpOrFail() // uses os.Args[1:]
 ```
 
+Note: Parse no longer prints help automatically for empty argument lists. Use HelpOrFail or handle `arg.ErrNonFatal` / `arg.ErrNoArgs` returned by `Parse` if you want to treat an empty invocation as a help case.
+
 ### Bash completions
 Generate a completion script for your tool:
 ```go
@@ -161,14 +165,10 @@ go test ./arg -v
 ```
 
 Contributions adding edge-case tests for long option parsing and environment variable behaviour are welcome.
-```go
-opt.AddGroup("Database")
-opt.SetOption("Database", "H", "db-host", "Database host.", "localhost", false, arg.VarString, nil)
-opt.SetOption("Database", "P", "db-port", "Database port.", 5432, false, arg.VarInt, nil)
-```
 
 ## Error handling
-- `arg.ErrNoArgs` — no arguments provided (help printed if enabled)
+- `arg.ErrNonFatal` — nothing to do (e.g. empty args). Not an error; callers should continue normal execution or explicitly print help.
+- `arg.ErrNoArgs` — no arguments provided (returned by subcommand parsing or when a required positional is missing).
 - `arg.ErrRunCommand` — a subcommand was matched and executed
 - `arg.ErrIllegalChoice` — value not in the allowed choices list
 - `arg.ErrMissingRequired` — a required option was not provided
