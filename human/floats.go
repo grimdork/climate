@@ -5,39 +5,55 @@ import (
 	"math"
 )
 
-// Float formats a floating-point number with the specified precision, optionally using SI or
-// IEC (binary) prefixes. When si==true, uses 1000-based prefixes (k, M, G...). When
-// si==false, uses 1024-based IEC prefixes (Ki, Mi, Gi...).
+// Float formats a floating-point number with the specified precision and returns the
+// value using the same unit prefixes and casing as UInt so callers can rely on
+// identical output for human-readable sizes.
+//
+// When si==true, uses 1000-based prefixes (k, M, G...) and a trailing "B" suffix
+// (e.g. "1.5 MB"). When si==false, uses legacy binary/IEC behaviour with a
+// lowercase kilo together with the "iB" suffix for 1024 ("kiB") and uppercase
+// letters for larger prefixes ("MiB", "GiB"), matching UInt.
 func Float(f float64, prec int, si bool) string {
-	unit := 1000.0
-	var prefixes []string
+	unit := 1024.0
 	if si {
 		unit = 1000.0
-		prefixes = []string{"k", "M", "G", "T", "P", "E"}
-	} else {
-		unit = 1024.0
-		prefixes = []string{"Ki", "Mi", "Gi", "Ti", "Pi", "Ei"}
 	}
 
+	// Under the unit size, show the raw number with a B suffix and respect whole numbers
 	if f < unit {
-		// Print without any prefix
-		return fmt.Sprintf("%.*f", prec, f)
+		if f == math.Floor(f) {
+			return fmt.Sprintf("%.0f B", f)
+		}
+		return fmt.Sprintf("%.*f B", prec, f)
 	}
 
 	exp := int(math.Log(f) / math.Log(unit))
-	if exp > len(prefixes) {
-		exp = len(prefixes)
+	if exp > 6 {
+		exp = 6
+	}
+
+	var prefixes []string
+	if si {
+		prefixes = []string{"k", "M", "G", "T", "P", "E"}
+	} else {
+		// Preserve legacy kilo casing for binary ("k" + "iB") and use uppercase for larger
+		// prefixes to maintain backward compatibility with existing output.
+		prefixes = []string{"k", "M", "G", "T", "P", "E"}
 	}
 
 	pre := prefixes[exp-1]
-	val := f / math.Pow(unit, float64(exp))
-
-	// If the value is a whole number and precision is 0 or 1, print without trailing .0
-	if prec <= 0 {
-		return fmt.Sprintf("%.0f %s", val, pre)
+	suffix := "B"
+	if !si {
+		suffix = "iB"
 	}
 
-	// When precision > 0, show requested decimals. If the fractional part is zero, and
-	// precision == 1, still show a single decimal to match previous behaviour for UInt.
-	return fmt.Sprintf("%.*f %s", prec, val, pre)
+	val := f / math.Pow(unit, float64(exp))
+
+	// Match UInt behaviour: if value is whole, don't show decimals
+	if val == math.Floor(val) {
+		return fmt.Sprintf("%.0f %s%s", val, pre, suffix)
+	}
+
+	// Otherwise honor the requested precision
+	return fmt.Sprintf("%.*f %s%s", prec, val, pre, suffix)
 }
