@@ -10,7 +10,10 @@ go get github.com/grimdork/climate/human
 
 ## Usage
 ### Binary Formatting (Default)
-The old way, still preferred by some. It uses base-1024 and units like KiB, MiB, etc.
+The library preserves historical/legacy behaviour for some binary prefixes. It uses base-1024 and returns units in a legacy-friendly form that matches existing expectations in the codebase and tests:
+
+- For kilo (1024) the output uses a lowercase `k` together with the `iB` suffix (e.g. `"1 kiB"`).
+- For larger binary prefixes it uses the more familiar `MiB`, `GiB`, `TiB`, etc.
 
 ```Go
 package main
@@ -23,15 +26,27 @@ import (
 func main() {
 	size := uint64(1572864)
 	fmt.Println(human.UInt(size, false)) // Output: 1.5 MiB
+	fmt.Println(human.UInt(1024, false)) // Output: 1 kiB (legacy kilo casing)
 }
 ```
 
 ### SI Formatting (Decimal)
-Standardised by storage manufacturers and used more recently in operating systems. It uses base-1000.
+Standardised by storage manufacturers and used more recently in operating systems. It uses base-1000 and produces SI-style prefixes (`k`, `M`, `G`...).
 
 ```Go
 size := uint64(1500000)
 fmt.Println(human.UInt(size, true)) // Output: 1.5 MB
+```
+
+### Floating-point formatting
+The Float function formats floating-point values using either SI (1000) or IEC/binary (1024) prefixes. Note the subtle differences between `Float` and `UInt`:
+
+- Float(si=false) uses IEC-style prefixes like `Ki`, `Mi`, `Gi` (capital `K`) and returns the value followed by the prefix (no trailing `B` by default): e.g. `"1.5 Ki"`.
+- UInt preserves legacy unit casing for kilo (returns `kiB`) and appends a `B`/`iB` suffix.
+
+```go
+fmt.Println(human.Float(1536, 1, false)) // -> "1.5 Ki"
+fmt.Println(human.Float(1500, 1, true))  // -> "1.5 k"
 ```
 
 ## Features
