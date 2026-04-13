@@ -18,6 +18,7 @@ Minimalist toolkit for Go command-line applications.
 | :--- | :--- |
 | **[`arg`](./arg)** | No-dependency option parser with subcommands and positionals. |
 | **[`cfmt`](./cfmt)** | `printf` wrapper with easy `%colour` formatting. |
+| **[`fx`](./fx)** | Small `{}`-style formatter with ANSI and time tokens. |
 | **[`daemon`](./daemon)** | Lifecycle utilities for background services and signal handling. |
 | **[`prompter`](./prompter)** | Interactive user prompts with support for masked secrets. |
 | **[`paths`](./paths)** | Resolves standard config paths (XDG on Linux, Library on macOS). |
@@ -74,6 +75,16 @@ import "github.com/grimdork/climate/cfmt"
 
 cfmt.Printf("%red Error:%reset file not found: '%s'\n", fn)
 cfmt.Print("%green Success!%reset Process completed.\n")
+```
+
+## Lightweight formatting (fx)
+Use simple `{}` placeholders plus optional colour, style, and time tokens.
+
+```go
+import "github.com/grimdork/climate/fx"
+
+fx.Println("{green}Status:{@} {}", "ready")
+fx.Println("[{time}] Starting up")
 ```
 
 ## Signal Handling (daemon)
