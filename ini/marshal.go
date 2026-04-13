@@ -74,8 +74,8 @@ func (ini *INI) Marshal() string {
 	return b.String()
 }
 
-// normalizeNumeric prepares a number string for parsing: remove underscores, handle localized decimal comma.
-func normalizeNumeric(raw string) string {
+// normaliseNumeric prepares a number string for parsing: remove underscores, handle localised decimal comma.
+func normaliseNumeric(raw string) string {
 	r := strings.TrimSpace(raw)
 	// remove common thousands separators (underscores)
 	r = strings.ReplaceAll(r, "_", "")
@@ -143,7 +143,7 @@ func (ini *INI) Parse(s string) error {
 								lines = lines[1:]
 								continue
 							case Int:
-								n := normalizeNumeric(val)
+								n := normaliseNumeric(val)
 								if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 									if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
 										sec.AddInt(key, iv)
@@ -158,7 +158,7 @@ func (ini *INI) Parse(s string) error {
 									}
 								}
 							case Float:
-								n := normalizeNumeric(val)
+								n := normaliseNumeric(val)
 								if fv, err := strconv.ParseFloat(n, 64); err == nil {
 									sec.AddFloat(key, fv)
 									lines = lines[1:]
@@ -180,7 +180,7 @@ func (ini *INI) Parse(s string) error {
 					continue
 				}
 				// try int (support hex and '_' separators)
-				n := normalizeNumeric(val)
+				n := normaliseNumeric(val)
 				if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 					if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
 						sec.AddInt(key, iv)
@@ -218,7 +218,7 @@ func (ini *INI) Parse(s string) error {
 							p.SetBool(boolValue(val))
 							continue
 						case Int:
-							n := normalizeNumeric(val)
+							n := normaliseNumeric(val)
 							if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 								if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
 									ini.Set("", key, val)
@@ -235,7 +235,7 @@ func (ini *INI) Parse(s string) error {
 								}
 							}
 						case Float:
-							n := normalizeNumeric(val)
+							n := normaliseNumeric(val)
 							if fv, err := strconv.ParseFloat(n, 64); err == nil {
 								ini.Set("", key, val)
 								p := ini.Properties[key]
@@ -256,7 +256,7 @@ func (ini *INI) Parse(s string) error {
 				continue
 			}
 			// try int
-			n := normalizeNumeric(val)
+			n := normaliseNumeric(val)
 			if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 				if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
 					ini.Set("", key, val)
