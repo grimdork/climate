@@ -36,6 +36,7 @@ Default paths by platform:
 | :--- | :--- | :--- |
 | macOS | `~/Library/Application Support/myapp` | `~/Library/Application Support/myapp` |
 | Linux/Unix | `$XDG_CONFIG_HOME/myapp` or `~/.config/myapp` | `/etc/myapp` |
+| Windows | `%AppData%\myapp` | `%ProgramData%\myapp` |
 
 ### Custom base paths
 Override the defaults if needed:
