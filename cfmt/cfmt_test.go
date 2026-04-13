@@ -113,7 +113,7 @@ func TestNoColorPath(t *testing.T) {
 
 func TestUnknownTagPassthrough(t *testing.T) {
 	var b strings.Builder
-	input := "%notacolor "
+	input := "%notacolour "
 	f := input
 	for len(f) > 0 {
 		c := f[0]
@@ -133,7 +133,7 @@ func TestUnknownTagPassthrough(t *testing.T) {
 		}
 	}
 
-	if !strings.Contains(b.String(), "%notacolor") {
+	if !strings.Contains(b.String(), "%notacolour") {
 		t.Errorf("expected unknown tag passthrough, got %q", b.String())
 	}
 }
