@@ -14,6 +14,10 @@ import (
 // lowercase kilo together with the "iB" suffix for 1024 ("kiB") and uppercase
 // letters for larger prefixes ("MiB", "GiB"), matching UInt.
 func Float(f float64, prec int, si bool) string {
+	if math.IsNaN(f) || math.IsInf(f, 0) {
+		return fmt.Sprintf("%.*f B", prec, f)
+	}
+
 	unit := 1024.0
 	if si {
 		unit = 1000.0
@@ -32,15 +36,7 @@ func Float(f float64, prec int, si bool) string {
 		exp = 6
 	}
 
-	var prefixes []string
-	if si {
-		prefixes = []string{"k", "M", "G", "T", "P", "E"}
-	} else {
-		// Preserve legacy kilo casing for binary ("k" + "iB") and use uppercase for larger
-		// prefixes to maintain backward compatibility with existing output.
-		prefixes = []string{"k", "M", "G", "T", "P", "E"}
-	}
-
+	prefixes := []string{"k", "M", "G", "T", "P", "E"}
 	pre := prefixes[exp-1]
 	suffix := "B"
 	if !si {

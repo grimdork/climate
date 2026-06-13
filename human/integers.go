@@ -24,16 +24,7 @@ func UInt(n uint64, si bool) string {
 		exp = 6
 	}
 
-	var prefixes []string
-	if si {
-		prefixes = []string{"k", "M", "G", "T", "P", "E"}
-	} else {
-		// Historical behaviour uses a lowercase 'k' together with the 'iB' suffix
-		// (e.g. "kiB") for the kilo prefix, and uppercase letters for larger
-		// prefixes (MiB, GiB...). Preserve that to match existing expectations.
-		prefixes = []string{"k", "M", "G", "T", "P", "E"}
-	}
-
+	prefixes := []string{"k", "M", "G", "T", "P", "E"}
 	pre := prefixes[exp-1]
 	// Use a 'B' suffix for SI and 'iB' for binary (legacy style: "kiB", "MiB").
 	suffix := "B"
