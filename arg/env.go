@@ -1,6 +1,7 @@
 package arg
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -32,25 +33,41 @@ func (opt *Options) ParseEnvironment(prefix, delimiter string) error {
 			o.Value = t
 
 		case VarInt:
-			i, _ := strconv.Atoi(vs)
+			i, err := strconv.Atoi(vs)
+			if err != nil {
+				return fmt.Errorf("env %s: %w", s, err)
+			}
+
 			o.Value = i
 
 		case VarIntSlice:
 			var list []int
 			for _, v := range strings.Split(vs, delimiter) {
-				i, _ := strconv.Atoi(v)
+				i, err := strconv.Atoi(v)
+				if err != nil {
+					return fmt.Errorf("env %s: %w", s, err)
+				}
+
 				list = append(list, i)
 			}
 			o.Value = list
 
 		case VarFloat:
-			f, _ := strconv.ParseFloat(vs, 64)
+			f, err := strconv.ParseFloat(vs, 64)
+			if err != nil {
+				return fmt.Errorf("env %s: %w", s, err)
+			}
+
 			o.Value = f
 
 		case VarFloatSlice:
 			var list []float64
 			for _, v := range strings.Split(vs, delimiter) {
-				f, _ := strconv.ParseFloat(v, 64)
+				f, err := strconv.ParseFloat(v, 64)
+				if err != nil {
+					return fmt.Errorf("env %s: %w", s, err)
+				}
+
 				list = append(list, f)
 			}
 			o.Value = list

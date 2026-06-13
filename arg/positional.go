@@ -98,7 +98,11 @@ func (opt *Options) GetPosIntSlice(placeholder string) []int {
 	}
 
 	if o.Value == nil {
-		return o.Default.([]int)
+		if o.Default != nil {
+			return o.Default.([]int)
+		}
+
+		return nil
 	}
 
 	return o.Value.([]int)
@@ -130,7 +134,11 @@ func (opt *Options) GetPosFloatSlice(placeholder string) []float64 {
 	}
 
 	if o.Value == nil {
-		return o.Default.([]float64)
+		if o.Default != nil {
+			return o.Default.([]float64)
+		}
+
+		return nil
 	}
 
 	return o.Value.([]float64)

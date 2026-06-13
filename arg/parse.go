@@ -139,11 +139,11 @@ func (opt *Options) parseArgs(args []string) error {
 			continue
 		}
 
-		//
-		// Long options
-		//
+	//
+	// Long options
+	//
 
-		if arg[0] == '-' && arg[1] == '-' {
+	if len(arg) > 1 && arg[0] == '-' && arg[1] == '-' {
 			arg = arg[2:]
 			if arg == "" {
 				return ErrEmptyLong
@@ -197,11 +197,11 @@ func (opt *Options) parseArgs(args []string) error {
 				case VarInt:
 					if a[1] != "" {
 						v, err := strconv.Atoi(a[1])
-						if !hasChoice(v, o.Choices) {
-							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
-						}
 						if err != nil {
-							return err
+							return fmt.Errorf("%s=%v: %w", arg, a[1], err)
+						}
+						if !hasChoice(v, o.Choices) {
+							return fmt.Errorf("%s=%v: %w", arg, a[1], ErrIllegalChoice)
 						}
 
 						o.Value = v
@@ -210,11 +210,11 @@ func (opt *Options) parseArgs(args []string) error {
 
 					if len(args) > i+1 {
 						v, err := strconv.Atoi(args[i+1])
-						if !hasChoice(v, o.Choices) {
-							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
-						}
 						if err != nil {
-							return err
+							return fmt.Errorf("--%s=%v: %w", o.LongName, args[i+1], err)
+						}
+						if !hasChoice(v, o.Choices) {
+							return fmt.Errorf("--%s=%v: %w", o.LongName, args[i+1], ErrIllegalChoice)
 						}
 
 						o.Value = v
@@ -227,11 +227,11 @@ func (opt *Options) parseArgs(args []string) error {
 				case VarFloat:
 					if a[1] != "" {
 						v, err := strconv.ParseFloat(a[1], 64)
-						if !hasChoice(v, o.Choices) {
-							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
-						}
 						if err != nil {
-							return err
+							return fmt.Errorf("%s=%v: %w", arg, a[1], err)
+						}
+						if !hasChoice(v, o.Choices) {
+							return fmt.Errorf("%s=%v: %w", arg, a[1], ErrIllegalChoice)
 						}
 
 						o.Value = v
@@ -240,11 +240,11 @@ func (opt *Options) parseArgs(args []string) error {
 
 					if len(args) > i+1 {
 						v, err := strconv.ParseFloat(args[i+1], 64)
-						if !hasChoice(v, o.Choices) {
-							return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
-						}
 						if err != nil {
-							return err
+							return fmt.Errorf("--%s=%v: %w", o.LongName, args[i+1], err)
+						}
+						if !hasChoice(v, o.Choices) {
+							return fmt.Errorf("--%s=%v: %w", o.LongName, args[i+1], ErrIllegalChoice)
 						}
 
 						o.Value = v
@@ -307,7 +307,7 @@ func (opt *Options) parseArgs(args []string) error {
 
 						if len(args) > i+1 {
 							if !hasChoice(args[i+1], o.Choices) {
-								return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
+								return fmt.Errorf("%s=%v: %w", arg, args[i+1], ErrIllegalChoice)
 							}
 							o.Value = args[i+1]
 							args[i+1] = ""
@@ -319,11 +319,11 @@ func (opt *Options) parseArgs(args []string) error {
 					case VarInt:
 						if a[0] == string(c) && a[1] != "" {
 							v, err := strconv.Atoi(a[1])
-							if !hasChoice(v, o.Choices) {
-								return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
-							}
 							if err != nil {
-								return err
+								return fmt.Errorf("%s=%v: %w", arg, a[1], err)
+							}
+							if !hasChoice(v, o.Choices) {
+								return fmt.Errorf("%s=%v: %w", arg, a[1], ErrIllegalChoice)
 							}
 
 							o.Value = v
@@ -332,11 +332,11 @@ func (opt *Options) parseArgs(args []string) error {
 
 						if len(args) > i+1 {
 							v, err := strconv.Atoi(args[i+1])
-							if !hasChoice(v, o.Choices) {
-								return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
-							}
 							if err != nil {
-								return err
+								return fmt.Errorf("-%c=%v: %w", c, args[i+1], err)
+							}
+							if !hasChoice(v, o.Choices) {
+								return fmt.Errorf("-%c=%v: %w", c, args[i+1], ErrIllegalChoice)
 							}
 
 							o.Value = v
@@ -349,11 +349,11 @@ func (opt *Options) parseArgs(args []string) error {
 					case VarFloat:
 						if a[0] == string(c) && a[1] != "" {
 							v, err := strconv.ParseFloat(a[1], 64)
-							if !hasChoice(v, o.Choices) {
-								return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
-							}
 							if err != nil {
-								return err
+								return fmt.Errorf("%s=%v: %w", arg, a[1], err)
+							}
+							if !hasChoice(v, o.Choices) {
+								return fmt.Errorf("%s=%v: %w", arg, a[1], ErrIllegalChoice)
 							}
 
 							o.Value = v
@@ -362,11 +362,11 @@ func (opt *Options) parseArgs(args []string) error {
 
 						if len(args) > i+1 {
 							v, err := strconv.ParseFloat(args[i+1], 64)
-							if !hasChoice(v, o.Choices) {
-								return fmt.Errorf("%s=%v: %w", arg, o.Value, ErrIllegalChoice)
-							}
 							if err != nil {
-								return err
+								return fmt.Errorf("-%c=%v: %w", c, args[i+1], err)
+							}
+							if !hasChoice(v, o.Choices) {
+								return fmt.Errorf("-%c=%v: %w", c, args[i+1], ErrIllegalChoice)
 							}
 
 							o.Value = v
