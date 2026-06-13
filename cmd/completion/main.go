@@ -23,7 +23,7 @@ func main() {
 		panic(err)
 	}
 
-	err = opt.Parse(os.Args)
+	err = opt.Parse(os.Args[1:])
 	if err != nil && err != arg.ErrNoArgs {
 		if err == arg.ErrRunCommand {
 			return
