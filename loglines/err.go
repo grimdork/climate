@@ -12,7 +12,7 @@ func Err(f string, v ...any) {
 	b := str.NewStringer()
 	b.WriteStrings(
 		NowString(),
-		":",
+		": ",
 		fmt.Sprintf(f, v...),
 	)
 	fmt.Fprintln(os.Stderr, b.String())

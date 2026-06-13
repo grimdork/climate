@@ -12,7 +12,7 @@ func Msg(f string, v ...any) {
 	b := str.NewStringer()
 	b.WriteStrings(
 		NowString(),
-		":",
+		": ",
 		fmt.Sprintf(f, v...),
 	)
 	fmt.Fprintln(os.Stdout, b.String())
