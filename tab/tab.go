@@ -34,10 +34,17 @@ func TabulateCSV(input string) (string, error) {
 	}
 
 	// Find max width per column across all rows
-	widths := make([]int, len(rows[0]))
+	var maxCols int
+	for _, row := range rows {
+		if len(row) > maxCols {
+			maxCols = len(row)
+		}
+	}
+
+	widths := make([]int, maxCols)
 	for _, row := range rows {
 		for i, cell := range row {
-			if i < len(widths) && len(cell) > widths[i] {
+			if len(cell) > widths[i] {
 				widths[i] = len(cell)
 			}
 		}
