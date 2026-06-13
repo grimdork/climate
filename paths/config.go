@@ -1,6 +1,7 @@
 package paths
 
 import (
+	"errors"
 	"path/filepath"
 )
 
@@ -16,6 +17,10 @@ type Paths struct {
 
 // New returns a Paths struct.
 func New(appname string) (*Paths, error) {
+	if appname == "" {
+		return nil, errors.New("appname cannot be empty")
+	}
+
 	cp := &Paths{
 		AppName: appname,
 	}
