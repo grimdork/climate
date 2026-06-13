@@ -3,10 +3,12 @@ package str
 import (
 	"strconv"
 	"strings"
+	"sync"
 )
 
 // Stringer extends strings.Builder with varargs-based write methods.
 type Stringer struct {
+	mu sync.Mutex
 	strings.Builder
 	sliceComma bool
 	mapComma   bool
@@ -51,6 +53,9 @@ func (s *Stringer) SetEquals(e byte) *Stringer {
 
 // WriteStrings writes any number of strings in one go.
 func (s *Stringer) WriteStrings(v ...string) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	var err error
 	var size, c int
 
@@ -70,6 +75,9 @@ func (s *Stringer) WriteStrings(v ...string) (int, error) {
 // Floating point numbers - all numbers with a decimal point are interpreted as float64, with the fewest necessary decimal places
 // Maps & slices - commas are not on by default, and maps will have "=" between each key-value pair
 func (s *Stringer) WriteI(v ...any) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	var err error
 	var size, c int
 
@@ -97,20 +105,58 @@ func (s *Stringer) writeX(x any) (int, error) {
 
 	case int:
 		return s.WriteString(strconv.FormatInt(int64(v), 10))
-
+	case int8:
+		return s.WriteString(strconv.FormatInt(int64(v), 10))
+	case int16:
+		return s.WriteString(strconv.FormatInt(int64(v), 10))
+	case int32:
+		return s.WriteString(strconv.FormatInt(int64(v), 10))
 	case int64:
 		return s.WriteString(strconv.FormatInt(v, 10))
 
+	case uint:
+		return s.WriteString(strconv.FormatUint(uint64(v), 10))
+	case uint8:
+		return s.WriteString(strconv.FormatUint(uint64(v), 10))
+	case uint16:
+		return s.WriteString(strconv.FormatUint(uint64(v), 10))
+	case uint32:
+		return s.WriteString(strconv.FormatUint(uint64(v), 10))
+	case uint64:
+		return s.WriteString(strconv.FormatUint(v, 10))
+	case uintptr:
+		return s.WriteString(strconv.FormatUint(uint64(v), 10))
+
+	case float32:
+		return s.WriteString(strconv.FormatFloat(float64(v), 'f', -1, 32))
 	case float64:
 		return s.WriteString(strconv.FormatFloat(v, 'f', -1, 64))
 
+	case []byte:
+		return s.WriteString(string(v))
 	case []bool:
 		return s.writeSlice(len(v), func(i int) any { return v[i] })
 	case []string:
 		return s.writeSlice(len(v), func(i int) any { return v[i] })
 	case []int:
 		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []int8:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []int16:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []int32:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
 	case []int64:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []uint:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []uint16:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []uint32:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []uint64:
+		return s.writeSlice(len(v), func(i int) any { return v[i] })
+	case []float32:
 		return s.writeSlice(len(v), func(i int) any { return v[i] })
 	case []float64:
 		return s.writeSlice(len(v), func(i int) any { return v[i] })
