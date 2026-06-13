@@ -698,11 +698,23 @@ func tokenEscape(tok string) (string, bool) {
 	return "", false
 }
 
+// IsTerminal reports whether the standard output is a character device (terminal).
+func IsTerminal() bool {
+	fi, err := os.Stdout.Stat()
+	if err != nil {
+		return false
+	}
+	return (fi.Mode() & os.ModeCharDevice) != 0
+}
+
 func colourEnabled(opts Options) bool {
 	if opts.DisableColour {
 		return false
 	}
-	return os.Getenv("NO_COLOR") == ""
+	if os.Getenv("NO_COLOR") != "" {
+		return false
+	}
+	return IsTerminal()
 }
 
 // StripANSI removes common ANSI SGR escape sequences (like \x1b[31m) from s.
