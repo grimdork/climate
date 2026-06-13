@@ -1,10 +1,15 @@
 package ini
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 // Field contains a variable and its data.
 type Field struct {
 	// Value will be stripped of surrounding whitespace when loaded.
+	// Prefer the typed Set*/Get* methods over writing Value directly — direct
+	// assignment bypasses the typed fields (boolV, intV, floatV).
 	Value string
 	// Type lets the user choose which Get* method to use when loading unknown files.
 	Type   byte
@@ -46,7 +51,7 @@ func (f *Field) GetFloat() float64 {
 func (f *Field) SetFloat(value float64) {
 	f.floatV = value
 	f.Type = Float
-	f.Value = fmt.Sprintf("%f", value)
+	f.Value = strconv.FormatFloat(value, 'f', -1, 64)
 }
 
 // SetString sets a field as a string.

@@ -22,11 +22,12 @@ func (ini *INI) Marshal() string {
 		}
 		sort.Strings(keys)
 		for _, k := range keys {
-			p := ini.Properties[k]
-			b.WriteString(k)
-			b.WriteString(" = ")
-			b.WriteString(p.Value)
-			b.WriteString("\n")
+			for _, p := range ini.Properties[k] {
+				b.WriteString(k)
+				b.WriteString(" = ")
+				b.WriteString(p.Value)
+				b.WriteString("\n")
+			}
 		}
 		b.WriteString("\n")
 	}
@@ -43,30 +44,32 @@ func (ini *INI) Marshal() string {
 			b.WriteString(name)
 			b.WriteString("]\n")
 			sec := ini.Sections[name]
-			// Preserve field order if available
+			sec.mu.RLock()
 			if len(sec.Order) > 0 {
 				for _, key := range sec.Order {
-					f := sec.Fields[key]
-					b.WriteString(key)
-					b.WriteString(" = ")
-					b.WriteString(f.Value)
-					b.WriteString("\n")
+					for _, f := range sec.Fields[key] {
+						b.WriteString(key)
+						b.WriteString(" = ")
+						b.WriteString(f.Value)
+						b.WriteString("\n")
+					}
 				}
 			} else {
-				// Fallback: sort keys
 				keys := make([]string, 0, len(sec.Fields))
 				for k := range sec.Fields {
 					keys = append(keys, k)
 				}
 				sort.Strings(keys)
 				for _, k := range keys {
-					f := sec.Fields[k]
-					b.WriteString(k)
-					b.WriteString(" = ")
-					b.WriteString(f.Value)
-					b.WriteString("\n")
+					for _, f := range sec.Fields[k] {
+						b.WriteString(k)
+						b.WriteString(" = ")
+						b.WriteString(f.Value)
+						b.WriteString("\n")
+					}
 				}
 			}
+			sec.mu.RUnlock()
 			b.WriteString("\n")
 		}
 	}
@@ -139,20 +142,20 @@ func (ini *INI) Parse(s string) error {
 						if t, ok2 := m[key]; ok2 {
 							switch t {
 							case Bool:
-								sec.AddBool(key, boolValue(val))
+								_ = sec.AddBool(key, boolValue(val))
 								lines = lines[1:]
 								continue
 							case Int:
 								n := normaliseNumeric(val)
 								if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 									if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
-										sec.AddInt(key, iv)
+										_ = sec.AddInt(key, iv)
 										lines = lines[1:]
 										continue
 									}
 								} else {
 									if iv, err := strconv.ParseInt(n, 10, 64); err == nil {
-										sec.AddInt(key, iv)
+										_ = sec.AddInt(key, iv)
 										lines = lines[1:]
 										continue
 									}
@@ -160,12 +163,12 @@ func (ini *INI) Parse(s string) error {
 							case Float:
 								n := normaliseNumeric(val)
 								if fv, err := strconv.ParseFloat(n, 64); err == nil {
-									sec.AddFloat(key, fv)
+									_ = sec.AddFloat(key, fv)
 									lines = lines[1:]
 									continue
 								}
 							case String:
-								sec.AddString(key, val)
+								_ = sec.AddString(key, val)
 								lines = lines[1:]
 								continue
 							}
@@ -175,7 +178,7 @@ func (ini *INI) Parse(s string) error {
 				// try bool
 				switch strings.ToLower(val) {
 				case "yes", "true", "on", "no", "false", "off":
-					sec.AddBool(key, boolValue(val))
+					_ = sec.AddBool(key, boolValue(val))
 					lines = lines[1:]
 					continue
 				}
@@ -183,24 +186,24 @@ func (ini *INI) Parse(s string) error {
 				n := normaliseNumeric(val)
 				if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 					if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
-						sec.AddInt(key, iv)
+						_ = sec.AddInt(key, iv)
 						lines = lines[1:]
 						continue
 					}
 				} else {
 					if iv, err := strconv.ParseInt(n, 10, 64); err == nil {
-						sec.AddInt(key, iv)
+						_ = sec.AddInt(key, iv)
 						lines = lines[1:]
 						continue
 					}
 				}
 				// try float
 				if fv, err := strconv.ParseFloat(n, 64); err == nil {
-					sec.AddFloat(key, fv)
+					_ = sec.AddFloat(key, fv)
 					lines = lines[1:]
 					continue
 				}
-				sec.AddString(key, val)
+				_ = sec.AddString(key, val)
 				lines = lines[1:]
 			}
 		} else {
@@ -213,37 +216,37 @@ func (ini *INI) Parse(s string) error {
 					if t, ok2 := m[key]; ok2 {
 						switch t {
 						case Bool:
-							ini.Set("", key, val)
-							p := ini.Properties[key]
-							p.SetBool(boolValue(val))
+							ini.Add("", key, val)
+							fields := ini.Properties[key]
+							fields[len(fields)-1].SetBool(boolValue(val))
 							continue
 						case Int:
 							n := normaliseNumeric(val)
 							if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 								if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
-									ini.Set("", key, val)
-									p := ini.Properties[key]
-									p.SetInt(iv)
+									ini.Add("", key, val)
+									fields := ini.Properties[key]
+									fields[len(fields)-1].SetInt(iv)
 									continue
 								}
 							} else {
 								if iv, err := strconv.ParseInt(n, 10, 64); err == nil {
-									ini.Set("", key, val)
-									p := ini.Properties[key]
-									p.SetInt(iv)
+									ini.Add("", key, val)
+									fields := ini.Properties[key]
+									fields[len(fields)-1].SetInt(iv)
 									continue
 								}
 							}
 						case Float:
 							n := normaliseNumeric(val)
 							if fv, err := strconv.ParseFloat(n, 64); err == nil {
-								ini.Set("", key, val)
-								p := ini.Properties[key]
-								p.SetFloat(fv)
+								ini.Add("", key, val)
+								fields := ini.Properties[key]
+								fields[len(fields)-1].SetFloat(fv)
 								continue
 							}
 						case String:
-							ini.Set("", key, val)
+							ini.Add("", key, val)
 							continue
 						}
 					}
@@ -252,36 +255,36 @@ func (ini *INI) Parse(s string) error {
 			// try bool
 			switch strings.ToLower(val) {
 			case "yes", "true", "on", "no", "false", "off":
-				ini.Set("", key, val)
+				ini.Add("", key, val)
+				fields := ini.Properties[key]
+				fields[len(fields)-1].SetBool(boolValue(val))
 				continue
 			}
 			// try int
 			n := normaliseNumeric(val)
 			if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 				if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
-					ini.Set("", key, val)
-					// store typed value
-					p := ini.Properties[key]
-					p.SetInt(iv)
+					ini.Add("", key, val)
+					fields := ini.Properties[key]
+					fields[len(fields)-1].SetInt(iv)
 					continue
 				}
 			} else {
 				if iv, err := strconv.ParseInt(n, 10, 64); err == nil {
-					ini.Set("", key, val)
-					// store typed value
-					p := ini.Properties[key]
-					p.SetInt(iv)
+					ini.Add("", key, val)
+					fields := ini.Properties[key]
+					fields[len(fields)-1].SetInt(iv)
 					continue
 				}
 			}
 			// try float
 			if fv, err := strconv.ParseFloat(n, 64); err == nil {
-				ini.Set("", key, val)
-				p := ini.Properties[key]
-				p.SetFloat(fv)
+				ini.Add("", key, val)
+				fields := ini.Properties[key]
+				fields[len(fields)-1].SetFloat(fv)
 				continue
 			}
-			ini.Set("", key, val)
+			ini.Add("", key, val)
 		}
 	}
 

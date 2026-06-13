@@ -2,6 +2,7 @@ package ini
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"os"
 	"strings"
@@ -19,7 +20,9 @@ type INI struct {
 	// Order sections were loaded or added in.
 	Order []string
 	// Properties outside of sections (top-level)
-	Properties map[string]*Field
+	Properties map[string][]*Field
+	// PropOrder preserves insertion order of top-level properties.
+	PropOrder []string
 	// ExpectedTypes lets callers declare types for specific section/key pairs.
 	// Map: section -> key -> type (Bool/Int/Float/String). Use section == "" for top-level properties.
 	ExpectedTypes map[string]map[string]byte
@@ -48,7 +51,7 @@ const (
 func New() (*INI, error) {
 	return &INI{
 		Sections:      make(map[string]*Section),
-		Properties:    make(map[string]*Field),
+		Properties:    make(map[string][]*Field),
 		ExpectedTypes: make(map[string]map[string]byte),
 		FilePerm:      0644,
 	}, nil
@@ -80,22 +83,208 @@ func (ini *INI) SetEnvFirst(on bool) {
 	ini.mu.Unlock()
 }
 
-// Set is a convenience method to drill down into the correct section to set a property.
-// The section will be created if missing.
-func (ini *INI) Set(s, k, v string) {
+// Set sets a property value. If the key already exists, the first entry is
+// replaced; otherwise a new entry is added. Returns an error if the key is empty.
+func (ini *INI) Set(s, k, v string) error {
 	ini.mu.Lock()
 	defer ini.mu.Unlock()
 	k = strings.ToLower(k)
+	if k == "" {
+		return errors.New("empty key")
+	}
 	if s == "" {
-		ini.Properties[k] = &Field{Value: v, Type: String}
-		return
+		if len(ini.Properties[k]) > 0 {
+			ini.Properties[k][0].SetString(v)
+			return nil
+		}
+		f := Field{}
+		f.SetString(v)
+		ini.Properties[k] = []*Field{&f}
+		ini.PropOrder = append(ini.PropOrder, k)
+		return nil
 	}
 
 	sec, ok := ini.Sections[s]
 	if !ok {
 		sec = ini.AddSection(s)
 	}
-	sec.AddString(k, v)
+	return sec.SetString(k, v)
+}
+
+// Add appends a new property value. The key may appear multiple times in the
+// section after repeated calls. Returns an error if the key is empty.
+func (ini *INI) Add(s, k, v string) error {
+	ini.mu.Lock()
+	defer ini.mu.Unlock()
+	k = strings.ToLower(k)
+	if k == "" {
+		return errors.New("empty key")
+	}
+	if s == "" {
+		f := Field{}
+		f.SetString(v)
+		ini.Properties[k] = append(ini.Properties[k], &f)
+		if len(ini.Properties[k]) == 1 {
+			ini.PropOrder = append(ini.PropOrder, k)
+		}
+		return nil
+	}
+
+	sec, ok := ini.Sections[s]
+	if !ok {
+		sec = ini.AddSection(s)
+	}
+	return sec.AddString(k, v)
+}
+
+// SetBool sets a boolean property. Replaces the first entry or adds a new one.
+func (ini *INI) SetBool(s, k string, v bool) error {
+	ini.mu.Lock()
+	defer ini.mu.Unlock()
+	k = strings.ToLower(k)
+	if k == "" {
+		return errors.New("empty key")
+	}
+	if s == "" {
+		if len(ini.Properties[k]) > 0 {
+			ini.Properties[k][0].SetBool(v)
+			return nil
+		}
+		f := Field{}
+		f.SetBool(v)
+		ini.Properties[k] = []*Field{&f}
+		ini.PropOrder = append(ini.PropOrder, k)
+		return nil
+	}
+	sec, ok := ini.Sections[s]
+	if !ok {
+		sec = ini.AddSection(s)
+	}
+	return sec.SetBool(k, v)
+}
+
+// AddBool appends a boolean property.
+func (ini *INI) AddBool(s, k string, v bool) error {
+	ini.mu.Lock()
+	defer ini.mu.Unlock()
+	k = strings.ToLower(k)
+	if k == "" {
+		return errors.New("empty key")
+	}
+	if s == "" {
+		f := Field{}
+		f.SetBool(v)
+		ini.Properties[k] = append(ini.Properties[k], &f)
+		if len(ini.Properties[k]) == 1 {
+			ini.PropOrder = append(ini.PropOrder, k)
+		}
+		return nil
+	}
+	sec, ok := ini.Sections[s]
+	if !ok {
+		sec = ini.AddSection(s)
+	}
+	return sec.AddBool(k, v)
+}
+
+// SetInt sets an integer property. Replaces the first entry or adds a new one.
+func (ini *INI) SetInt(s, k string, v int64) error {
+	ini.mu.Lock()
+	defer ini.mu.Unlock()
+	k = strings.ToLower(k)
+	if k == "" {
+		return errors.New("empty key")
+	}
+	if s == "" {
+		if len(ini.Properties[k]) > 0 {
+			ini.Properties[k][0].SetInt(v)
+			return nil
+		}
+		f := Field{}
+		f.SetInt(v)
+		ini.Properties[k] = []*Field{&f}
+		ini.PropOrder = append(ini.PropOrder, k)
+		return nil
+	}
+	sec, ok := ini.Sections[s]
+	if !ok {
+		sec = ini.AddSection(s)
+	}
+	return sec.SetInt(k, v)
+}
+
+// AddInt appends an integer property.
+func (ini *INI) AddInt(s, k string, v int64) error {
+	ini.mu.Lock()
+	defer ini.mu.Unlock()
+	k = strings.ToLower(k)
+	if k == "" {
+		return errors.New("empty key")
+	}
+	if s == "" {
+		f := Field{}
+		f.SetInt(v)
+		ini.Properties[k] = append(ini.Properties[k], &f)
+		if len(ini.Properties[k]) == 1 {
+			ini.PropOrder = append(ini.PropOrder, k)
+		}
+		return nil
+	}
+	sec, ok := ini.Sections[s]
+	if !ok {
+		sec = ini.AddSection(s)
+	}
+	return sec.AddInt(k, v)
+}
+
+// SetFloat sets a float property. Replaces the first entry or adds a new one.
+func (ini *INI) SetFloat(s, k string, v float64) error {
+	ini.mu.Lock()
+	defer ini.mu.Unlock()
+	k = strings.ToLower(k)
+	if k == "" {
+		return errors.New("empty key")
+	}
+	if s == "" {
+		if len(ini.Properties[k]) > 0 {
+			ini.Properties[k][0].SetFloat(v)
+			return nil
+		}
+		f := Field{}
+		f.SetFloat(v)
+		ini.Properties[k] = []*Field{&f}
+		ini.PropOrder = append(ini.PropOrder, k)
+		return nil
+	}
+	sec, ok := ini.Sections[s]
+	if !ok {
+		sec = ini.AddSection(s)
+	}
+	return sec.SetFloat(k, v)
+}
+
+// AddFloat appends a float property.
+func (ini *INI) AddFloat(s, k string, v float64) error {
+	ini.mu.Lock()
+	defer ini.mu.Unlock()
+	k = strings.ToLower(k)
+	if k == "" {
+		return errors.New("empty key")
+	}
+	if s == "" {
+		f := Field{}
+		f.SetFloat(v)
+		ini.Properties[k] = append(ini.Properties[k], &f)
+		if len(ini.Properties[k]) == 1 {
+			ini.PropOrder = append(ini.PropOrder, k)
+		}
+		return nil
+	}
+	sec, ok := ini.Sections[s]
+	if !ok {
+		sec = ini.AddSection(s)
+	}
+	return sec.AddFloat(k, v)
 }
 
 // DeclareType declares the expected type for a given section/key. Use section=="" for top-level properties.
@@ -122,16 +311,14 @@ func (ini *INI) GetString(s, k string) string {
 	upper := ini.upper
 	ini.mu.RUnlock()
 
-	// Environment override
-	// Compute fallback from INI
 	l := strings.ToLower(k)
 	var fallback string
 	if s == "" {
 		ini.mu.RLock()
 		p, ok := ini.Properties[l]
 		ini.mu.RUnlock()
-		if ok {
-			fallback = p.Value
+		if ok && len(p) > 0 {
+			fallback = p[0].Value
 		}
 	} else {
 		ini.mu.RLock()
@@ -161,14 +348,13 @@ func (ini *INI) GetBool(s, k string) bool {
 	upper := ini.upper
 	ini.mu.RUnlock()
 
-	// Compute fallback
 	var fallback bool
 	if s == "" {
 		ini.mu.RLock()
 		p, ok := ini.Properties[k]
 		ini.mu.RUnlock()
-		if ok {
-			fallback = p.GetBool()
+		if ok && len(p) > 0 {
+			fallback = p[0].GetBool()
 		}
 	} else {
 		fallback = ini.Sections[s].GetBool(k, false)
@@ -193,14 +379,13 @@ func (ini *INI) GetInt(s, k string) int64 {
 	upper := ini.upper
 	ini.mu.RUnlock()
 
-	// Compute fallback
 	var fallback int64
 	if s == "" {
 		ini.mu.RLock()
 		p, ok := ini.Properties[k]
 		ini.mu.RUnlock()
-		if ok {
-			fallback = p.GetInt()
+		if ok && len(p) > 0 {
+			fallback = p[0].GetInt()
 		}
 	} else {
 		fallback = ini.Sections[s].GetInt(k, 0)
@@ -225,14 +410,13 @@ func (ini *INI) GetFloat(s, k string) float64 {
 	upper := ini.upper
 	ini.mu.RUnlock()
 
-	// Compute fallback
 	var fallback float64
 	if s == "" {
 		ini.mu.RLock()
 		p, ok := ini.Properties[k]
 		ini.mu.RUnlock()
-		if ok {
-			fallback = p.GetFloat()
+		if ok && len(p) > 0 {
+			fallback = p[0].GetFloat()
 		}
 	} else {
 		fallback = ini.Sections[s].GetFloat(k, 0.0)
@@ -247,6 +431,26 @@ func (ini *INI) GetFloat(s, k string) float64 {
 	}
 
 	return fallback
+}
+
+// GetMatch returns all fields for a key. For section-scoped keys it returns
+// the section's fields; for top-level (section == "") it returns property fields.
+func (ini *INI) GetMatch(s, k string) []*Field {
+	ini.mu.RLock()
+	defer ini.mu.RUnlock()
+	k = strings.ToLower(k)
+	if s == "" {
+		v, ok := ini.Properties[k]
+		if !ok {
+			return nil
+		}
+		return v
+	}
+	sec, ok := ini.Sections[s]
+	if !ok {
+		return nil
+	}
+	return sec.GetAll(k)
 }
 
 // Load INI from file and take a guess at the types of each value.
@@ -291,7 +495,8 @@ func Load(filename string) (*INI, error) {
 
 		// Handle top-level properties (key=value) if present.
 		a := splitProp(l)
-		ini.Set("", a[0], a[1])
+		// key is non-empty for valid input so the error is unused
+		_ = ini.Add("", a[0], a[1])
 
 		if err == io.EOF {
 			break
@@ -306,35 +511,55 @@ func Load(filename string) (*INI, error) {
 func (ini *INI) Save(filename string, tabbed bool) error {
 	ini.mu.RLock()
 	filePerm := ini.FilePerm
-	// Hold read lock while serialising to avoid concurrent map access.
 	defer ini.mu.RUnlock()
 
 	b := str.NewStringer()
-	count := 0
-	for _, secname := range ini.Order {
-		if count > 0 {
-			b.WriteString("\n")
-		}
-		count++
-		b.WriteStrings("[", secname, "]\n")
-		for _, key := range ini.Sections[secname].Order {
-			f := ini.Sections[secname].Fields[key]
+
+	// Top-level properties
+	for _, key := range ini.PropOrder {
+		for _, f := range ini.Properties[key] {
 			if tabbed {
 				b.WriteRune('\t')
 			}
 			b.WriteStrings(key, "=", f.Value, "\n")
 		}
 	}
+
+	// Sections
+	first := true
+	for _, secname := range ini.Order {
+		sec := ini.Sections[secname]
+		sec.mu.RLock()
+		if len(sec.Order) == 0 {
+			sec.mu.RUnlock()
+			continue
+		}
+		if !first {
+			b.WriteString("\n")
+		}
+		first = false
+		b.WriteStrings("[", secname, "]\n")
+		for _, key := range sec.Order {
+			for _, f := range sec.Fields[key] {
+				if tabbed {
+					b.WriteRune('\t')
+				}
+				b.WriteStrings(key, "=", f.Value, "\n")
+			}
+		}
+		sec.mu.RUnlock()
+	}
 	return os.WriteFile(filename, []byte(b.String()), filePerm)
 }
 
-// AddSection to INI structure. Returns existing section if present.
+// AddSection adds a named section to the INI or returns an existing one.
+// It is NOT safe for concurrent use unless the caller holds ini.mu.
 func (ini *INI) AddSection(name string) *Section {
 	if sec := ini.Sections[name]; sec != nil {
 		return sec
 	}
 	sec := &Section{
-		Fields: make(map[string]*Field),
+		Fields: make(map[string][]*Field),
 	}
 	ini.Sections[name] = sec
 	ini.Order = append(ini.Order, name)

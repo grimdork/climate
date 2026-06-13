@@ -31,7 +31,9 @@ snot=12x
 	// Dump properties for debugging
 	t.Logf("properties: %+v", ini.Properties)
 	for k, v := range ini.Properties {
-		t.Logf("prop %s: Type=%d Value=%q intV=%d floatV=%v boolV=%v", k, v.Type, v.Value, v.intV, v.floatV, v.boolV)
+		if len(v) > 0 {
+			t.Logf("prop %s: Type=%d Value=%q intV=%d floatV=%v boolV=%v", k, v[0].Type, v[0].Value, v[0].intV, v[0].floatV, v[0].boolV)
+		}
 	}
 
 	if got := ini.GetInt("", "i"); got != 42 {
