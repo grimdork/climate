@@ -147,6 +147,13 @@ func TestSprintWithDelims(t *testing.T) {
 	}
 }
 
+func TestSprintWithDelimsOptions(t *testing.T) {
+	got := fx.SprintWithDelimsOptions(fx.Options{DisableColour: true}, "<", ">", "<red>Hello<@>")
+	if got != "Hello" {
+		t.Fatalf("expected plain text with DisableColour, got %q", got)
+	}
+}
+
 func TestDisableColourOption(t *testing.T) {
 	got := fx.RenderWithOptions(fx.Options{DisableColour: true}, "{red}warn{@}")
 	if got != "warn" {

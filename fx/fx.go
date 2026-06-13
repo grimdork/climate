@@ -258,11 +258,16 @@ func RenderPlainWithOptions(opts Options, format string, args ...any) string {
 // delimiters instead of { and } (e.g. '<' and '>'). If open or close are not
 // single bytes the call falls back to Sprint.
 func SprintWithDelims(open, close string, format string, args ...any) string {
+	return SprintWithDelimsOptions(Options{}, open, close, format, args...)
+}
+
+// SprintWithDelimsOptions is like SprintWithDelims but accepts caller-supplied Options.
+func SprintWithDelimsOptions(opts Options, open, close string, format string, args ...any) string {
 	if len(open) != 1 || len(close) != 1 {
 		return Sprint(format, args...)
 	}
-	out := renderWithChars(open[0], close[0], Options{}, format, args...)
-	if !colourEnabled(Options{}) {
+	out := renderWithChars(open[0], close[0], opts, format, args...)
+	if !colourEnabled(opts) {
 		return StripANSI(out)
 	}
 	return out

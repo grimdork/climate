@@ -36,6 +36,15 @@ fx.Println("{success}Done{@}")
 
 Tokens are case-insensitive. Use `{@}` or `{reset}` to clear formatting.
 
+| Category | Tokens |
+|---|---|
+| Foreground | `{black}`, `{red}`, `{green}`, `{yellow}`, `{blue}`, `{magenta}`, `{cyan}`, `{white}`, `{grey}`/`{gray}` |
+| Bright foreground | `{brightblack}`, `{brightred}`, …, `{brightwhite}` |
+| Background | `{bgblack}`, `{bgred}`, …, `{bgwhite}`, `{bggrey}`/`{bggray}` |
+| Bright background | `{bgbrightblack}`, `{bgbrightred}`, …, `{bgbrightwhite}` |
+| Styles | `{bold}`, `{dim}`, `{italic}`, `{underline}`/`{under}`, `{blink}`, `{fast}`, `{inverse}`/`{invert}`, `{hidden}`/`{conceal}`/`{concealed}`, `{strike}`/`{strikethrough}` |
+| Reset | `{@}`, `{reset}` |
+
 ### Log-safe output
 `RenderPlain`, `Log`, and `Logln` strip ANSI escape codes from the result.
 
@@ -123,10 +132,25 @@ fx.Sprint("{{red}}") // "{red}"
 fx.Sprint("{{}}")    // "{}"
 ```
 
-Use `SprintWithDelims` if you want a different single-byte delimiter pair:
+Use `SprintWithDelims` for a different single-byte delimiter pair:
 
 ```go
 fx.SprintWithDelims("<", ">", "<red>Hello<@> <>", "world")
+```
+
+To also pass options, use `SprintWithDelimsOptions`:
+
+```go
+fx.SprintWithDelimsOptions(fx.Options{DisableColour: true}, "<", ">", "<red>Hello<@>")
+```
+
+## Terminal detection
+`IsTerminal()` reports whether stdout is a character device (terminal). Colour output is automatically suppressed when stdout is a pipe or file, or when `NO_COLOR` is set.
+
+```go
+if fx.IsTerminal() {
+    // Terminal-specific output
+}
 ```
 
 ## Render options
@@ -138,6 +162,11 @@ out := fx.RenderWithOptions(fx.Options{SortMaps: true}, "{}", map[string]int{
 	"a": 1,
 })
 // out == "{a=1, b=2}"
+```
+
+Custom delimiters also support options via `SprintWithDelimsOptions`:
+
+```go
 ```
 
 ## ANSI stripping
