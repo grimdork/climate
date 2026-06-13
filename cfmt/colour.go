@@ -46,38 +46,38 @@ const (
 	//
 
 	// BGBlack is the background colour black.
-	BGBlack = "\x1b[40;5m"
+	BGBlack = "\x1b[40;1m"
 	// BGRed is the background colour red.
-	BGRed = "\x1b[41;5m"
+	BGRed = "\x1b[41;1m"
 	// BGGreen is the background colour green.
-	BGGreen = "\x1b[42;5m"
+	BGGreen = "\x1b[42;1m"
 	// BGYellow is the background colour yellow.
-	BGYellow = "\x1b[43;5m"
+	BGYellow = "\x1b[43;1m"
 	// BGBlue is the background colour blue.
-	BGBlue = "\x1b[44;5m"
+	BGBlue = "\x1b[44;1m"
 	// BGMagenta is the background colour magenta.
-	BGMagenta = "\x1b[45;5m"
+	BGMagenta = "\x1b[45;1m"
 	// BGCyan is the background colour cyan.
-	BGCyan = "\x1b[46;5m"
+	BGCyan = "\x1b[46;1m"
 	// BGWhite is the background colour white.
-	BGWhite = "\x1b[47;5m"
+	BGWhite = "\x1b[47;1m"
 
 	// BGGrey is the background colour grey.
-	BGGrey = "\x1b[100;5m"
+	BGGrey = "\x1b[100;1m"
 	// BGLightRed is the background colour light red.
-	BGLightRed = "\x1b[101;5m"
+	BGLightRed = "\x1b[101;1m"
 	// BGLightGreen is the background colour light green.
-	BGLightGreen = "\x1b[102;5m"
+	BGLightGreen = "\x1b[102;1m"
 	// BGLightYellow is the background colour light yellow.
-	BGLightYellow = "\x1b[103;5m"
+	BGLightYellow = "\x1b[103;1m"
 	// BGLightBlue is the background colour light blue.
-	BGLightBlue = "\x1b[104;5m"
+	BGLightBlue = "\x1b[104;1m"
 	// BGLightMagenta is the background colour light magenta.
-	BGLightMagenta = "\x1b[105;5m"
+	BGLightMagenta = "\x1b[105;1m"
 	// BGLightCyan is the background colour light cyan.
-	BGLightCyan = "\x1b[106;5m"
+	BGLightCyan = "\x1b[106;1m"
 	// BGLightWhite is the background colour light white.
-	BGLightWhite = "\x1b[107;5m"
+	BGLightWhite = "\x1b[107;1m"
 
 	//
 	// Style options
