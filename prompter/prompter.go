@@ -82,11 +82,29 @@ func NewWithReader(q []Question, input io.Reader, output io.Writer, readPass rea
 
 // Ask the user for input.
 func (pr *Prompter) Ask() error {
+	if len(pr.Questions) == 0 {
+		return nil
+	}
+
+	// Grow Answers and Secret to match Questions if caller mutated them directly.
+	for len(pr.Answers) < len(pr.Questions) {
+		pr.Answers = append(pr.Answers, "")
+	}
+	for len(pr.Secret) < len(pr.Questions) {
+		pr.Secret = append(pr.Secret, false)
+	}
+
 	var t string
 	var err error
 	for i, q := range pr.Questions {
-		fmt.Fprintf(pr.output, "%s [%s]: ", q, pr.Answers[i])
-		if pr.Secret[i] {
+		ans := ""
+		if i < len(pr.Answers) {
+			ans = pr.Answers[i]
+		}
+		secret := i < len(pr.Secret) && pr.Secret[i]
+
+		fmt.Fprintf(pr.output, "%s [%s]: ", q, ans)
+		if secret {
 			sec, err := pr.readPass()
 			fmt.Fprintln(pr.output)
 			if err != nil {
@@ -101,12 +119,14 @@ func (pr *Prompter) Ask() error {
 			}
 		}
 
-		if len(t) > 0 && !pr.Secret[i] {
+		if len(t) > 0 && !secret {
 			t = t[:len(t)-1]
 		}
 
 		if t != "" {
-			pr.Answers[i] = t
+			if i < len(pr.Answers) {
+				pr.Answers[i] = t
+			}
 		}
 	}
 
