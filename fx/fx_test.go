@@ -153,3 +153,64 @@ func TestDisableColourOption(t *testing.T) {
 		t.Fatalf("expected DisableColour to suppress ANSI, got %q", got)
 	}
 }
+
+func TestNewStyleTags(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{"strikethrough", "{strike}x{@}", "x"},
+		{"strikethrough full", "{strikethrough}x{@}", "x"},
+		{"blink", "{blink}x{@}", "x"},
+		{"fast blink", "{fast}x{@}", "x"},
+		{"conceal", "{conceal}x{@}", "x"},
+		{"concealed", "{concealed}x{@}", "x"},
+		{"under shortcut", "{under}x{@}", "x"},
+		{"grey foreground", "{grey}x{@}", "x"},
+		{"gray foreground", "{gray}x{@}", "x"},
+		{"bggrey background", "{bggrey}x{@}", "x"},
+		{"bggray background", "{bggray}x{@}", "x"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			plain := fx.RenderPlain(tc.input)
+			if plain != tc.want {
+				t.Fatalf("RenderPlain(%q) = %q, want %q", tc.input, plain, tc.want)
+			}
+
+			got := fx.RenderWithOptions(fx.Options{DisableColour: true}, tc.input)
+			if got != tc.want {
+				t.Fatalf("RenderWithOptions(DisableColour, %q) = %q, want %q", tc.input, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestExportedANSIConstants(t *testing.T) {
+	if fx.Reset != "\x1b[0m" {
+		t.Fatalf("Reset = %q, want %q", fx.Reset, "\x1b[0m")
+	}
+	if fx.Red != "\x1b[31m" {
+		t.Fatalf("Red = %q, want %q", fx.Red, "\x1b[31m")
+	}
+	if fx.Grey != "\x1b[90m" {
+		t.Fatalf("Grey = %q, want %q", fx.Grey, "\x1b[90m")
+	}
+	if fx.BGGrey != "\x1b[100m" {
+		t.Fatalf("BGGrey = %q, want %q", fx.BGGrey, "\x1b[100m")
+	}
+	if fx.BrightRed != "\x1b[91m" {
+		t.Fatalf("BrightRed = %q, want %q", fx.BrightRed, "\x1b[91m")
+	}
+	if fx.BGBrightRed != "\x1b[101m" {
+		t.Fatalf("BGBrightRed = %q, want %q", fx.BGBrightRed, "\x1b[101m")
+	}
+	if fx.Strikethrough != "\x1b[9m" {
+		t.Fatalf("Strikethrough = %q, want %q", fx.Strikethrough, "\x1b[9m")
+	}
+	if fx.FastBlink != "\x1b[6m" {
+		t.Fatalf("FastBlink = %q, want %q", fx.FastBlink, "\x1b[6m")
+	}
+}

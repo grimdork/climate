@@ -659,16 +659,28 @@ func tokenEscape(tok string) (string, bool) {
 		return "\x1b[2m", true
 	case "italic":
 		return "\x1b[3m", true
-	case "underline":
+	case "underline", "under":
 		return "\x1b[4m", true
+	case "blink":
+		return "\x1b[5m", true
+	case "fast":
+		return "\x1b[6m", true
 	case "inverse", "invert":
 		return "\x1b[7m", true
-	case "hidden":
+	case "hidden", "conceal", "concealed":
 		return "\x1b[8m", true
+	case "strike", "strikethrough":
+		return "\x1b[9m", true
+	case "grey", "gray":
+		return "\x1b[90m", true
 	}
 
 	if strings.HasPrefix(tok, "bg") {
 		c := strings.TrimSpace(strings.TrimPrefix(tok, "bg"))
+		if c == "grey" || c == "gray" {
+			return "\x1b[100m", true
+		}
+
 		isBright := false
 		if strings.HasPrefix(c, "bright") {
 			isBright = true
