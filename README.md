@@ -17,8 +17,7 @@ Minimalist toolkit for Go command-line applications.
 | Package | Description |
 | :--- | :--- |
 | **[`arg`](./arg)** | No-dependency option parser with subcommands and positionals. |
-| **[`cfmt`](./cfmt)** | `printf` wrapper with easy `%colour` formatting. |
-| **[`fx`](./fx)** | Small `{}`-style formatter with ANSI and time tokens. |
+| **[`fx`](./fx)** | `{}`-style formatter with ANSI tokens, time tokens, and format specs. |
 | **[`daemon`](./daemon)** | Lifecycle utilities for background services and signal handling. |
 | **[`prompter`](./prompter)** | Interactive user prompts with support for masked secrets. |
 | **[`paths`](./paths)** | Resolves standard config paths (XDG on Linux, Library on macOS). |
@@ -67,23 +66,22 @@ func main() {
 }
 ```
 
-## Colour formatting (cfmt)
-Use ANSI colours with Printf.
-
-```go
-import "github.com/grimdork/climate/cfmt"
-
-cfmt.Printf("%red Error:%reset file not found: '%s'\n", fn)
-cfmt.Print("%green Success!%reset Process completed.\n")
-```
-
-## Lightweight formatting (fx)
-Use simple `{}` placeholders plus optional colour, style, and time tokens.
+## Colour and value formatting (fx)
+`{}` placeholders with colour, style, time tokens, and Go `fmt`-compatible format specs.
 
 ```go
 import "github.com/grimdork/climate/fx"
 
+// Colour and style tokens
 fx.Println("{green}Status:{@} {}", "ready")
+fx.Println("{red}Error:{@} {}", "file not found")
+
+// Format specs (any Go % verb)
+fx.Println("{:x}", 255)          // "ff"
+fx.Println("{:.2f}%", 98.5)      // "98.50%"
+fx.Println("{:09d}", 42)         // "000000042"
+
+// Time tokens
 fx.Println("[{time}] Starting up")
 ```
 
