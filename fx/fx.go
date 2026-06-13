@@ -2,6 +2,7 @@ package fx
 
 import (
 	"encoding"
+	"fmt"
 	"io"
 	"os"
 	"regexp"
@@ -401,13 +402,32 @@ func renderWithChars(open, close byte, opts Options, format string, args ...any)
 				i++
 				continue
 			}
-			tok := strings.ToLower(format[i+1 : j])
+			raw := format[i+1 : j]
+			if len(raw) > 0 && raw[0] == ':' {
+				// Format spec — delegate to fmt.Sprintf with the next argument.
+				if argIndex < len(args) {
+					spec := raw[1:]
+					if spec == "" {
+						spec = "v"
+					}
+					b.writeString(fmt.Sprintf("%"+spec, args[argIndex]))
+					argIndex++
+				} else {
+					b.writeByte(open)
+					b.writeString(raw)
+					b.writeByte(close)
+				}
+				i = j + 1
+				continue
+			}
+
+			tok := strings.ToLower(raw)
 			if writeToken(&b, tok, 0) {
 				i = j + 1
 				continue
 			}
 			b.writeByte(open)
-			b.writeString(format[i+1 : j])
+			b.writeString(raw)
 			b.writeByte(close)
 			i = j + 1
 			continue

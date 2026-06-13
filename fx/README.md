@@ -90,6 +90,44 @@ Some timezone tokens accept a `:utc` modifier, such as `{tzoffset:utc}`.
 - Unknown tokens are left unchanged.
 - Setting `NO_COLOR` suppresses ANSI output automatically.
 
+## Format specs
+Use `{:spec}` to format an argument with Go's `fmt` formatting verbs:
+
+```go
+fx.Println("Hex: {:x}", 255)              // "ff"
+fx.Println("Bin: {:b}", 42)               // "101010"
+fx.Println("{:.2f}%", 98.5)               // "98.50%"
+fx.Println("{:10.3f}", 3.14)              // "     3.140"
+fx.Println("{:09d}", 42)                  // "000000042"
+fx.Println("{:+d}", 42)                   // "+42"
+fx.Println("{:10s}", "hello")             // "     hello"
+fx.Println("{:-10s}", "hello")            // "hello     "
+fx.Println("Type: {:T}", 42)              // "int"
+fx.Println("Repr: {:#v}", &x)             // Go syntax
+```
+
+The spec after `:` is passed directly as the format string to `fmt.Sprintf`, so any valid Go `%` verb works. Commonly used specs:
+
+| Spec | Example arg | Output |
+|---|---|---|
+| `{:x}` | `255` | `"ff"` |
+| `{:X}` | `255` | `"FF"` |
+| `{:b}` | `42` | `"101010"` |
+| `{:o}` | `42` | `"52"` |
+| `{:.2f}` | `3.14159` | `"3.14"` |
+| `{:10.3f}` | `3.14` | `"     3.140"` |
+| `{:09d}` | `42` | `"000000042"` |
+| `{:+d}` | `42` | `"+42"` |
+| `{:q}` | `"hello"` | `"\"hello\""` |
+| `{:c}` | `65` | `"A"` |
+| `{:t}` | `true` | `"true"` |
+| `{:p}` | pointer | `"0xc000..."` |
+| `{:+v}` | struct | `"{A:1}"` |
+| `{:#v}` | any | Go-syntax repr |
+| `{:T}` | any | Go type name |
+
+Plain `{}` uses the type-switch and is preferred when no special formatting is needed.
+
 ## Aliases
 Predefined aliases:
 - `danger` → `red bold`

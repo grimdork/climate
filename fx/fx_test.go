@@ -221,3 +221,49 @@ func TestExportedANSIConstants(t *testing.T) {
 		t.Fatalf("FastBlink = %q, want %q", fx.FastBlink, "\x1b[6m")
 	}
 }
+
+func TestFormatSpec(t *testing.T) {
+	tests := []struct {
+		name string
+		fmt  string
+		args []any
+		want string
+	}{
+		{"hex", "{:x}", []any{255}, "ff"},
+		{"hex upper", "{:X}", []any{255}, "FF"},
+		{"binary", "{:b}", []any{42}, "101010"},
+		{"octal", "{:o}", []any{42}, "52"},
+		{"precision float", "{:.2f}", []any{3.14159}, "3.14"},
+		{"width+precision", "{:10.3f}", []any{3.14}, "     3.140"},
+		{"zero-padded int", "{:09d}", []any{42}, "000000042"},
+		{"sign always", "{:+d}", []any{42}, "+42"},
+		{"sign negative", "{:+d}", []any{-5}, "-5"},
+		{"string width", "{:10s}", []any{"hi"}, "        hi"},
+		{"string left-align", "{:-10s}", []any{"hi"}, "hi        "},
+		{"quoted string", "{:q}", []any{"hello"}, `"hello"`},
+		{"unicode char", "{:c}", []any{65}, "A"},
+		{"bool", "{:t}", []any{true}, "true"},
+		{"struct with fields", "{:+v}", []any{struct{ A int }{42}}, "{A:42}"},
+		{"go syntax", "{:#v}", []any{struct{ A int }{42}}, "struct { A int }{A:42}"},
+		{"type name", "{:T}", []any{42}, "int"},
+		{"pointer", "{:p}", []any{&struct{}{}}, ""},
+		{"empty spec", "{:}", []any{42}, "42"},
+		{"missing arg", "{:x}", []any{}, "{:x}"},
+		{"combined with colour", "{:x} {red}{:d}{@}", []any{255, 42}, "ff 42"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := fx.Render(tc.fmt, tc.args...)
+			if tc.name == "pointer" {
+				if !strings.Contains(got, "0x") {
+					t.Fatalf("Render(%q) = %q, want containing 0x", tc.fmt, got)
+				}
+				return
+			}
+			if got != tc.want {
+				t.Fatalf("Render(%q, %v) = %q, want %q", tc.fmt, tc.args, got, tc.want)
+			}
+		})
+	}
+}
