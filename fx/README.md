@@ -37,11 +37,11 @@ fx.Println("{success}Done{@}")
 Tokens are case-insensitive. Use `{@}` or `{reset}` to clear formatting.
 
 | Category | Tokens |
-|---|---|
+|---|---|---|
 | Foreground | `{black}`, `{red}`, `{green}`, `{yellow}`, `{blue}`, `{magenta}`, `{cyan}`, `{white}`, `{grey}`/`{gray}` |
-| Bright foreground | `{brightblack}`, `{brightred}`, …, `{brightwhite}` |
+| Bright foreground | `{brightblack}`/`{brightgrey}`/`{brightgray}`, `{brightred}`, …, `{brightwhite}` |
 | Background | `{bgblack}`, `{bgred}`, …, `{bgwhite}`, `{bggrey}`/`{bggray}` |
-| Bright background | `{bgbrightblack}`, `{bgbrightred}`, …, `{bgbrightwhite}` |
+| Bright background | `{bgbrightblack}`/`{bgbrightgrey}`/`{bgbrightgray}`, `{bgbrightred}`, …, `{bgbrightwhite}` |
 | Styles | `{bold}`, `{dim}`, `{italic}`, `{underline}`/`{under}`, `{blink}`, `{fast}`, `{inverse}`/`{invert}`, `{hidden}`/`{conceal}`/`{concealed}`, `{strike}`/`{strikethrough}` |
 | Reset | `{@}`, `{reset}` |
 
@@ -86,6 +86,7 @@ Some timezone tokens accept a `:utc` modifier, such as `{tzoffset:utc}`.
 - Common slices are joined with `, ` and no brackets.
 - `error` values and types with a `String() string` method use their own string output.
 - Common string-key and int-key maps are rendered as `{key=value}` pairs.
+- `complex64` and `complex128` are supported.
 - Unsupported values render as `<unsupported>` unless they provide their own string or text output.
 - Unknown tokens are left unchanged.
 - Setting `NO_COLOR` suppresses ANSI output automatically.

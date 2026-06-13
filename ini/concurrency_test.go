@@ -23,7 +23,6 @@ func TestConcurrencyStress(t *testing.T) {
 				k := fmt.Sprintf("k_%d_%d", id, j)
 				ini.Set("sec", k, "v")
 				_ = ini.GetString("sec", k)
-				_ = ini.GetString("sec", k)
 				// occasionally save
 				if j%50 == 0 {
 					fn := filepath.Join(d, fmt.Sprintf("out_%d_%d.ini", id, j))

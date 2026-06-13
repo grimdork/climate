@@ -56,20 +56,21 @@ func NewWithReader(q []Question, input io.Reader, output io.Writer, readPass rea
 	if output == nil {
 		output = io.Discard
 	}
+	pr := &Prompter{
+		reader: bufio.NewReader(input),
+		output: output,
+	}
 	if readPass == nil {
-		r := bufio.NewReader(input)
-		readPass = func() ([]byte, error) {
+		r := pr.reader
+		pr.readPass = func() ([]byte, error) {
 			line, err := r.ReadString('\n')
 			if len(line) > 0 && line[len(line)-1] == '\n' {
 				line = line[:len(line)-1]
 			}
 			return []byte(line), err
 		}
-	}
-	pr := &Prompter{
-		reader:   bufio.NewReader(input),
-		output:   output,
-		readPass: readPass,
+	} else {
+		pr.readPass = readPass
 	}
 	for _, q := range q {
 		pr.Questions = append(pr.Questions, q.Question)

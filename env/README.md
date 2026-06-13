@@ -12,7 +12,7 @@ go get github.com/grimdork/climate/env
 - Get(key, alt string) string
   - Returns the environment value if the variable is set (returns empty string if set to empty). If the variable is not set, returns alt.
 - GetBool(key string, alt bool) bool
-  - If the variable is not set, returns alt. If set, returns true only for explicit truthy values (true/yes/on/1/t); everything else (including empty, quoted non-truthy values, or invalid tokens) is false.
+  - If the variable is not set, returns alt. If set, returns true only for explicit truthy values (true/yes/on/1/t/enabled, case-insensitive); everything else (including empty, quoted non-truthy values, or invalid tokens) returns alt.
 - GetInt(key string, alt int64) int64
   - If the variable is not set, returns alt. If set, attempts to parse as int64 (supports +/-, underscores, and 0x/0X hex). On parse failure or overflow, returns alt.
 - GetFloat(key string, alt float64) float64

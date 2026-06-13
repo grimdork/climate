@@ -41,8 +41,8 @@ const (
 	// Grey foreground colour (bright black).
 	Grey = "\x1b[90m"
 
-	// BrightBlack foreground colour.
-	BrightBlack = "\x1b[90m"
+	// BrightBlack foreground colour (alias for Grey).
+	BrightBlack = Grey
 	// BrightRed foreground colour.
 	BrightRed = "\x1b[91m"
 	// BrightGreen foreground colour.
@@ -77,8 +77,8 @@ const (
 	// BGGrey background colour (bright black background).
 	BGGrey = "\x1b[100m"
 
-	// BGBrightBlack background colour.
-	BGBrightBlack = "\x1b[100m"
+	// BGBrightBlack background colour (alias for BGGrey).
+	BGBrightBlack = BGGrey
 	// BGBrightRed background colour.
 	BGBrightRed = "\x1b[101m"
 	// BGBrightGreen background colour.

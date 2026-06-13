@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/grimdork/climate/str"
 )
 
 // helper: strip surrounding single or double quotes
@@ -32,7 +34,7 @@ func Get(key, alt string) string {
 // When the variable is set, truthiness rules apply: only explicit "true"-like
 // values are considered true. If the variable is set but not a recognized
 // truthy value, the alt fallback is returned (i.e. invalid -> alt).
-// Accepted true values (case-insensitive): "true", "yes", "on", "1", "t".
+// Accepted true values (case-insensitive): "true", "yes", "on", "1", "t", "enabled".
 func GetBool(key string, alt bool) bool {
 	v, ok := os.LookupEnv(key)
 	if !ok {
@@ -42,15 +44,10 @@ func GetBool(key string, alt bool) bool {
 	if v == "" {
 		return alt
 	}
-	v = strings.ToLower(v)
-	switch v {
-	case "true", "yes", "on", "1", "t":
-		return true
-	case "false", "no", "off", "0", "f":
-		return false
-	default:
-		return alt
+	if val, ok := str.BoolFromString(v); ok {
+		return val
 	}
+	return alt
 }
 
 // GetInt fetches an environment variable and parses it as an int64.
@@ -89,12 +86,7 @@ func GetFloat(key string, alt float64) float64 {
 	if v == "" {
 		return alt
 	}
-	// Remove underscores
-	v = strings.ReplaceAll(v, "_", "")
-	// If there is a comma but no dot, treat comma as decimal separator.
-	if strings.Contains(v, ",") && !strings.Contains(v, ".") {
-		v = strings.ReplaceAll(v, ",", ".")
-	}
+	v = str.NormaliseNumeric(v)
 	x, err := strconv.ParseFloat(v, 64)
 	if err != nil {
 		return alt

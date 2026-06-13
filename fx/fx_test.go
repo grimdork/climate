@@ -58,6 +58,13 @@ func TestRenderPlainAndNoColor(t *testing.T) {
 	if got != "OK" {
 		t.Fatalf("expected NO_COLOR to suppress ANSI, got %q", got)
 	}
+
+	// Empty NO_COLOR value should also suppress colours per no-color.org spec
+	os.Setenv("NO_COLOR", "")
+	got = fx.Render("{blue}empty{@}")
+	if got != "empty" {
+		t.Fatalf("expected empty NO_COLOR to suppress ANSI, got %q", got)
+	}
 }
 
 func TestWriterVariants(t *testing.T) {
@@ -122,6 +129,12 @@ func TestAliasRegistryAndConcurrency(t *testing.T) {
 		t.Fatalf("expected alias to resolve, got %q", got)
 	}
 
+	// Alias with a modifier should still resolve (modifier is silently dropped)
+	got = fx.RenderPlain("{note:important}memo{@}")
+	if got != "memo" {
+		t.Fatalf("expected alias with modifier to resolve, got %q", got)
+	}
+
 	var wg sync.WaitGroup
 	for i := 0; i < 16; i++ {
 		wg.Add(1)
@@ -176,8 +189,12 @@ func TestNewStyleTags(t *testing.T) {
 		{"under shortcut", "{under}x{@}", "x"},
 		{"grey foreground", "{grey}x{@}", "x"},
 		{"gray foreground", "{gray}x{@}", "x"},
+		{"bright grey foreground", "{brightgrey}x{@}", "x"},
+		{"bright gray foreground", "{brightgray}x{@}", "x"},
 		{"bggrey background", "{bggrey}x{@}", "x"},
 		{"bggray background", "{bggray}x{@}", "x"},
+		{"bgbrightgrey background", "{bgbrightgrey}x{@}", "x"},
+		{"bgbrightgray background", "{bgbrightgray}x{@}", "x"},
 	}
 
 	for _, tc := range tests {
@@ -250,6 +267,7 @@ func TestFormatSpec(t *testing.T) {
 		{"empty spec", "{:}", []any{42}, "42"},
 		{"missing arg", "{:x}", []any{}, "{:x}"},
 		{"combined with colour", "{:x} {red}{:d}{@}", []any{255, 42}, "ff 42"},
+		{"bad spec", "{:%bad}", []any{42}, "%bad%!(EXTRA int=42)"},
 	}
 
 	for _, tc := range tests {

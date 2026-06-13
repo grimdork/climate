@@ -1,3 +1,5 @@
+//go:build unix && !tinygo
+
 package daemon
 
 import (

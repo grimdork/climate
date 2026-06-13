@@ -1,3 +1,5 @@
+//go:build !tinygo
+
 package prompter
 
 import (
@@ -26,19 +28,29 @@ func readPassword() ([]byte, error) {
 	// Restore on exit
 	defer syscall.Syscall6(syscall.SYS_IOCTL, uintptr(fd), ioctlWriteTermios, uintptr(unsafe.Pointer(&oldState)), 0, 0, 0)
 
-	var buf [256]byte
-	n, err := os.Stdin.Read(buf[:])
-	if err != nil {
-		return nil, err
+	// Read in chunks to support arbitrary-length passwords
+	var buf []byte
+	tmp := make([]byte, 4096)
+	for {
+		n, err := os.Stdin.Read(tmp[:])
+		if err != nil {
+			return nil, err
+		}
+		// Append to buffer
+		buf = append(buf, tmp[:n]...)
+		// Stop at newline (terminal input ends with newline)
+		if n > 0 && tmp[n-1] == '\n' {
+			break
+		}
 	}
 
 	// Strip trailing newline
-	if n > 0 && buf[n-1] == '\n' {
-		n--
+	if len(buf) > 0 && buf[len(buf)-1] == '\n' {
+		buf = buf[:len(buf)-1]
 	}
-	if n > 0 && buf[n-1] == '\r' {
-		n--
+	if len(buf) > 0 && buf[len(buf)-1] == '\r' {
+		buf = buf[:len(buf)-1]
 	}
 
-	return buf[:n], nil
+	return buf, nil
 }

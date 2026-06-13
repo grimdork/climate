@@ -2,12 +2,13 @@ package ini
 
 import (
 	"errors"
-	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/grimdork/climate/str"
 )
 
-// Marshal INI into a string. Global properties first (sorted), then sections (sorted).
+// Marshal INI into a string. Global properties first (in insertion order), then sections (in insertion order).
 func (ini *INI) Marshal() string {
 	ini.mu.RLock()
 	defer ini.mu.RUnlock()
@@ -16,77 +17,57 @@ func (ini *INI) Marshal() string {
 
 	// Properties
 	if len(ini.Properties) > 0 {
-		keys := make([]string, 0, len(ini.Properties))
-		for k := range ini.Properties {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
+		for _, k := range ini.PropOrder {
 			for _, p := range ini.Properties[k] {
 				b.WriteString(k)
-				b.WriteString(" = ")
+				b.WriteString("=")
 				b.WriteString(p.Value)
 				b.WriteString("\n")
 			}
 		}
-		b.WriteString("\n")
+		if len(ini.Sections) > 0 {
+			b.WriteString("\n")
+		}
 	}
 
 	// Sections
-	if len(ini.Sections) > 0 {
-		secNames := make([]string, 0, len(ini.Sections))
-		for name := range ini.Sections {
-			secNames = append(secNames, name)
+	first := true
+	for _, name := range ini.Order {
+		sec := ini.Sections[name]
+		if sec == nil {
+			continue
 		}
-		sort.Strings(secNames)
-		for _, name := range secNames {
-			b.WriteString("[")
-			b.WriteString(name)
-			b.WriteString("]\n")
-			sec := ini.Sections[name]
-			sec.mu.RLock()
-			if len(sec.Order) > 0 {
-				for _, key := range sec.Order {
-					for _, f := range sec.Fields[key] {
-						b.WriteString(key)
-						b.WriteString(" = ")
-						b.WriteString(f.Value)
-						b.WriteString("\n")
-					}
-				}
-			} else {
-				keys := make([]string, 0, len(sec.Fields))
-				for k := range sec.Fields {
-					keys = append(keys, k)
-				}
-				sort.Strings(keys)
-				for _, k := range keys {
-					for _, f := range sec.Fields[k] {
-						b.WriteString(k)
-						b.WriteString(" = ")
-						b.WriteString(f.Value)
-						b.WriteString("\n")
-					}
-				}
-			}
+		sec.mu.RLock()
+		if len(sec.Order) == 0 {
 			sec.mu.RUnlock()
+			continue
+		}
+		if !first {
 			b.WriteString("\n")
 		}
+		first = false
+		b.WriteString("[")
+		b.WriteString(name)
+		b.WriteString("]\n")
+		if len(sec.Order) > 0 {
+			for _, key := range sec.Order {
+				for _, f := range sec.Fields[key] {
+					b.WriteString(key)
+					b.WriteString("=")
+					b.WriteString(f.Value)
+					b.WriteString("\n")
+				}
+			}
+		}
+		sec.mu.RUnlock()
 	}
 
 	return b.String()
 }
 
-// normaliseNumeric prepares a number string for parsing: remove underscores, handle localised decimal comma.
-func normaliseNumeric(raw string) string {
-	r := strings.TrimSpace(raw)
-	// remove common thousands separators (underscores)
-	r = strings.ReplaceAll(r, "_", "")
-	// If it contains a comma but no dot, assume comma is decimal separator and convert to dot.
-	if strings.Contains(r, ",") && !strings.Contains(r, ".") {
-		r = strings.ReplaceAll(r, ",", ".")
-	}
-	return r
+// NormaliseNumeric prepares a number string for parsing: remove underscores, handle localised decimal comma.
+func NormaliseNumeric(raw string) string {
+	return str.NormaliseNumeric(raw)
 }
 
 // Parse parses an INI document string into the existing INI structure, honouring any
@@ -101,6 +82,9 @@ func (ini *INI) Parse(s string) error {
 	if len(lines) == 0 {
 		return errors.New("no lines")
 	}
+
+	ini.mu.Lock()
+	defer ini.mu.Unlock()
 
 	for len(lines) > 0 {
 		line := strings.TrimSpace(lines[0])
@@ -117,7 +101,8 @@ func (ini *INI) Parse(s string) error {
 				continue
 			}
 			name := line[1 : len(line)-1]
-			sec := ini.AddSection(name)
+			name = strings.ToLower(name)
+			sec := ini.addSection(name)
 			// Consume following lines until next section or EOF
 			for len(lines) > 0 {
 				ln := strings.TrimSpace(lines[0])
@@ -136,6 +121,10 @@ func (ini *INI) Parse(s string) error {
 				a := splitProp(ln)
 				key := strings.ToLower(a[0])
 				val := strings.TrimSpace(a[1])
+				if key == "" {
+					lines = lines[1:]
+					continue
+				}
 				// Check expected type declarations first
 				if ini.ExpectedTypes != nil {
 					if m, ok := ini.ExpectedTypes[name]; ok {
@@ -146,7 +135,7 @@ func (ini *INI) Parse(s string) error {
 								lines = lines[1:]
 								continue
 							case Int:
-								n := normaliseNumeric(val)
+								n := NormaliseNumeric(val)
 								if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 									if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
 										_ = sec.AddInt(key, iv)
@@ -161,7 +150,7 @@ func (ini *INI) Parse(s string) error {
 									}
 								}
 							case Float:
-								n := normaliseNumeric(val)
+								n := NormaliseNumeric(val)
 								if fv, err := strconv.ParseFloat(n, 64); err == nil {
 									_ = sec.AddFloat(key, fv)
 									lines = lines[1:]
@@ -176,14 +165,13 @@ func (ini *INI) Parse(s string) error {
 					}
 				}
 				// try bool
-				switch strings.ToLower(val) {
-				case "yes", "true", "on", "no", "false", "off":
+				if _, ok := str.BoolFromString(val); ok {
 					_ = sec.AddBool(key, boolValue(val))
 					lines = lines[1:]
 					continue
 				}
 				// try int (support hex and '_' separators)
-				n := normaliseNumeric(val)
+				n := NormaliseNumeric(val)
 				if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 					if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
 						_ = sec.AddInt(key, iv)
@@ -210,68 +198,70 @@ func (ini *INI) Parse(s string) error {
 			a := splitProp(line)
 			key := strings.ToLower(a[0])
 			val := strings.TrimSpace(a[1])
+			if key == "" {
+				continue
+			}
 			// Check expected type declarations for top-level properties
 			if ini.ExpectedTypes != nil {
 				if m, ok := ini.ExpectedTypes[""]; ok {
 					if t, ok2 := m[key]; ok2 {
 						switch t {
 						case Bool:
-							ini.Add("", key, val)
+							ini.addProp(key, val)
 							fields := ini.Properties[key]
 							fields[len(fields)-1].SetBool(boolValue(val))
 							continue
 						case Int:
-							n := normaliseNumeric(val)
+							n := NormaliseNumeric(val)
 							if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 								if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
-									ini.Add("", key, val)
+									ini.addProp(key, val)
 									fields := ini.Properties[key]
 									fields[len(fields)-1].SetInt(iv)
 									continue
 								}
 							} else {
 								if iv, err := strconv.ParseInt(n, 10, 64); err == nil {
-									ini.Add("", key, val)
+									ini.addProp(key, val)
 									fields := ini.Properties[key]
 									fields[len(fields)-1].SetInt(iv)
 									continue
 								}
 							}
 						case Float:
-							n := normaliseNumeric(val)
+							n := NormaliseNumeric(val)
 							if fv, err := strconv.ParseFloat(n, 64); err == nil {
-								ini.Add("", key, val)
+								ini.addProp(key, val)
 								fields := ini.Properties[key]
 								fields[len(fields)-1].SetFloat(fv)
 								continue
 							}
 						case String:
-							ini.Add("", key, val)
+							ini.addProp(key, val)
 							continue
 						}
 					}
 				}
 			}
 			// try bool
-			switch strings.ToLower(val) {
-			case "yes", "true", "on", "no", "false", "off":
-				ini.Add("", key, val)
+			if _, ok := str.BoolFromString(val); ok {
+				ini.addProp(key, val)
 				fields := ini.Properties[key]
 				fields[len(fields)-1].SetBool(boolValue(val))
 				continue
 			}
 			// try int
-			n := normaliseNumeric(val)
+			n := NormaliseNumeric(val)
 			if strings.HasPrefix(n, "0x") || strings.HasPrefix(n, "0X") {
 				if iv, err := strconv.ParseInt(n, 0, 64); err == nil {
-					ini.Add("", key, val)
+					ini.addProp(key, val)
 					fields := ini.Properties[key]
 					fields[len(fields)-1].SetInt(iv)
 					continue
 				}
 			} else {
 				if iv, err := strconv.ParseInt(n, 10, 64); err == nil {
-					ini.Add("", key, val)
+					ini.addProp(key, val)
 					fields := ini.Properties[key]
 					fields[len(fields)-1].SetInt(iv)
 					continue
@@ -279,12 +269,12 @@ func (ini *INI) Parse(s string) error {
 			}
 			// try float
 			if fv, err := strconv.ParseFloat(n, 64); err == nil {
-				ini.Add("", key, val)
+				ini.addProp(key, val)
 				fields := ini.Properties[key]
 				fields[len(fields)-1].SetFloat(fv)
 				continue
 			}
-			ini.Add("", key, val)
+			ini.addProp(key, val)
 		}
 	}
 
@@ -298,6 +288,21 @@ func Unmarshal(s string) (*INI, error) {
 		return nil, err
 	}
 	return ini, nil
+}
+
+// addProp adds a top-level property without locking. Caller must hold ini.mu.
+func (ini *INI) addProp(key, val string) error {
+	k := strings.ToLower(key)
+	if k == "" {
+		return ErrEmptyKey
+	}
+	f := Field{}
+	f.SetString(val)
+	ini.Properties[k] = append(ini.Properties[k], &f)
+	if len(ini.Properties[k]) == 1 {
+		ini.PropOrder = append(ini.PropOrder, k)
+	}
+	return nil
 }
 
 func splitProp(s string) []string {

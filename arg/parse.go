@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/grimdork/climate/loglines"
+	"github.com/grimdork/climate/str"
 )
 
 // ShowOptions shows the values of all options. Used for debugging.
@@ -22,7 +22,7 @@ func (opt *Options) ShowOptions() {
 
 // Parse command line arguments from a string slice.
 // - If default help is defined, it will print the help message after parsing when "-h" or "--help" is supplied,
-// then os.Exit(0). Returns ErrNoArgs if no arguments are supplied.
+// then os.Exit(0). Returns ErrNonFatal if no arguments are supplied.
 //
 // Tool commands, short options (single dash and one letter), long options (double dash and one or more
 // letters), and positional arguments are each paarsed in the order they are supplied. If a positional
@@ -58,7 +58,7 @@ func (opt *Options) Parse(args []string) error {
 		return err
 	}
 
-	if opt.hashelp && opt.GetBool("h") {
+	if opt.hashelp && (opt.GetBool("h") || opt.GetBool("help")) {
 		opt.PrintHelp()
 		os.Exit(0)
 	}
@@ -93,7 +93,7 @@ func (opt *Options) ParseAndRun(args []string) {
 			os.Exit(1)
 		}
 
-		loglines.Err("Error parsing arguments: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error parsing arguments: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -110,7 +110,7 @@ func (opt *Options) parseArgs(args []string) error {
 		if cmd != nil {
 			fn := cmd.Func
 			if fn == nil {
-				return fmt.Errorf("%s: %s", arg, ErrMissingFunc)
+				return fmt.Errorf("%s: %w", arg, ErrMissingFunc)
 			}
 
 			cmd.Options.Args = args[i+1:]
@@ -139,11 +139,11 @@ func (opt *Options) parseArgs(args []string) error {
 			continue
 		}
 
-	//
-	// Long options
-	//
+		//
+		// Long options
+		//
 
-	if len(arg) > 1 && arg[0] == '-' && arg[1] == '-' {
+		if len(arg) > 1 && arg[0] == '-' && arg[1] == '-' {
 			arg = arg[2:]
 			if arg == "" {
 				return ErrEmptyLong
@@ -155,10 +155,13 @@ func (opt *Options) parseArgs(args []string) error {
 				switch o.Type {
 				case VarBool:
 					t, v := isTruthy(a[1])
-					// We have the form "--option=value"
 					if t {
 						o.Value = v
 						continue
+					}
+					// Unrecognised explicit value like --option=xyz
+					if a[1] != "" {
+						return fmt.Errorf("%s=%v: %w", arg, a[1], ErrIllegalValue)
 					}
 
 					if len(args) > i+1 {
@@ -280,7 +283,10 @@ func (opt *Options) parseArgs(args []string) error {
 					switch o.Type {
 					case VarBool:
 						if a[0] == string(c) && a[1] != "" {
-							_, v := isTruthy(a[1])
+							t, v := isTruthy(a[1])
+							if !t {
+								return fmt.Errorf("%s=%v: %w", arg, a[1], ErrIllegalValue)
+							}
 							o.Value = v
 							continue
 						}
@@ -473,6 +479,12 @@ func (opt *Options) parseArgs(args []string) error {
 		}
 	}
 
+	for _, o := range opt.positional {
+		if o.Required && o.Value == nil {
+			return fmt.Errorf("%s: %w", o.Placeholder, ErrMissingRequired)
+		}
+	}
+
 	return nil
 }
 
@@ -488,14 +500,11 @@ func splitOption(arg string) []string {
 // isTruthy returns whether the supplied string is a truthy value.
 // The second value is the decoded value, if applicable, false otherwise.
 func isTruthy(s string) (bool, bool) {
-	switch strings.ToLower(s) {
-	case "true", "yes", "on", "1", "t":
-		return true, true
-	case "false", "no", "off", "0", "f":
-		return true, false
+	v, ok := str.BoolFromString(s)
+	if !ok {
+		return false, false
 	}
-
-	return false, false
+	return true, v
 }
 
 func hasChoice[C comparable](c C, list []any) bool {

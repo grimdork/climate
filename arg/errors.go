@@ -34,4 +34,6 @@ var (
 	ErrUnknownType = errors.New("unknown option type")
 	// ErrNoPlaceholder is returned when a positional argument is missing a placeholder.
 	ErrNoPlaceholder = errors.New("no placeholder")
+	// ErrIllegalValue is returned when a boolean option receives an unrecognised value.
+	ErrIllegalValue = errors.New("illegal value")
 )

@@ -45,6 +45,9 @@ func (opt *Options) GroupCount() int {
 
 // AddGroup adds a new group. This ensures the order for help listing.
 func (opt *Options) AddGroup(group string) *Group {
+	if _, ok := opt.groups[group]; ok {
+		return opt.groups[group]
+	}
 	opt.groups[group] = &Group{Name: group}
 	opt.order = append(opt.order, group)
 	return opt.groups[group]
@@ -106,13 +109,18 @@ func (opt *Options) GetBool(name string) bool {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.(bool)
+			if v, ok := o.Default.(bool); ok {
+				return v
+			}
 		}
 
 		return false
 	}
 
-	return o.Value.(bool)
+	if v, ok := o.Value.(bool); ok {
+		return v
+	}
+	return false
 }
 
 // GetString returns a string option's value.
@@ -124,13 +132,18 @@ func (opt *Options) GetString(name string) string {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.(string)
+			if v, ok := o.Default.(string); ok {
+				return v
+			}
 		}
 
 		return ""
 	}
 
-	return o.Value.(string)
+	if v, ok := o.Value.(string); ok {
+		return v
+	}
+	return ""
 }
 
 // GetStringSlice returns a string slice option's value.
@@ -142,13 +155,18 @@ func (opt *Options) GetStringSlice(name string) []string {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.([]string)
+			if v, ok := o.Default.([]string); ok {
+				return v
+			}
 		}
 
 		return []string{}
 	}
 
-	return o.Value.([]string)
+	if v, ok := o.Value.([]string); ok {
+		return v
+	}
+	return []string{}
 }
 
 // GetInt returns an int option's value.
@@ -160,13 +178,18 @@ func (opt *Options) GetInt(name string) int {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.(int)
+			if v, ok := o.Default.(int); ok {
+				return v
+			}
 		}
 
 		return 0
 	}
 
-	return o.Value.(int)
+	if v, ok := o.Value.(int); ok {
+		return v
+	}
+	return 0
 }
 
 // GetFloat returns a float option's value.
@@ -178,11 +201,16 @@ func (opt *Options) GetFloat(name string) float64 {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.(float64)
+			if v, ok := o.Default.(float64); ok {
+				return v
+			}
 		}
 
 		return 0.0
 	}
 
-	return o.Value.(float64)
+	if v, ok := o.Value.(float64); ok {
+		return v
+	}
+	return 0.0
 }

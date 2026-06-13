@@ -18,5 +18,5 @@ func basePath() (string, error) {
 }
 
 func baseServerPath() (string, error) {
-	return basePath()
+	return "/Library/Application Support", nil
 }

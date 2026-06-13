@@ -4,7 +4,7 @@ Opinionated, simple logging utilities for small CLIs and services.
 `loglines` provides three lightweight helpers for human-friendly output:
 
 - `Msg(...)` — info-style lines to stdout with a timestamp
-- `CMsg(...)` — colourised info lines using `fx` (timestamp grey, message cyan)
+- `CMsg(...)` — colourised info lines using `fx` (timestamp grey, message cyan) — uses `{@}` syntax
 - `Err(...)` — error-style lines to stderr with a timestamp
 
 Timestamps use the format: `<dayname> <mon> <day> HH:MM:SS.<microseconds> <year>`.

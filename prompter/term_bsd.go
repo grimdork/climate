@@ -1,4 +1,4 @@
-//go:build darwin || freebsd || netbsd || openbsd || dragonfly
+//go:build (darwin || freebsd || netbsd || openbsd || dragonfly) && !tinygo
 
 package prompter
 

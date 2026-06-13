@@ -31,13 +31,18 @@ func (opt *Options) GetPosBool(placeholder string) bool {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.(bool)
+			if v, ok := o.Default.(bool); ok {
+				return v
+			}
 		}
 
 		return false
 	}
 
-	return o.Value.(bool)
+	if v, ok := o.Value.(bool); ok {
+		return v
+	}
+	return false
 }
 
 // GetPosString returns a positional string's value.
@@ -49,13 +54,18 @@ func (opt *Options) GetPosString(placeholder string) string {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.(string)
+			if v, ok := o.Default.(string); ok {
+				return v
+			}
 		}
 
 		return ""
 	}
 
-	return o.Value.(string)
+	if v, ok := o.Value.(string); ok {
+		return v
+	}
+	return ""
 }
 
 // GetPosStringSlice returns a positional string slice's values.
@@ -69,7 +79,10 @@ func (opt *Options) GetPosStringSlice(placeholder string) []string {
 		return []string{}
 	}
 
-	return o.Value.([]string)
+	if v, ok := o.Value.([]string); ok {
+		return v
+	}
+	return []string{}
 }
 
 // GetPosInt returns a positional int's value.
@@ -81,13 +94,18 @@ func (opt *Options) GetPosInt(placeholder string) int {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.(int)
+			if v, ok := o.Default.(int); ok {
+				return v
+			}
 		}
 
 		return 0
 	}
 
-	return o.Value.(int)
+	if v, ok := o.Value.(int); ok {
+		return v
+	}
+	return 0
 }
 
 // GetPosIntSlice returns a positional int slice's values.
@@ -99,13 +117,18 @@ func (opt *Options) GetPosIntSlice(placeholder string) []int {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.([]int)
+			if v, ok := o.Default.([]int); ok {
+				return v
+			}
 		}
 
 		return nil
 	}
 
-	return o.Value.([]int)
+	if v, ok := o.Value.([]int); ok {
+		return v
+	}
+	return nil
 }
 
 // GetPosFloat returns a positional float's value.
@@ -117,13 +140,18 @@ func (opt *Options) GetPosFloat(placeholder string) float64 {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.(float64)
+			if v, ok := o.Default.(float64); ok {
+				return v
+			}
 		}
 
 		return 0
 	}
 
-	return o.Value.(float64)
+	if v, ok := o.Value.(float64); ok {
+		return v
+	}
+	return 0
 }
 
 // GetPosFloatSlice returns a positional float slice's values.
@@ -135,11 +163,16 @@ func (opt *Options) GetPosFloatSlice(placeholder string) []float64 {
 
 	if o.Value == nil {
 		if o.Default != nil {
-			return o.Default.([]float64)
+			if v, ok := o.Default.([]float64); ok {
+				return v
+			}
 		}
 
 		return nil
 	}
 
-	return o.Value.([]float64)
+	if v, ok := o.Value.([]float64); ok {
+		return v
+	}
+	return nil
 }

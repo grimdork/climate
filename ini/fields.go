@@ -54,8 +54,11 @@ func (f *Field) SetFloat(value float64) {
 	f.Value = strconv.FormatFloat(value, 'f', -1, 64)
 }
 
-// SetString sets a field as a string.
+// SetString sets a field as a string and clears typed values.
 func (f *Field) SetString(value string) {
 	f.Value = value
 	f.Type = String
+	f.boolV = false
+	f.intV = 0
+	f.floatV = 0
 }

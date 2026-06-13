@@ -57,9 +57,14 @@ fmt.Println(s.String())
 ### Supported types
 | Category | Types |
 | :--- | :--- |
-| Scalars | `bool`, `string`, `int`, `int64`, `float64` |
+| Scalars | `bool`, `string`, `int`, `int8`, `int16`, `int32`, `int64`, `uint`, `uint8`, `uint16`, `uint32`, `uint64`, `uintptr`, `float32`, `float64`, `[]byte` |
 | Slices | `[]bool`, `[]string`, `[]int`, `[]int64`, `[]float64`, `[]any` |
 | Maps | `map[string]string`, `map[string]int`, `map[string]any`, `map[int]string`, `map[int]int`, `map[int]any` |
+
+### Utility functions
+
+- `BoolFromString(s string) (bool, bool)` — parses common boolean strings: `"true"`, `"yes"`, `"on"`, `"1"`, `"t"`, `"enabled"` (truthy) and `"false"`, `"no"`, `"off"`, `"0"`, `"f"` (falsy), all case-insensitive. Returns the value and whether the input was recognised.
+- `NormaliseNumeric(raw string) string` — strips underscores and converts a single comma to a decimal dot when no dot is present (handles locale formats like `"3,14"`).
 
 Unsupported types are silently skipped.
 

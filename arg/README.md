@@ -171,6 +171,7 @@ Contributions adding edge-case tests for long option parsing and environment var
 - `arg.ErrNoArgs` — no arguments provided (returned by subcommand parsing or when a required positional is missing).
 - `arg.ErrRunCommand` — a subcommand was matched and executed
 - `arg.ErrIllegalChoice` — value not in the allowed choices list
+- `arg.ErrIllegalValue` — boolean option received an unrecognised value (e.g. `--opt=xyz`)
 - `arg.ErrMissingRequired` — a required option was not provided
 - `arg.ErrMissingParam` — an option that expects a value didn't get one
 - `arg.ErrUnknownOption` — unrecognised flag encountered

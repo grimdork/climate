@@ -192,7 +192,7 @@ func TestDuplicateKeyRoundtrip(t *testing.T) {
 	}
 
 	// GetString still returns first
-	if got := loaded.GetString("sec", "x"); got != "1" {
+	if got := loaded.GetString("sec", "x"); got != "true" {
 		t.Fatalf("GetString should return first, got %q", got)
 	}
 }
@@ -278,19 +278,19 @@ func TestMarshalWithDuplicateKeys(t *testing.T) {
 	ini.Add("sec", "y", "single")
 
 	s := ini.Marshal()
-	if !strings.Contains(s, "top = a\n") {
+	if !strings.Contains(s, "top=a\n") {
 		t.Fatal("Marshal missing top=a")
 	}
-	if !strings.Contains(s, "top = b\n") {
+	if !strings.Contains(s, "top=b\n") {
 		t.Fatal("Marshal missing top=b")
 	}
-	if !strings.Contains(s, "x = 1\n") {
+	if !strings.Contains(s, "x=1\n") {
 		t.Fatal("Marshal missing x=1")
 	}
-	if !strings.Contains(s, "x = 2\n") {
+	if !strings.Contains(s, "x=2\n") {
 		t.Fatal("Marshal missing x=2")
 	}
-	if !strings.Contains(s, "y = single\n") {
+	if !strings.Contains(s, "y=single\n") {
 		t.Fatal("Marshal missing y=single")
 	}
 

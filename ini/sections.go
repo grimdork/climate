@@ -2,9 +2,10 @@ package ini
 
 import (
 	"bufio"
-	"errors"
 	"strings"
 	"sync"
+
+	"github.com/grimdork/climate/str"
 )
 
 // Section holds one or more fields.
@@ -23,9 +24,10 @@ func (s *Section) parse(r *bufio.Reader) {
 			return
 		}
 
-		// Blank line — return (existing behaviour)
+		// Blank line — skip
 		if next[0] == '\n' || next[0] == '\r' {
-			return
+			r.ReadString('\n')
+			continue
 		}
 
 		// New section — done
@@ -44,15 +46,14 @@ func (s *Section) parse(r *bufio.Reader) {
 		}
 
 		a := strings.SplitN(p, "=", 2)
-		if a == nil || len(a) != 2 {
-			return
+		if len(a) != 2 {
+			continue
 		}
 
 		a[0] = strings.TrimSpace(a[0])
 		a[1] = strings.TrimSpace(a[1])
 		a[0] = strings.ToLower(a[0])
-		switch a[1] {
-		case "yes", "true", "on", "no", "false", "off":
+		if _, ok := str.BoolFromString(a[1]); ok {
 			_ = s.AddBool(a[0], boolValue(a[1]))
 			continue
 		}
@@ -66,7 +67,7 @@ func (s *Section) parse(r *bufio.Reader) {
 func (s *Section) GetBool(key string, alt bool) bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	v, ok := s.Fields[key]
+	v, ok := s.Fields[strings.ToLower(key)]
 	if !ok || len(v) == 0 {
 		return alt
 	}
@@ -78,8 +79,9 @@ func (s *Section) AddBool(key string, value bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if key == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
+	key = strings.ToLower(key)
 	f := Field{}
 	f.SetBool(value)
 	s.Fields[key] = append(s.Fields[key], &f)
@@ -94,8 +96,9 @@ func (s *Section) SetBool(key string, value bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if key == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
+	key = strings.ToLower(key)
 	if len(s.Fields[key]) > 0 {
 		s.Fields[key][0].SetBool(value)
 		return nil
@@ -111,7 +114,7 @@ func (s *Section) SetBool(key string, value bool) error {
 func (s *Section) GetInt(key string, alt int64) int64 {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	v, ok := s.Fields[key]
+	v, ok := s.Fields[strings.ToLower(key)]
 	if !ok || len(v) == 0 {
 		return alt
 	}
@@ -123,8 +126,9 @@ func (s *Section) AddInt(key string, value int64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if key == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
+	key = strings.ToLower(key)
 	f := Field{}
 	f.SetInt(value)
 	s.Fields[key] = append(s.Fields[key], &f)
@@ -139,8 +143,9 @@ func (s *Section) SetInt(key string, value int64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if key == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
+	key = strings.ToLower(key)
 	if len(s.Fields[key]) > 0 {
 		s.Fields[key][0].SetInt(value)
 		return nil
@@ -156,7 +161,7 @@ func (s *Section) SetInt(key string, value int64) error {
 func (s *Section) GetFloat(key string, alt float64) float64 {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	v, ok := s.Fields[key]
+	v, ok := s.Fields[strings.ToLower(key)]
 	if !ok || len(v) == 0 {
 		return alt
 	}
@@ -168,8 +173,9 @@ func (s *Section) AddFloat(key string, value float64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if key == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
+	key = strings.ToLower(key)
 	f := Field{}
 	f.SetFloat(value)
 	s.Fields[key] = append(s.Fields[key], &f)
@@ -184,8 +190,9 @@ func (s *Section) SetFloat(key string, value float64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if key == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
+	key = strings.ToLower(key)
 	if len(s.Fields[key]) > 0 {
 		s.Fields[key][0].SetFloat(value)
 		return nil
@@ -201,7 +208,7 @@ func (s *Section) SetFloat(key string, value float64) error {
 func (s *Section) GetString(key, alt string) string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	v, ok := s.Fields[key]
+	v, ok := s.Fields[strings.ToLower(key)]
 	if !ok || len(v) == 0 {
 		return alt
 	}
@@ -213,8 +220,9 @@ func (s *Section) AddString(key string, value string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if key == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
+	key = strings.ToLower(key)
 	f := Field{}
 	f.SetString(value)
 	s.Fields[key] = append(s.Fields[key], &f)
@@ -229,8 +237,9 @@ func (s *Section) SetString(key string, value string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if key == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
+	key = strings.ToLower(key)
 	if len(s.Fields[key]) > 0 {
 		s.Fields[key][0].SetString(value)
 		return nil
@@ -246,7 +255,7 @@ func (s *Section) SetString(key string, value string) error {
 func (s *Section) GetAll(key string) []*Field {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	v, ok := s.Fields[key]
+	v, ok := s.Fields[strings.ToLower(key)]
 	if !ok {
 		return nil
 	}
@@ -255,19 +264,11 @@ func (s *Section) GetAll(key string) []*Field {
 
 // boolValue from common strings.
 func boolValue(s string) bool {
-	switch s {
-	case "yes", "true", "1", "on":
-		return true
-	}
-
-	return false
+	v, ok := str.BoolFromString(s)
+	return ok && v
 }
 
 // BoolFromString returns true for truthy values.
 func BoolFromString(s string) bool {
-	switch s {
-	case "true", "on", "enabled", "yes":
-		return true
-	}
-	return false
+	return boolValue(s)
 }

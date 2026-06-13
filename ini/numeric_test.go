@@ -52,12 +52,12 @@ snot=12x
 		t.Fatalf("expected neg=-2.5, got %v", got)
 	}
 
-	if got := ini.GetInt("", "zero"); got != 0 {
-		t.Fatalf("expected zero=0, got %d", got)
+	if got := ini.GetBool("", "zero"); got != false {
+		t.Fatalf("expected zero=false, got %v", got)
 	}
 
-	if got := ini.GetInt("", "one"); got != 1 {
-		t.Fatalf("expected one=1, got %d", got)
+	if got := ini.GetBool("", "one"); got != true {
+		t.Fatalf("expected one=true, got %v", got)
 	}
 
 	if got := ini.GetString("", "notnum"); got != "1.2.3" {

@@ -130,3 +130,61 @@ func TestChaining(t *testing.T) {
 		t.Fatalf("expected 'a;b', got '%s'", s.String())
 	}
 }
+
+func TestBoolFromString(t *testing.T) {
+	tests := []struct {
+		input string
+		val   bool
+		ok    bool
+	}{
+		{"true", true, true},
+		{"yes", true, true},
+		{"on", true, true},
+		{"1", true, true},
+		{"t", true, true},
+		{"enabled", true, true},
+		{"TRUE", true, true},
+		{"True", true, true},
+		{"false", false, true},
+		{"no", false, true},
+		{"off", false, true},
+		{"0", false, true},
+		{"f", false, true},
+		{"FALSE", false, true},
+		{"maybe", false, false},
+		{"2", false, false},
+		{"", false, false},
+		{"disabled", false, false},
+	}
+	for _, tc := range tests {
+		val, ok := BoolFromString(tc.input)
+		if val != tc.val || ok != tc.ok {
+			t.Errorf("BoolFromString(%q) = (%v, %v), want (%v, %v)", tc.input, val, ok, tc.val, tc.ok)
+		}
+	}
+}
+
+func TestNormaliseNumeric(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"123", "123"},
+		{"1_000", "1000"},
+		{"1_000_000", "1000000"},
+		{"3,14", "3.14"},
+		{"3.14", "3.14"},
+		{"3,14,15", "3.14.15"},
+		{" 42 ", "42"},
+		{"-2.5", "-2.5"},
+		{"0x1a", "0x1a"},
+		{"1,5", "1.5"},
+		{"1,000", "1.000"},
+	}
+	for _, tc := range tests {
+		got := NormaliseNumeric(tc.input)
+		if got != tc.want {
+			t.Errorf("NormaliseNumeric(%q) = %q, want %q", tc.input, got, tc.want)
+		}
+	}
+}

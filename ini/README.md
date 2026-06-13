@@ -9,7 +9,7 @@ and small helpers for numeric parsing (hex, localized decimals, underscores).
 - Typed fields: `Bool`, `Int`, `Float`, `String`
 - Duplicate keys: `Add` appends entries; `Set` replaces the first entry
 - `GetMatch(section, key)` returns all `*Field` entries for a key
-- Deterministic `Marshal()` output (sorted) and `Save(filename, tabbed)`
+- Deterministic `Marshal()` output in insertion order and `Save(filename, tabbed)`
 - Environment overrides with `ForceUpper()` support; enable env-first lookup with `SetEnvFirst(true)` so getters consult the environment before falling back to INI values
 - Schema hints: `DeclareType(section, key, type)` + `Parse(s)` so you can declare expected types before parsing
 - Numeric parsing enhancements: hex integers (`0x...`), localized decimal comma (`"3,14" -> 3.14`), underscores (`"1_000"`)
@@ -165,7 +165,7 @@ for _, f := range fields {
 - Integer literals that start with `0x`/`0X` are parsed as hex.
 - If a numeric token contains a comma but no dot (e.g. `3,14`) the comma is treated as the decimal separator.
 - Use `DeclareType` to force a particular type for a key.
-- `BoolFromString(s)` is a convenience that returns `true` for `"true"`, `"on"`, `"enabled"`, `"yes"` (case-sensitive).
+- `BoolFromString(s)` is a convenience that delegates to `str.BoolFromString` and returns `true` for case-insensitive `"true"`, `"yes"`, `"on"`, `"1"`, `"t"`, `"enabled"`.
 
 ## Environment helpers and interaction
 

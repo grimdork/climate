@@ -157,7 +157,7 @@ func (opt *Options) HelpOrFailArgs(args []string) {
 	err := opt.Parse(args)
 	if err != nil {
 		// -h was supplied somewhere on the command line, so exit cleanly after printing help.
-		if err == ErrNoArgs {
+		if err == ErrNoArgs || err == ErrNonFatal {
 			opt.PrintHelp()
 			os.Exit(0)
 		}

@@ -29,15 +29,20 @@ func (opt *Options) ParseEnvironment(prefix, delimiter string) error {
 
 		switch o.Type {
 		case VarBool:
-			_, t := isTruthy(vs)
-			o.Value = t
+			t, v := isTruthy(vs)
+			if !t {
+				return fmt.Errorf("env %s=%s: %w", s, vs, ErrIllegalValue)
+			}
+			o.Value = v
 
 		case VarInt:
 			i, err := strconv.Atoi(vs)
 			if err != nil {
 				return fmt.Errorf("env %s: %w", s, err)
 			}
-
+			if !hasChoice(i, o.Choices) {
+				return fmt.Errorf("env %s=%d: %w", s, i, ErrIllegalChoice)
+			}
 			o.Value = i
 
 		case VarIntSlice:
@@ -47,7 +52,9 @@ func (opt *Options) ParseEnvironment(prefix, delimiter string) error {
 				if err != nil {
 					return fmt.Errorf("env %s: %w", s, err)
 				}
-
+				if !hasChoice(i, o.Choices) {
+					return fmt.Errorf("env %s=%d: %w", s, i, ErrIllegalChoice)
+				}
 				list = append(list, i)
 			}
 			o.Value = list
@@ -57,7 +64,9 @@ func (opt *Options) ParseEnvironment(prefix, delimiter string) error {
 			if err != nil {
 				return fmt.Errorf("env %s: %w", s, err)
 			}
-
+			if !hasChoice(f, o.Choices) {
+				return fmt.Errorf("env %s=%v: %w", s, f, ErrIllegalChoice)
+			}
 			o.Value = f
 
 		case VarFloatSlice:
@@ -67,16 +76,27 @@ func (opt *Options) ParseEnvironment(prefix, delimiter string) error {
 				if err != nil {
 					return fmt.Errorf("env %s: %w", s, err)
 				}
-
+				if !hasChoice(f, o.Choices) {
+					return fmt.Errorf("env %s=%v: %w", s, f, ErrIllegalChoice)
+				}
 				list = append(list, f)
 			}
 			o.Value = list
 
 		case VarString:
+			if !hasChoice(vs, o.Choices) {
+				return fmt.Errorf("env %s=%s: %w", s, vs, ErrIllegalChoice)
+			}
 			o.Value = vs
 
 		case VarStringSlice:
-			o.Value = strings.Split(vs, delimiter)
+			parts := strings.Split(vs, delimiter)
+			for _, p := range parts {
+				if !hasChoice(p, o.Choices) {
+					return fmt.Errorf("env %s=%s: %w", s, p, ErrIllegalChoice)
+				}
+			}
+			o.Value = parts
 		}
 	}
 

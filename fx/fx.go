@@ -27,10 +27,6 @@ type Options struct {
 // was accepted.
 type TokenFunc func(modifier string) (string, bool)
 
-type stringer interface {
-	String() string
-}
-
 type builderState struct {
 	strings.Builder
 	last byte
@@ -227,6 +223,7 @@ var (
 // Each {} is replaced by the next argument's string representation.
 // If there are more args than placeholders they are appended separated by spaces.
 // If there are fewer args than placeholders the remaining {} are left as-is.
+// Sprint is a shorthand for Render.
 func Sprint(format string, args ...any) string {
 	return Render(format, args...)
 }
@@ -265,7 +262,7 @@ func SprintWithDelims(open, close string, format string, args ...any) string {
 // SprintWithDelimsOptions is like SprintWithDelims but accepts caller-supplied Options.
 func SprintWithDelimsOptions(opts Options, open, close string, format string, args ...any) string {
 	if len(open) != 1 || len(close) != 1 {
-		return Sprint(format, args...)
+		return RenderWithOptions(opts, format, args...)
 	}
 	out := renderWithChars(open[0], close[0], opts, format, args...)
 	if !colourEnabled(opts) {
@@ -463,6 +460,16 @@ func writeToken(b *builderState, tok string, depth int) bool {
 		return true
 	}
 	name, modifier := splitToken(tok)
+	// Try alias lookup on the name part when the full token (including modifier) failed.
+	if exp, ok := getAlias(name); ok {
+		parts := strings.Fields(exp)
+		for _, part := range parts {
+			if writeToken(b, strings.ToLower(part), depth+1) {
+				continue
+			}
+		}
+		return true
+	}
 	if fn, ok := getToken(name); ok {
 		if v, ok := fn(modifier); ok {
 			b.writeString(v)
@@ -492,7 +499,7 @@ func sprintValue(v any, opts Options) string {
 	switch x := v.(type) {
 	case error:
 		return x.Error()
-	case stringer:
+	case fmt.Stringer:
 		return x.String()
 	case encoding.TextMarshaler:
 		if text, err := x.MarshalText(); err == nil {
@@ -528,6 +535,10 @@ func sprintValue(v any, opts Options) string {
 		return strconv.FormatFloat(float64(x), 'g', -1, 32)
 	case float64:
 		return strconv.FormatFloat(x, 'g', -1, 64)
+	case complex64:
+		return strconv.FormatComplex(complex128(x), 'g', -1, 64)
+	case complex128:
+		return strconv.FormatComplex(x, 'g', -1, 64)
 	case []byte:
 		return string(x)
 	case []string:
@@ -675,41 +686,44 @@ func formatIntMap[T any](m map[int]T, opts Options) string {
 // If the token is unknown it returns false.
 func tokenEscape(tok string) (string, bool) {
 	if tok == "@" || tok == "reset" {
-		return "\x1b[0m", true
+		return Reset, true
 	}
 	switch tok {
 	case "bold":
-		return "\x1b[1m", true
+		return Bold, true
 	case "dim":
-		return "\x1b[2m", true
+		return Dim, true
 	case "italic":
-		return "\x1b[3m", true
+		return Italic, true
 	case "underline", "under":
-		return "\x1b[4m", true
+		return Underline, true
 	case "blink":
-		return "\x1b[5m", true
+		return Blink, true
 	case "fast":
-		return "\x1b[6m", true
+		return FastBlink, true
 	case "inverse", "invert":
-		return "\x1b[7m", true
+		return Inverse, true
 	case "hidden", "conceal", "concealed":
-		return "\x1b[8m", true
+		return Hidden, true
 	case "strike", "strikethrough":
-		return "\x1b[9m", true
+		return Strikethrough, true
 	case "grey", "gray":
-		return "\x1b[90m", true
+		return Grey, true
 	}
 
 	if strings.HasPrefix(tok, "bg") {
 		c := strings.TrimSpace(strings.TrimPrefix(tok, "bg"))
 		if c == "grey" || c == "gray" {
-			return "\x1b[100m", true
+			return BGGrey, true
 		}
 
 		isBright := false
 		if strings.HasPrefix(c, "bright") {
 			isBright = true
 			c = strings.TrimPrefix(c, "bright")
+		}
+		if c == "grey" || c == "gray" {
+			return BGGrey, true
 		}
 		if code, ok := colourCodes[c]; ok {
 			if isBright {
@@ -725,6 +739,9 @@ func tokenEscape(tok string) (string, bool) {
 	if strings.HasPrefix(c, "bright") {
 		isBright = true
 		c = strings.TrimPrefix(c, "bright")
+	}
+	if c == "grey" || c == "gray" {
+		return Grey, true
 	}
 	if code, ok := colourCodes[c]; ok {
 		if isBright {
@@ -748,7 +765,7 @@ func colourEnabled(opts Options) bool {
 	if opts.DisableColour {
 		return false
 	}
-	if os.Getenv("NO_COLOR") != "" {
+	if _, ok := os.LookupEnv("NO_COLOR"); ok {
 		return false
 	}
 	return IsTerminal()

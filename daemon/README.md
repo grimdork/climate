@@ -9,7 +9,7 @@ go get github.com/grimdork/climate/daemon
 ```
 
 ## Graceful shutdown with BreakChannel
-Returns a channel that blocks until the program receives SIGINT or SIGTERM. Also cleans up the `^C` output from the terminal.
+Returns a channel that blocks until the program receives SIGINT or SIGTERM.
 
 ```go
 package main

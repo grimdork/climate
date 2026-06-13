@@ -46,6 +46,9 @@ const (
 	String
 )
 
+// ErrEmptyKey is returned when a key is empty.
+var ErrEmptyKey = errors.New("empty key")
+
 // New returns an empty INI structure.
 // Returns (*INI, error) to allow future initialization errors. Currently always succeeds.
 func New() (*INI, error) {
@@ -88,9 +91,10 @@ func (ini *INI) SetEnvFirst(on bool) {
 func (ini *INI) Set(s, k, v string) error {
 	ini.mu.Lock()
 	defer ini.mu.Unlock()
+	s = strings.ToLower(s)
 	k = strings.ToLower(k)
 	if k == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
 	if s == "" {
 		if len(ini.Properties[k]) > 0 {
@@ -106,7 +110,7 @@ func (ini *INI) Set(s, k, v string) error {
 
 	sec, ok := ini.Sections[s]
 	if !ok {
-		sec = ini.AddSection(s)
+		sec = ini.addSection(s)
 	}
 	return sec.SetString(k, v)
 }
@@ -116,9 +120,10 @@ func (ini *INI) Set(s, k, v string) error {
 func (ini *INI) Add(s, k, v string) error {
 	ini.mu.Lock()
 	defer ini.mu.Unlock()
+	s = strings.ToLower(s)
 	k = strings.ToLower(k)
 	if k == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
 	if s == "" {
 		f := Field{}
@@ -132,7 +137,7 @@ func (ini *INI) Add(s, k, v string) error {
 
 	sec, ok := ini.Sections[s]
 	if !ok {
-		sec = ini.AddSection(s)
+		sec = ini.addSection(s)
 	}
 	return sec.AddString(k, v)
 }
@@ -141,9 +146,10 @@ func (ini *INI) Add(s, k, v string) error {
 func (ini *INI) SetBool(s, k string, v bool) error {
 	ini.mu.Lock()
 	defer ini.mu.Unlock()
+	s = strings.ToLower(s)
 	k = strings.ToLower(k)
 	if k == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
 	if s == "" {
 		if len(ini.Properties[k]) > 0 {
@@ -158,7 +164,7 @@ func (ini *INI) SetBool(s, k string, v bool) error {
 	}
 	sec, ok := ini.Sections[s]
 	if !ok {
-		sec = ini.AddSection(s)
+		sec = ini.addSection(s)
 	}
 	return sec.SetBool(k, v)
 }
@@ -167,9 +173,10 @@ func (ini *INI) SetBool(s, k string, v bool) error {
 func (ini *INI) AddBool(s, k string, v bool) error {
 	ini.mu.Lock()
 	defer ini.mu.Unlock()
+	s = strings.ToLower(s)
 	k = strings.ToLower(k)
 	if k == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
 	if s == "" {
 		f := Field{}
@@ -182,7 +189,7 @@ func (ini *INI) AddBool(s, k string, v bool) error {
 	}
 	sec, ok := ini.Sections[s]
 	if !ok {
-		sec = ini.AddSection(s)
+		sec = ini.addSection(s)
 	}
 	return sec.AddBool(k, v)
 }
@@ -191,9 +198,10 @@ func (ini *INI) AddBool(s, k string, v bool) error {
 func (ini *INI) SetInt(s, k string, v int64) error {
 	ini.mu.Lock()
 	defer ini.mu.Unlock()
+	s = strings.ToLower(s)
 	k = strings.ToLower(k)
 	if k == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
 	if s == "" {
 		if len(ini.Properties[k]) > 0 {
@@ -208,7 +216,7 @@ func (ini *INI) SetInt(s, k string, v int64) error {
 	}
 	sec, ok := ini.Sections[s]
 	if !ok {
-		sec = ini.AddSection(s)
+		sec = ini.addSection(s)
 	}
 	return sec.SetInt(k, v)
 }
@@ -217,9 +225,10 @@ func (ini *INI) SetInt(s, k string, v int64) error {
 func (ini *INI) AddInt(s, k string, v int64) error {
 	ini.mu.Lock()
 	defer ini.mu.Unlock()
+	s = strings.ToLower(s)
 	k = strings.ToLower(k)
 	if k == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
 	if s == "" {
 		f := Field{}
@@ -232,7 +241,7 @@ func (ini *INI) AddInt(s, k string, v int64) error {
 	}
 	sec, ok := ini.Sections[s]
 	if !ok {
-		sec = ini.AddSection(s)
+		sec = ini.addSection(s)
 	}
 	return sec.AddInt(k, v)
 }
@@ -241,9 +250,10 @@ func (ini *INI) AddInt(s, k string, v int64) error {
 func (ini *INI) SetFloat(s, k string, v float64) error {
 	ini.mu.Lock()
 	defer ini.mu.Unlock()
+	s = strings.ToLower(s)
 	k = strings.ToLower(k)
 	if k == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
 	if s == "" {
 		if len(ini.Properties[k]) > 0 {
@@ -258,7 +268,7 @@ func (ini *INI) SetFloat(s, k string, v float64) error {
 	}
 	sec, ok := ini.Sections[s]
 	if !ok {
-		sec = ini.AddSection(s)
+		sec = ini.addSection(s)
 	}
 	return sec.SetFloat(k, v)
 }
@@ -267,9 +277,10 @@ func (ini *INI) SetFloat(s, k string, v float64) error {
 func (ini *INI) AddFloat(s, k string, v float64) error {
 	ini.mu.Lock()
 	defer ini.mu.Unlock()
+	s = strings.ToLower(s)
 	k = strings.ToLower(k)
 	if k == "" {
-		return errors.New("empty key")
+		return ErrEmptyKey
 	}
 	if s == "" {
 		f := Field{}
@@ -282,7 +293,7 @@ func (ini *INI) AddFloat(s, k string, v float64) error {
 	}
 	sec, ok := ini.Sections[s]
 	if !ok {
-		sec = ini.AddSection(s)
+		sec = ini.addSection(s)
 	}
 	return sec.AddFloat(k, v)
 }
@@ -294,6 +305,7 @@ func (ini *INI) DeclareType(section, key string, t byte) {
 	if ini.ExpectedTypes == nil {
 		ini.ExpectedTypes = make(map[string]map[string]byte)
 	}
+	section = strings.ToLower(section)
 	m, ok := ini.ExpectedTypes[section]
 	if !ok {
 		m = make(map[string]byte)
@@ -307,27 +319,23 @@ func (ini *INI) DeclareType(section, key string, t byte) {
 // `upper` flag controls whether env keys are upper-cased before lookup.
 func (ini *INI) GetString(s, k string) string {
 	ini.mu.RLock()
+	s = strings.ToLower(s)
+	l := strings.ToLower(k)
 	envFirst := ini.envFirst
 	upper := ini.upper
-	ini.mu.RUnlock()
-
-	l := strings.ToLower(k)
 	var fallback string
 	if s == "" {
-		ini.mu.RLock()
 		p, ok := ini.Properties[l]
-		ini.mu.RUnlock()
 		if ok && len(p) > 0 {
 			fallback = p[0].Value
 		}
 	} else {
-		ini.mu.RLock()
 		sec, ok := ini.Sections[s]
-		ini.mu.RUnlock()
 		if ok {
 			fallback = sec.GetString(l, "")
 		}
 	}
+	ini.mu.RUnlock()
 
 	if envFirst {
 		kk := k
@@ -344,21 +352,23 @@ func (ini *INI) GetString(s, k string) string {
 // If envFirst is enabled, the environment is consulted first.
 func (ini *INI) GetBool(s, k string) bool {
 	ini.mu.RLock()
+	s = strings.ToLower(s)
+	l := strings.ToLower(k)
 	envFirst := ini.envFirst
 	upper := ini.upper
-	ini.mu.RUnlock()
-
 	var fallback bool
 	if s == "" {
-		ini.mu.RLock()
-		p, ok := ini.Properties[k]
-		ini.mu.RUnlock()
+		p, ok := ini.Properties[l]
 		if ok && len(p) > 0 {
 			fallback = p[0].GetBool()
 		}
 	} else {
-		fallback = ini.Sections[s].GetBool(k, false)
+		sec, ok := ini.Sections[s]
+		if ok {
+			fallback = sec.GetBool(l, false)
+		}
 	}
+	ini.mu.RUnlock()
 
 	if envFirst {
 		kk := k
@@ -375,21 +385,23 @@ func (ini *INI) GetBool(s, k string) bool {
 // If envFirst is enabled, the environment is consulted first.
 func (ini *INI) GetInt(s, k string) int64 {
 	ini.mu.RLock()
+	s = strings.ToLower(s)
+	l := strings.ToLower(k)
 	envFirst := ini.envFirst
 	upper := ini.upper
-	ini.mu.RUnlock()
-
 	var fallback int64
 	if s == "" {
-		ini.mu.RLock()
-		p, ok := ini.Properties[k]
-		ini.mu.RUnlock()
+		p, ok := ini.Properties[l]
 		if ok && len(p) > 0 {
 			fallback = p[0].GetInt()
 		}
 	} else {
-		fallback = ini.Sections[s].GetInt(k, 0)
+		sec, ok := ini.Sections[s]
+		if ok {
+			fallback = sec.GetInt(l, 0)
+		}
 	}
+	ini.mu.RUnlock()
 
 	if envFirst {
 		kk := k
@@ -406,21 +418,23 @@ func (ini *INI) GetInt(s, k string) int64 {
 // If envFirst is enabled, the environment is consulted first.
 func (ini *INI) GetFloat(s, k string) float64 {
 	ini.mu.RLock()
+	s = strings.ToLower(s)
+	l := strings.ToLower(k)
 	envFirst := ini.envFirst
 	upper := ini.upper
-	ini.mu.RUnlock()
-
 	var fallback float64
 	if s == "" {
-		ini.mu.RLock()
-		p, ok := ini.Properties[k]
-		ini.mu.RUnlock()
+		p, ok := ini.Properties[l]
 		if ok && len(p) > 0 {
 			fallback = p[0].GetFloat()
 		}
 	} else {
-		fallback = ini.Sections[s].GetFloat(k, 0.0)
+		sec, ok := ini.Sections[s]
+		if ok {
+			fallback = sec.GetFloat(l, 0.0)
+		}
 	}
+	ini.mu.RUnlock()
 
 	if envFirst {
 		kk := k
@@ -438,6 +452,7 @@ func (ini *INI) GetFloat(s, k string) float64 {
 func (ini *INI) GetMatch(s, k string) []*Field {
 	ini.mu.RLock()
 	defer ini.mu.RUnlock()
+	s = strings.ToLower(s)
 	k = strings.ToLower(k)
 	if s == "" {
 		v, ok := ini.Properties[k]
@@ -478,16 +493,15 @@ func Load(filename string) (*INI, error) {
 			if err == io.EOF {
 				break
 			}
-			// continue reading
-			if err != nil {
-				// non-EOF error but we have content handled above
-				return ini, err
-			}
+			continue
+		}
+
+		if strings.HasPrefix(l, ";") || strings.HasPrefix(l, "#") {
 			continue
 		}
 
 		if strings.HasPrefix(l, "[") && strings.HasSuffix(l, "]") {
-			name := l[1 : len(l)-1]
+			name := strings.ToLower(l[1 : len(l)-1])
 			s := ini.AddSection(name)
 			s.parse(r)
 			continue
@@ -529,6 +543,9 @@ func (ini *INI) Save(filename string, tabbed bool) error {
 	first := true
 	for _, secname := range ini.Order {
 		sec := ini.Sections[secname]
+		if sec == nil {
+			continue
+		}
 		sec.mu.RLock()
 		if len(sec.Order) == 0 {
 			sec.mu.RUnlock()
@@ -553,8 +570,15 @@ func (ini *INI) Save(filename string, tabbed bool) error {
 }
 
 // AddSection adds a named section to the INI or returns an existing one.
-// It is NOT safe for concurrent use unless the caller holds ini.mu.
 func (ini *INI) AddSection(name string) *Section {
+	ini.mu.Lock()
+	defer ini.mu.Unlock()
+	return ini.addSection(name)
+}
+
+// addSection is the internal version that does not lock. Caller must hold ini.mu.
+func (ini *INI) addSection(name string) *Section {
+	name = strings.ToLower(name)
 	if sec := ini.Sections[name]; sec != nil {
 		return sec
 	}

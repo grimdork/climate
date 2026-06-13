@@ -196,7 +196,7 @@ port := cfg.GetInt("", "port")
 
 Notes:
 - The ini parser preserves integer-vs-float typing by trying integer parsing first, then float.
-- Marshal produces a stable, sorted representation (properties then sections).
+- Marshal produces output in insertion order (global properties first, then sections in the order they appeared).
 - For TinyGo/embedded use, consider supplying an EnvLookup or build-tagbed stubs for env and filesystem operations so the parsing/formatting code remains usable without an OS.
 
 

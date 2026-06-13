@@ -41,12 +41,13 @@ fmt.Println(human.UInt(size, true)) // Output: 1.5 MB
 ### Floating-point formatting
 The Float function formats floating-point values using either SI (1000) or IEC/binary (1024) prefixes. Note the subtle differences between `Float` and `UInt`:
 
-- Float(si=false) uses IEC-style prefixes like `Ki`, `Mi`, `Gi` (capital `K`) and returns the value followed by the prefix (no trailing `B` by default): e.g. `"1.5 Ki"`.
-- UInt preserves legacy unit casing for kilo (returns `kiB`) and appends a `B`/`iB` suffix.
+- Both Float and UInt use lowercase `k` for kilo and append `B` (SI) or `iB` (binary/IEC) suffix.
+- Float(si=false) uses 1024-based IEC prefixes with `"iB"` suffix: e.g. `"1.5 kiB"`.
+- Float(si=true) uses 1000-based SI prefixes with `"B"` suffix: e.g. `"1.5 kB"`.
 
 ```go
-fmt.Println(human.Float(1536, 1, false)) // -> "1.5 Ki"
-fmt.Println(human.Float(1500, 1, true))  // -> "1.5 k"
+fmt.Println(human.Float(1536, 1, false)) // -> "1.5 kiB"
+fmt.Println(human.Float(1500, 1, true))  // -> "1.5 kB"
 ```
 
 ## Features

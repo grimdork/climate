@@ -8,7 +8,7 @@ import (
 
 // Stringer extends strings.Builder with varargs-based write methods.
 type Stringer struct {
-	mu sync.Mutex
+	mu sync.RWMutex
 	strings.Builder
 	sliceComma bool
 	mapComma   bool
@@ -27,27 +27,42 @@ func NewStringer() *Stringer {
 	return &s
 }
 
+// String returns the accumulated string. Thread-safe.
+func (s *Stringer) String() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.Builder.String()
+}
+
 // SetSliceComma enables adding a comma between elements in supplied slices.
 func (s *Stringer) SetSliceComma(b bool) *Stringer {
+	s.mu.Lock()
 	s.sliceComma = b
+	s.mu.Unlock()
 	return s
 }
 
 // SetMapComma enables adding a comma between elements in supplied maps.
 func (s *Stringer) SetMapComma(b bool) *Stringer {
+	s.mu.Lock()
 	s.mapComma = b
+	s.mu.Unlock()
 	return s
 }
 
 // SetComma sets the symbol to use for joining slices and map k-v pairs.
 func (s *Stringer) SetComma(c byte) *Stringer {
+	s.mu.Lock()
 	s.comma = c
+	s.mu.Unlock()
 	return s
 }
 
 // SetEquals sets the symbol to join keys and values in maps.
 func (s *Stringer) SetEquals(e byte) *Stringer {
+	s.mu.Lock()
 	s.equals = e
+	s.mu.Unlock()
 	return s
 }
 
@@ -244,4 +259,28 @@ func (s *Stringer) writeMap(length int, entries []mapEntry) (int, error) {
 		}
 	}
 	return size, nil
+}
+
+// BoolFromString parses a common boolean string and returns the value and
+// whether the string was recognised. Truthy: true, yes, on, 1, t, enabled.
+// Falsy: false, no, off, 0, f.
+func BoolFromString(s string) (bool, bool) {
+	switch strings.ToLower(s) {
+	case "true", "yes", "on", "1", "t", "enabled":
+		return true, true
+	case "false", "no", "off", "0", "f":
+		return false, true
+	}
+	return false, false
+}
+
+// NormaliseNumeric prepares a number string for parsing by removing underscores
+// and converting a single comma to a decimal dot when no dot is present.
+func NormaliseNumeric(raw string) string {
+	r := strings.TrimSpace(raw)
+	r = strings.ReplaceAll(r, "_", "")
+	if strings.Contains(r, ",") && !strings.Contains(r, ".") {
+		r = strings.ReplaceAll(r, ",", ".")
+	}
+	return r
 }
