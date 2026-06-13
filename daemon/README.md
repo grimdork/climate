@@ -37,9 +37,9 @@ Drop from root to a specified user. Useful for services that bind to privileged 
 ```go
 err := daemon.DegradeToUser("www-data")
 if err != nil {
-	// Either not running as root (daemon.ErrorNotRoot) or user lookup failed
+	// Either not running as root (daemon.ErrNotRoot) or user lookup failed
 	log.Fatal(err)
 }
 ```
 
-Sets the effective UID and primary GID of the specified user. Returns `daemon.ErrorNotRoot` if the process is not running as root.
+Sets the effective UID and primary GID of the specified user. Returns `daemon.ErrNotRoot` if the process is not running as root.

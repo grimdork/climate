@@ -35,7 +35,7 @@ func DegradeToUser(uname string) error {
 			return err
 		}
 	} else {
-		return ErrorNotRoot
+		return ErrNotRoot
 	}
 
 	return nil

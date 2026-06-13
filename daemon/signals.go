@@ -1,7 +1,6 @@
 package daemon
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,12 +11,11 @@ import (
 //
 //	<-daemon.BreakChannel()
 func BreakChannel() chan bool {
-	quit := make(chan bool)
+	quit := make(chan bool, 1)
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	go func() {
 		<-ch
-		fmt.Print("\b\b") // Remove the CTRL-C symbol from stdout.
 		quit <- true
 	}()
 
