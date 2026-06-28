@@ -12,6 +12,8 @@ type Options struct {
 	order []string
 	// Args contains args not parsed as options, commands or positional args.
 	Args []string
+	// CommandRun is set to the command name when a subcommand is dispatched by Parse.
+	CommandRun string
 
 	appname string
 	// appdesc is a short one-line description shown in help output.

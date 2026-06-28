@@ -24,12 +24,12 @@ func main() {
 	}
 
 	err = opt.Parse(os.Args[1:])
-	if err != nil && err != arg.ErrNoArgs {
-		if err == arg.ErrRunCommand {
-			return
-		}
-
+	if err != nil {
 		panic(err)
+	}
+
+	if opt.CommandRun != "" {
+		return
 	}
 
 	fmt.Printf("%s\n", comp)

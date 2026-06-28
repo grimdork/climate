@@ -235,7 +235,7 @@ func TestCommand(t *testing.T) {
 
 	args := []string{"moo", "--help"}
 	err := opt.Parse(args)
-	if err != nil && err != arg.ErrRunCommand {
+	if err != nil {
 		t.Fatalf("Expected no error, but got %s", err.Error())
 		t.FailNow()
 	}

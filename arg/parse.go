@@ -21,18 +21,19 @@ func (opt *Options) ShowOptions() {
 }
 
 // Parse command line arguments from a string slice.
-// - If default help is defined, it will print the help message after parsing when "-h" or "--help" is supplied,
-// then os.Exit(0). Returns ErrNonFatal if no arguments are supplied.
 //
 // Tool commands, short options (single dash and one letter), long options (double dash and one or more
-// letters), and positional arguments are each paarsed in the order they are supplied. If a positional
+// letters), and positional arguments are each parsed in the order they are supplied. If a positional
 // argument is of a slice type, it will swallow all remaining arguments, including long and short options.
 //
 // Single- and double-dash options found before any tool commands are parsed for the Options structure.
 //
-// Tool commands break the parsing off, and calls the command with the remaining arguments after running
+// Tool commands break parsing off, and call the command with the remaining arguments after running
 //
 //	any handlers for the pre-command options.
+//
+// When a subcommand is dispatched, CommandRun is set to the command name and Parse returns whatever
+// the command function returned (nil on success).
 //
 // Options criteria:
 // - Short options start with a single dash ("-").
@@ -47,45 +48,17 @@ func (opt *Options) ShowOptions() {
 // - Long options are followed by either whitespace or an equal sign ("--foo bar" or "--foo=bar").
 func (opt *Options) Parse(args []string) error {
 	if len(args) == 0 {
-		// When no args are supplied, don't print help automatically. Let the caller decide how
-		// to handle empty args. Return ErrNonFatal so callers can treat this as a non-fatal
-		// signal (i.e. nothing to do) instead of an error that forces printing help or exiting.
-		return ErrNonFatal
+		return nil
 	}
 
-	err := opt.parseArgs(args)
-	if err != nil {
-		return err
-	}
-
-	if opt.hashelp && (opt.GetBool("h") || opt.GetBool("help")) {
-		opt.PrintHelp()
-		os.Exit(0)
-	}
-
-	return nil
+	return opt.parseArgs(args)
 }
 
-// ParseAndRun is a helper method that calls Parse, runs any commands and exits the program on error.
-// It does not return any error, but is instead intended as the error handler.
+// ParseAndRun is a helper method that calls Parse and exits the program on error.
+// It does not return any error, but is instead intended as the final error handler in main().
 func (opt *Options) ParseAndRun(args []string) {
 	err := opt.Parse(args)
 	if err != nil {
-		// If a command handled the error (printed its own help), respect that and exit non-zero
-		if err == ErrHandled {
-			os.Exit(1)
-		}
-
-		// If a command ran successfully and signalled it handled the run, exit zero
-		if err == ErrRunCommand {
-			os.Exit(0)
-		}
-
-		// ErrNonFatal indicates nothing to do; exit successfully without printing help.
-		if err == ErrNonFatal {
-			os.Exit(0)
-		}
-
 		if err == ErrNoArgs || len(opt.Args) == 0 {
 			if opt.hashelp {
 				opt.PrintHelp()
@@ -93,8 +66,17 @@ func (opt *Options) ParseAndRun(args []string) {
 			os.Exit(1)
 		}
 
-		fmt.Fprintf(os.Stderr, "Error parsing arguments: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
 		os.Exit(1)
+	}
+
+	if opt.CommandRun != "" {
+		os.Exit(0)
+	}
+
+	if len(args) == 0 && opt.hashelp {
+		opt.PrintHelp()
+		os.Exit(0)
 	}
 }
 
@@ -114,24 +96,8 @@ func (opt *Options) parseArgs(args []string) error {
 			}
 
 			cmd.Options.Args = args[i+1:]
-			// Call the command and handle the case where the subcommand Parse reports ErrNoArgs.
-			if err := fn(cmd.Options); err != nil {
-				if err == ErrNoArgs {
-					// If the subcommand has default help, print it and signal we've handled the run.
-					if cmd.Options.hashelp {
-						cmd.Options.PrintHelp()
-						return ErrRunCommand
-					}
-					return ErrNoArgs
-				}
-				// For any other error, print subcommand help (if available) and signal handled error
-				if cmd.Options.hashelp {
-					cmd.Options.PrintHelp()
-				}
-				return ErrHandled
-			}
-			// Command executed successfully: signal that a command was run
-			return ErrRunCommand
+			opt.CommandRun = cmd.Name
+			return fn(cmd.Options)
 		}
 
 		if len(arg) < 2 && len(pos) == 0 {

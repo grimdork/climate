@@ -156,15 +156,21 @@ func (opt *Options) HelpOrFail() {
 func (opt *Options) HelpOrFailArgs(args []string) {
 	err := opt.Parse(args)
 	if err != nil {
-		// -h was supplied somewhere on the command line, so exit cleanly after printing help.
-		if err == ErrNoArgs || err == ErrNonFatal {
+		if err == ErrNoArgs {
 			opt.PrintHelp()
 			os.Exit(0)
 		}
 
-		// Some other error occurred, probably not an issue with input arguments, so just print the error and exit.
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
 		os.Exit(2)
 	}
-	// If we got this far, everything is fine and the program can proceed.
+
+	if opt.CommandRun != "" {
+		return
+	}
+
+	if len(args) == 0 && opt.hashelp {
+		opt.PrintHelp()
+		os.Exit(0)
+	}
 }
